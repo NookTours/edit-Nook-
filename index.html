@@ -122,11 +122,12 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     <div><label>📌 السلوجان (الشريط السفلي)</label><input type="text" class="ltr" id="gSlogan" value="DISCOVER MORE, CREATE MEMORIES"></div>
 
     <div class="sec">5 · التصميم</div>
-    <div class="grid" id="posG">
-      <button class="tb" type="button" data-p="tc" style="grid-column:1/-1">⬆️ أعلى المنتصف</button>
-      <button class="tb" type="button" data-p="tl">↖ يسار أعلى</button>
-      <button class="tb on" type="button" data-p="tr">↗ يمين أعلى</button>
+    <div class="grid" id="posG" style="grid-template-columns:1fr 1fr 1fr">
+      <button class="tb" type="button" data-p="tl">↖ يسار</button>
+      <button class="tb on" type="button" data-p="tc">↑ منتصف</button>
+      <button class="tb" type="button" data-p="tr">↗ يمين</button>
       <button class="tb" type="button" data-p="bl">↙ يسار أسفل</button>
+      <button class="tb" type="button" data-p="bc">↓ منتصف أسفل</button>
       <button class="tb" type="button" data-p="br">↘ يمين أسفل</button>
     </div>
     <div><label>حجم اللوجو <span id="lv">56</span></label><input type="range" id="lsz" min="40" max="90" value="56"></div>
@@ -182,7 +183,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const isMobile=()=>/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&innerWidth<1000);
 const AR="'Cairo',sans-serif",EN="'Montserrat',sans-serif",G='#c9a84c',G2='#e8c56a',NV='#0a1628';
 const FMT={post:{w:1080,h:1350,n:'4:5 بوست'},reel:{w:1080,h:1920,n:'9:16 ريل/ستوري'},sq:{w:1080,h:1080,n:'1:1 مربع'},land:{w:1920,h:1080,n:'16:9 لاندسكيب'}};
-const S={tpl:'trip',fmt:'post',media:'photo',pos:'tr',fx:.5,fy:.5,z:1,sound:false,store:{},ts:1};
+const S={tpl:'trip',fmt:'post',media:'photo',pos:'tc',fx:.5,fy:.5,z:1,sound:false,store:{},ts:1};
 const M={img:null,vurl:null};
 let LOGO_URL='',LOGO_DATA='';
 
@@ -203,8 +204,11 @@ const fade=(P,a,b)=>P.land
 /* ================= عناصر التصميم المشتركة ================= */
 const badgeCSS=`display:inline-block;background:linear-gradient(135deg,${G2},${G});color:${NV};font:800 27px ${AR};padding:10px 32px;border-radius:40px;white-space:nowrap;box-shadow:0 6px 22px rgba(201,168,76,.45)`;
 const badge=(d,s)=>d.badge?`<div style="${badgeCSS};${s||''}">${esc(d.badge)}</div>`:'';
-const tcOff=()=>($('tLogo')&&$('tLogo').checked&&S.pos==='tc')?Math.round($('lsz').value*2.1)+32:0;
-const topBadge=(d,P)=>badge(d,`position:absolute;top:${P.top+tcOff()}px;left:50%;transform:translateX(-50%)`);
+const topBadge=(d,P)=>{
+  let extra=0;
+  try{if(S.pos==='tc'&&$('tLogo')&&$('tLogo').checked) extra=Math.round((+$('lsz').value||56)*2.1)+36}catch(e){}
+  return badge(d,`position:absolute;top:${P.top+extra}px;left:50%;transform:translateX(-50%)`);
+};
 const ttl=(d,P,c,x)=>`<div style="color:${c||'#fff'};font:900 ${ts(P)+(x||0)}px/1.25 ${AR};${c?'':'text-shadow:0 4px 22px rgba(0,0,0,.5)'}">${ml(d.title)}</div>`;
 const subT=(d,c,s)=>d.sub?`<div style="color:${c||'#c8e6f5'};font:500 30px/1.6 ${AR};margin:12px 0 20px;${s||''}">${ml(d.sub)}</div>`:'';
 const chip=t=>`<span style="display:inline-block;padding:10px 24px;border-radius:40px;border:2px solid rgba(201,168,76,.7);background:rgba(10,22,40,.6);color:#fff;font:700 26px ${AR};white-space:nowrap">${esc(t)}</span>`;
@@ -274,7 +278,7 @@ cinema:{n:'سينمائي',i:'🎬',f:['badge','title','sub','pfrom','price','cu
 reels:{n:'جريء / ريلز',i:'⚡',f:['badge','title','sub','pfrom','price','cur','cta'],
   d:{badge:'⚡ مغامرة الويك إند',title:'جاهز تغيّر مودك؟',sub:'رحلة يوم واحد بدون تعب — ارجع بنفس اليوم',pfrom:'من بس',price:'999',cur:'ج.م',cta:'احجز دلوقتي'},
   r:(d,P)=>({ov:`radial-gradient(ellipse at center,rgba(6,12,22,.35) 20%,rgba(6,12,22,.9) 100%)`,
-    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+Math.max(80,tcOff()+20)}px;bottom:${P.bot}px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">${badge(d,'margin-bottom:26px')}
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+80}px;bottom:${P.bot}px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">${badge(d,'margin-bottom:26px')}
     <div style="color:#fff;font:900 ${ts(P)+26}px/1.18 ${AR};text-shadow:0 6px 34px rgba(0,0,0,.7)">${ml(d.title)}</div>${subT(d,'rgba(220,240,255,.92)','margin:16px 0 26px')}
     ${pricePill(d,P.sq||P.land?72:90)}<div style="margin:26px 0 20px">${cta(d.cta,'font-size:40px;padding:22px 60px')}</div>${contactRow(d)}</div>`})},
 
@@ -282,13 +286,48 @@ review:{n:'رأي عميل',i:'⭐',f:['badge','stars','sub','who','c1','cta'],
   L:{sub:'💬 نص الرأي',c1:'✈️ الرحلة اللي سافرها'},
   d:{badge:'⭐ رأي عميل',stars:'⭐⭐⭐⭐⭐',sub:'"التنظيم كان ممتاز والبرنامج مظبوط — رجعت مبسوط ومش هسافر غير مع Nook Tours 🙏"',who:'أحمد محمد',c1:'رحلة شرم الشيخ',cta:'احجز رحلتك دلوقتي',reviewMode:'text',reviewImage:''},
   r:(d,P)=>({ov:`linear-gradient(rgba(6,12,22,.74),rgba(6,12,22,.84))`,
-    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+Math.max(60,tcOff()+20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center">
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+60}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center">
     <div style="width:100%;max-width:${P.land?1200:960}px;${glass};border-radius:48px;padding:46px 54px;text-align:center">${badge(d,'margin-bottom:6px')}
     <div style="font-size:50px;margin-bottom:12px">${esc(d.stars)}</div>
     ${d.reviewMode==='image'&&d.reviewImage?`<div style="width:100%;height:${P.land?250:300}px;max-width:820px;margin:8px auto 18px;border:2px solid rgba(201,168,76,.55);border-radius:20px;background:rgba(4,12,24,.35);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:8px"><img src="${d.reviewImage}" alt="صورة رأي العميل" style="display:block;width:100%;height:100%;object-fit:contain;border-radius:12px"></div>`:d.reviewMode==='image'?`<div style="width:100%;height:${P.land?250:300}px;max-width:820px;margin:8px auto 18px;border:2px dashed rgba(201,168,76,.65);border-radius:20px;background:rgba(4,12,24,.25);display:flex;align-items:center;justify-content:center;color:${G2};font:700 26px ${AR}">ارفع صورة رأي العميل من لوحة التعديل</div>`:`<div style="color:${G};font:900 140px/1 Georgia,serif;margin-bottom:-24px;height:90px">“</div><div style="color:#fff;font:700 ${P.land?40:44}px/1.65 ${AR}">${ml(d.sub)}</div>`}
     <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin:26px 0"><span style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,${G2},${G});color:${NV};font:900 40px/76px ${AR};text-align:center;display:inline-block">${esc([...String(d.who||'ع')][0])}</span>
     <div style="text-align:right"><div style="color:#fff;font:800 34px ${AR}">${esc(d.who)}</div>${d.c1?`<div style="color:${G2};font:600 24px ${AR}">✓ ${esc(d.c1)}</div>`:''}</div></div>
-    ${cta(d.cta,'font-size:32px;padding:16px 44px')}<div style="margin-top:18px">${contactRow(d)}</div></div></div>`})}
+    ${cta(d.cta,'font-size:32px;padding:16px 44px')}<div style="margin-top:18px">${contactRow(d)}</div></div></div>`})},
+
+brand:{n:'براندنج / كفر',i:'✨',f:['badge','title','sub','cta'],
+  L:{title:'📝 العنوان الرئيسي',sub:'💬 جملة تحت العنوان',cta:'🔵 نص الزر (اختياري)'},
+  d:{badge:'NOOK TOURS',title:'اكتشف أكتر\nاصنع ذكريات',sub:'رحلات منظمة · جروبات مظبوطة · تجربة تستاهل',cta:'اعرف أكتر'},
+  r:(d,P)=>{
+    const big=P.tall?110:P.land?88:P.sq?96:100;
+    return{ov:`linear-gradient(to bottom,rgba(6,12,22,.55) 0%,rgba(6,12,22,.25) 40%,rgba(6,12,22,.82) 100%)`,
+    body:`<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:${P.pad}px">
+      <div style="width:80px;height:3px;background:linear-gradient(90deg,transparent,${G},${G2},transparent);margin-bottom:28px;border-radius:2px"></div>
+      ${d.badge?`<div style="color:${G};font:800 28px ${EN};letter-spacing:6px;text-transform:uppercase;margin-bottom:22px">${esc(d.badge)}</div>`:''}
+      <div style="color:#fff;font:900 ${big}px/1.2 ${AR};text-shadow:0 8px 40px rgba(0,0,0,.55);max-width:92%">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:rgba(200,230,245,.92);font:500 ${P.land?32:36}px/1.55 ${AR};margin:22px 0 0;max-width:85%">${ml(d.sub)}</div>`:''}
+      <div style="width:80px;height:3px;background:linear-gradient(90deg,transparent,${G},${G2},transparent);margin:32px 0 28px;border-radius:2px"></div>
+      ${d.cta?cta(d.cta,'font-size:34px;padding:18px 48px'):''}
+      <div style="margin-top:28px">${contactRow(d)}</div>
+    </div>`}}},
+
+after:{n:'صور بعد الرحلة',i:'📸',f:['badge','title','sub','who','c1','cta'],
+  L:{title:'📝 العنوان',sub:'💬 جملة تحت',who:'👤 اسم / الجروب',c1:'✈️ اسم الرحلة'},
+  d:{badge:'📸 من الذكريات',title:'لحظات من الرحلة',sub:'ذكريات حلوة مع Nook Tours',who:'جروب شرم — ديسمبر',c1:'رحلة شرم الشيخ',cta:'احجز رحلتك الجاية'},
+  r:(d,P)=>({ov:`linear-gradient(to top,rgba(6,12,22,.92) 0%,rgba(6,12,22,.35) 45%,rgba(6,12,22,.2) 100%)`,
+    body:`<div style="position:absolute;left:0;right:0;bottom:${P.strip?72:0}px;padding:${P.sq?36:48}px ${P.pad}px ${P.tall?220:40}px;text-align:center">
+      ${badge(d,'margin-bottom:16px')}
+      <div style="color:#fff;font:900 ${ts(P)+8}px/1.25 ${AR};text-shadow:0 4px 24px rgba(0,0,0,.5)">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:#c8e6f5;font:500 30px/1.5 ${AR};margin:12px 0 18px">${ml(d.sub)}</div>`:''}
+      ${(d.who||d.c1)?`<div style="display:inline-flex;align-items:center;gap:14px;background:rgba(201,168,76,.14);border:1.5px solid rgba(201,168,76,.45);border-radius:40px;padding:10px 26px;margin-bottom:20px">
+        ${d.who?`<span style="color:#fff;font:700 26px ${AR}">${esc(d.who)}</span>`:''}
+        ${d.who&&d.c1?`<span style="color:${G};opacity:.7">·</span>`:''}
+        ${d.c1?`<span style="color:${G2};font:600 24px ${AR}">${esc(d.c1)}</span>`:''}
+      </div>`:''}
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:8px">
+        ${d.cta?cta(d.cta,'font-size:30px;padding:14px 36px'):''}
+      </div>
+      <div style="margin-top:16px">${contactRow(d)}</div>
+    </div>`})}
 };
 const FL={badge:['🏷️ الشارة','t'],title:['📝 العنوان','a'],sub:['💬 التفاصيل','a'],c1:['📌 سطر مميز 1','t'],c2:['📌 سطر مميز 2','t'],c3:['📌 سطر مميز 3','t'],inc:['✅ المميزات (سطر لكل ميزة)','a'],rows:['📋 الأسعار','a'],pfrom:['نص قبل السعر','t'],price:['💰 السعر','t'],cur:['العملة / الوحدة','t'],old:['السعر القديم (اختياري)','t'],disc:['نسبة الخصم (اختياري)','t'],who:['👤 اسم العميل','t'],stars:['⭐ التقييم','s'],cta:['🔵 نص الزر','t']};
 const HALF=['pfrom','price','cur','old','disc','stars'];
@@ -298,8 +337,13 @@ const GD=()=>({phone:$('gPhone').value,web:$('gWeb').value,slogan:$('gSlogan').v
 const curData=()=>Object.assign({},GD(),S.store[S.tpl]);
 
 function logoHTML(P){const sz=Math.round($('lsz').value*2.1);
-  const v=S.pos[0]==='t'?`top:${P.top}px`:`bottom:${P.bot}px`,h=S.pos[1]==='c'?'left:50%;transform:translateX(-50%)':S.pos[1]==='r'?`right:${P.pad-12}px`:`left:${P.pad-12}px`;
-  return `<div style="position:absolute;${v};${h};z-index:10;background:rgba(255,255,255,.96);border-radius:24px;padding:8px;box-shadow:0 6px 24px rgba(0,0,0,.35)"><img src="${LOGO_URL||LOGO_DATA}" style="display:block;width:${sz}px;height:${sz}px" alt=""></div>`}
+  const top=S.pos[0]==='t';
+  const v=top?`top:${P.top}px`:`bottom:${P.bot}px`;
+  let h;
+  if(S.pos[1]==='c') h=`left:50%;transform:translateX(-50%)`;
+  else if(S.pos[1]==='r') h=`right:${P.pad-12}px`;
+  else h=`left:${P.pad-12}px`;
+  return `<div style="position:absolute;${v};${h};z-index:5;background:rgba(255,255,255,.96);border-radius:24px;padding:8px;box-shadow:0 6px 24px rgba(0,0,0,.35)"><img src="${LOGO_URL}" style="display:block;width:${sz}px;height:${sz}px" alt=""></div>`}
 function stripHTML(d){const s=d.slogan||'',ls=/[\u0600-\u06FF]/.test(s)?0:5;
   return `<div style="position:absolute;left:0;right:0;bottom:0;height:72px;background:rgba(5,10,20,.93);border-top:2px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;gap:16px"><span style="width:8px;height:8px;border-radius:50%;background:${G};display:inline-block"></span><span style="color:${G};font:700 19px ${EN};letter-spacing:${ls}px;text-transform:uppercase">${esc(s)}</span><span style="width:8px;height:8px;border-radius:50%;background:${G};display:inline-block"></span></div>`}
 function buildUIRaw(d,P){const t=TPL[S.tpl].r(d,P),v=+$('dark').value,op=Math.min(1,v/66),ex=Math.max(0,(v-66)/100*.6);
@@ -311,8 +355,8 @@ function render(){$('ui').innerHTML=buildUI(curData(),geo())}
 /* ================= المعاينة ================= */
 function fit(){const P=geo(),a=$('pv'),vb=$('vbar').style.display==='flex'?62:0,m=innerWidth<=900?20:56;
   const s=Math.max(.05,Math.min((a.clientWidth-m)/P.W,(a.clientHeight-m-vb)/P.H));
-  $('stage').style.cssText=`width:${P.W}px;height:${P.H}px;transform:scale(${s})`;
-  $('wrap').style.cssText=`width:${P.W*s}px;height:${P.H*s}px;margin-bottom:${vb}px`;
+  $('stage').style.cssText+=`;width:${P.W}px;height:${P.H}px;transform:scale(${s})`;
+  $('wrap').style.cssText+=`;width:${P.W*s}px;height:${P.H*s}px;margin-bottom:${vb}px`;
   $('ptag').textContent='PREVIEW · '+FMT[S.fmt].n+' · '+P.W+'×'+P.H}
 function applyFocus(){const p=`${S.fx*100}% ${S.fy*100}%`;['pImg','pVid'].forEach(i=>{const e=$(i);e.style.objectPosition=p;e.style.transformOrigin=p;e.style.transform=`scale(${S.z})`})}
 function hint(){$('hint').textContent=TPL[S.tpl].n+' · '+FMT[S.fmt].n+(S.media==='video'?' · فيديو':'')}
@@ -333,7 +377,7 @@ function setTpl(t){S.tpl=t;if(!S.store[t])S.store[t]=Object.assign({},TPL[t].d);
 function setFmt(k){S.fmt=k;mark('[data-f]','f',k);hint();fit();render()}
 
 /* ================= الميديا: صورة / فيديو (ركنين منفصلين) ================= */
-function setImg(url,isDef){const im=new Image();im.onload=()=>{M.img=im;$('pImg').src=url;if(!isDef){const t=$('thumb');t.src=url;t.style.display='block'}setMedia('photo');render()};im.onerror=()=>toast('الصورة دي مش مدعومة — جرب JPG أو PNG');im.src=url}
+function setImg(url){const im=new Image();im.onload=()=>{M.img=im;$('pImg').src=url;const t=$('thumb');t.src=url;t.style.display='block';setMedia('photo')};im.onerror=()=>toast('الصورة دي مش مدعومة — جرب JPG أو PNG');im.src=url}
 function setVid(f){if(M.vurl)URL.revokeObjectURL(M.vurl);M.vurl=URL.createObjectURL(f);const v=$('pVid');v.src=M.vurl;v.loop=true;v.muted=!S.sound;
   v.onloadedmetadata=()=>{$('vinfo').textContent=`✅ ${Math.round(v.duration)} ثانية · ${v.videoWidth}×${v.videoHeight} — الصوت من زر 🔊 تحت المعاينة`;fit()};
   v.onerror=()=>toast('الفيديو ده مش مدعوم — جرب MP4 (H.264)');setMedia('video');v.play().catch(()=>{})}
@@ -437,7 +481,7 @@ async function exportVideo(){
 async function prepLogo(){const im=new Image();await new Promise(r=>{im.onload=im.onerror=r;im.src=LOGO_SRC});
   const k=Math.min(1,360/Math.max(im.naturalWidth||360,im.naturalHeight||360)),c=document.createElement('canvas');
   c.width=Math.round((im.naturalWidth||360)*k);c.height=Math.round((im.naturalHeight||360)*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
-  LOGO_DATA=c.toDataURL('image/jpeg',.92);LOGO_URL=LOGO_DATA}
+  LOGO_DATA=c.toDataURL('image/jpeg',.92);LOGO_URL=URL.createObjectURL(dataBlob(LOGO_DATA))}
 
 function bind(){
   $('tplG').innerHTML=Object.keys(TPL).map(k=>`<button class="tb" type="button" data-t="${k}">${TPL[k].i} ${TPL[k].n}</button>`).join('');
@@ -463,24 +507,14 @@ function bind(){
   $('vsnd').onclick=async()=>{S.sound=!S.sound;v.muted=!S.sound;v.volume=1;if(S.sound){if(AC&&AC.state==='suspended')try{await AC.resume()}catch(_){}v.play().catch(()=>{})}sndLbl()};
   new ResizeObserver(fit).observe($('pv'));
 }
-function makeDefaultBG(){
-  const c=document.createElement('canvas');c.width=1080;c.height=1350;
-  const x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,1350);
-  g.addColorStop(0,'#102542');g.addColorStop(.5,'#1d3c63');g.addColorStop(1,'#0a1628');
-  x.fillStyle=g;x.fillRect(0,0,1080,1350);
-  const r=x.createRadialGradient(540,420,40,540,420,520);
-  r.addColorStop(0,'rgba(232,197,106,0.38)');r.addColorStop(1,'rgba(232,197,106,0)');
-  x.fillStyle=r;x.fillRect(0,0,1080,1350);
-  return c.toDataURL('image/jpeg',.9);
-}
 (async function init(){
-  bind();
+  bind();await prepLogo();
+  if(typeof BG_SRC==='string' && BG_SRC.startsWith('data:')){
+    try{setImg(URL.createObjectURL(dataBlob(BG_SRC)))}catch(e){}
+  }
   setTpl('trip');setFmt('post');applyFocus();sndLbl();
-  await prepLogo();
-  const bg=(typeof BG_SRC==='string'&&BG_SRC.startsWith('data:'))?URL.createObjectURL(dataBlob(BG_SRC)):makeDefaultBG();
-  setImg(bg,true);
-  render();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(render);
+  else render();
 })();
 </script>
 </body>
