@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0a1628">
-<title>Nook Tours Studio v10</title>
+<title>Nook Tours Studio v11</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -84,7 +84,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v10</span></h1>
+    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v11</span></h1>
 
     <div class="sec">1 · القالب</div>
     <div class="grid" id="tplG"></div>
@@ -103,9 +103,11 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     <div id="pVideo" style="display:none">
       <div class="up"><input type="file" id="fVid" accept="video/*"><p>اضغط لاختيار <span>فيديو</span></p></div>
       <div class="hint" id="vinfo" style="margin-top:8px">التحكم في التشغيل والصوت 🔊 من الشريط تحت المعاينة. التصدير بيسجّل الصوت مع الفيديو.</div>
-      <div style="margin-top:8px"><label>جودة تصدير الفيديو</label>
-        <div class="grid"><select id="vq"><option value="1">عالية (1080p)</option><option value="0.667">متوسطة (720p) — أخف</option></select>
-        <select id="vfps"><option value="60" selected>60 fps — أنعم</option><option value="30">30 fps — أخف</option></select></div></div>
+    </div>
+    <div id="vqBox" style="display:none">
+      <div><label>جودة تصدير الفيديو</label>
+        <div class="grid"><select id="vq" aria-label="الجودة"><option value="1">عالية (1080p)</option><option value="0.667">متوسطة (720p) — أخف</option></select>
+        <select id="vfps" aria-label="عدد الفريمات"><option value="60" selected>60 fps — أنعم</option><option value="30">30 fps — أخف</option></select></div></div>
       <div class="hint" style="margin-top:8px">60fps بيدّي نعومة كاملة لو الفيديو الأصلي 60fps. سيب الصفحة مفتوحة وقدّامك أثناء التسجيل.</div>
     </div>
     <div><label>↔ موضع الخلفية (أفقي)</label><input type="range" id="fx" min="0" max="100" value="50"></div>
@@ -132,6 +134,16 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     </div>
     <div class="hint">الخط بيتطبق على كل نصوص التصميم ما عدا السلوجان.</div>
     <div id="fields"></div>
+
+    <div id="animP" style="display:none">
+      <div class="sec">🎬 الأنيميشن</div>
+      <div class="grid">
+        <div><label for="aDur">⏱ مدة الفيديو</label><select id="aDur"><option value="6">6 ثواني</option><option value="8" selected>8 ثواني</option><option value="10">10 ثواني</option><option value="15">15 ثانية</option></select></div>
+        <div><label for="aTheme">🎨 خلفية البداية</label><select id="aTheme"><option value="light">فاتحة (زي الموقع)</option><option value="dark">كحلي</option></select></div>
+      </div>
+      <button class="btn o" type="button" id="aPlay" style="margin-top:8px">▶️ شغّل الأنيميشن</button>
+      <div class="hint" style="margin-top:8px">الفيديو بيتعمل فريم بفريم، فالـ 60fps بتطلع ناعمة مهما كان الجهاز. الخلفية ممكن تبقى صورة أو فيديو (الفيديو بيطلع من غير صوت).</div>
+    </div>
 
     <div class="sec">بيانات ثابتة (لكل القوالب)</div>
     <div class="grid">
@@ -166,6 +178,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       <div id="stage">
         <div id="mlay"><img id="pImg" alt=""><video id="pVid" playsinline loop muted preload="auto"></video></div>
         <div id="ui"></div>
+        <canvas id="acv" style="position:absolute;left:0;top:0;width:100%;height:100%;display:none;z-index:4"></canvas>
       </div>
     </div>
     <div id="vbar">
@@ -200,11 +213,11 @@ const ml=s=>esc(s).replace(/\n/g,'<br>');
 const lines=s=>String(s||'').split('\n').map(x=>x.trim()).filter(Boolean);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const isMobile=()=>/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&innerWidth<1000);
-const AR="'Cairo',sans-serif",EN="'Montserrat',sans-serif",G='#c9a84c',G2='#e8c56a',NV='#0a1628';
+const AR="'Cairo',sans-serif",EN="'Montserrat',sans-serif",SERIF="'Manrope','Readex Pro',sans-serif",G='#c9a84c',G2='#e8c56a',NV='#0a1628';
 const FMT={post:{w:1080,h:1350,n:'4:5 بوست'},reel:{w:1080,h:1920,n:'9:16 ريل/ستوري'},sq:{w:1080,h:1080,n:'1:1 مربع'},land:{w:1920,h:1080,n:'16:9 لاندسكيب'}};
 const S={tpl:'season',fmt:'post',media:'photo',pos:'tc',fx:.5,fy:.5,z:1,sound:false,store:{},ts:1,szTitle:1,szBadge:1,szSub:1,szCta:1,cTitle:'#e8c56a',cBadge:'#c9a84c',cSub:'#c8e6f5',cCta:'#0a1628',fAr:'Cairo',fEn:'Montserrat'};
 const M={img:null,vurl:null};
-let LOGO_URL='',LOGO_DATA='';
+let LOGO_URL='',LOGO_DATA='',LOGO_IMG=null;
 
 function dataBlob(d){const [h,b]=d.split(','),m=h.match(/:(.*?);/)[1],bin=atob(b),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:m})}
 function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
@@ -215,9 +228,9 @@ function side(o){$('app').classList.toggle('so',!!o)}
 /* ريل 9:16: مساحة آمنة بعيد عن واجهة إنستجرام وتيك توك (الشريط العلوي، الكابشن، أزرار اللايك) */
 const REEL_SAFE={top:230,bottom:400,side:100},STRIP_H=76,FIT_GAP=20;
 function geo(){const f=FMT[S.fmt],W=f.w,H=f.h,strip=$('tStrip').checked,tall=H>1900;
-  const sb=tall?REEL_SAFE.bottom:0; /* مكان شريط السلوجان من تحت */
+  const sb=0; /* شريط السلوجان دايماً في آخر الصورة تحت */
   return{W,H,land:W>H,tall,sq:W===H,strip,sb,pad:W>H?70:tall?REEL_SAFE.side:60,top:tall?REEL_SAFE.top:56,
-    bot:tall?REEL_SAFE.bottom+(strip?STRIP_H+24:0):(strip?72:0)+50}}
+    bot:tall?REEL_SAFE.bottom:(strip?72:0)+50}}
 const ts=P=>P.land?66:P.tall?96:P.sq?72:84;
 const dock=(P,w,x)=>{x=x==null?P.pad:x;return P.land?`position:absolute;bottom:${P.bot}px;right:${x}px;width:${w||1000}px`:`position:absolute;bottom:${P.bot}px;left:${x}px;right:${x}px`};
 const fade=(P,a,b)=>P.land
@@ -408,6 +421,38 @@ itin:{n:'برنامج الرحلة',i:'🗓️',f:['badge','title','sub','rows',
       <div style="display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap">${pricePill(d,SZ(56,'title'))}${d.cta?cta(d.cta,`font-size:${SZ(30,'cta')}px;padding:14px 36px`):''}</div>
       <div style="margin-top:16px">${contactRow(d)}</div></div>`}}},
 
+splash:{n:'افتتاحية الموقع (متحركة)',i:'🎬',anim:true,f:['c1','c2','c3','who','badge','title','sub','cta'],
+  L:{c1:'🎬 سطر الترحيب الصغير',c2:'🎬 الاسم الكبير',c3:'🎬 الجملة اللي بعد الاسم',who:'👋 جملة تحت اللوجو',badge:'🏷️ سطر فوق العنوان',title:'📝 العنوان',sub:'💬 التفاصيل',cta:'🔵 نص الزر'},
+  d:{c1:'Welcome to',c2:'Nook Tours Egypt',c3:'Let’s discover',who:'Welcome to Nook Tours',badge:'إقامات · داي يوز · رحلات',title:'خبرتنا في خدمتك،\nمن أول استفسار لحد ما ترجع',sub:'نختار لك أفضل الخيارات ونتابع معك كل التفاصيل',cta:'ابدأ حجزك'},
+  r:(d,P)=>{const col=C(),lg=P.tall?240:P.land?160:P.sq?170:200;
+    return{noLogo:true,ov:`linear-gradient(180deg,rgba(6,18,32,.5),rgba(6,18,32,.78))`,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;width:100%">
+      <div data-splash-logo="1" style="width:${lg}px;height:${lg}px;padding:${Math.round(lg*.14)}px;background:#fff;border-radius:${Math.round(lg*.22)}px;box-shadow:0 18px 40px -12px rgba(10,42,74,.28)"><img src="${LOGO_URL}" alt="" style="display:block;width:100%;height:100%;object-fit:contain"></div>
+      ${d.who?`<div style="color:#fff;font:600 ${SZ(P.land?42:50,'sub')}px/1.2 ${SERIF};letter-spacing:-.5px;margin-top:26px;text-shadow:0 2px 24px rgba(0,0,0,.35)">${esc(d.who)}</div>`:''}
+      <div style="width:22px;height:22px;border-right:3px solid rgba(255,255,255,.85);border-bottom:3px solid rgba(255,255,255,.85);transform:rotate(45deg);margin:14px 0 ${P.land?26:40}px"></div>
+      ${d.badge?`<div style="color:${col.badge};font:700 ${SZ(26,'badge')}px ${AR};letter-spacing:1px;margin-bottom:12px">${esc(d.badge)}</div>`:''}
+      <div style="color:${col.title};font:900 ${SZ(ts(P)-14,'title')}px/1.25 ${AR};text-shadow:0 4px 22px rgba(0,0,0,.5)">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(28,'sub')}px/1.55 ${AR};margin-top:14px;max-width:880px">${ml(d.sub)}</div>`:''}
+      ${d.cta?`<div style="margin-top:26px">${cta(d.cta,`font-size:${SZ(30,'cta')}px;padding:14px 40px`)}</div>`:''}
+      <div style="margin-top:18px">${contactRow(d)}</div>
+    </div></div>`}}},
+
+explain:{n:'شرح الموقع (متحرك)',i:'📱',anim:true,font:'Readex Pro',f:['title','c1','c2','who','badge','rows','stats','sub','cta'],
+  L:{title:'🪝 الهوك (أول جملة)',c1:'🪝 الرد على الهوك',c2:'🏷️ اسم البراند',who:'💬 جملة تحت البراند',badge:'📝 عنوان المميزات',
+    rows:'⭐ المميزات — كل سطر: أيقونة | عنوان | وصف\nالأيقونات: hotel · chat · user · shield · pin · clock · star',sub:'📝 جملة شاشة الحجز',cta:'🔵 نص الزر'},
+  d:{title:'لسه بتدوّر على رحلتك\nفي 10 جروبات؟',c1:'خلّيها علينا.',c2:'Nook Tours',who:'إقامات · داي يوز · رحلات — في مكان واحد',badge:'ليه Nook Tours؟',
+    rows:'hotel | إقامات · داي يوز · رحلات | فنادق مختارة في كل وجهاتنا\nchat | رد فوري على واتساب | بالسعر الحالي من غير انتظار\nuser | ملف شخصي لكل عميل | حجوزاتك وتفاصيلك في مكان واحد\nshield | حجز موثوق ومضمون | بنتابع معاك لحد ما ترجع',
+    stats:'9 وجهات · 100+ فندق · 24/7 دعم فوري',sub:'رحلتك الجاية تبدأ من هنا',cta:'احجز دلوقتي'},
+  r:(d,P)=>{const dark=$('aTheme')&&$('aTheme').value==='dark',C=dark?EXP_C.dark:EXP_C.light,F="'Readex Pro',sans-serif",lg=P.tall?190:P.land?140:160;
+    return{noLogo:true,ov:hasMedia()?`linear-gradient(${C.tint},${C.tint})`:C.bg,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top}px;bottom:${P.tall?REEL_SAFE.bottom:60}px;display:flex;align-items:center;justify-content:center"><div style="display:flex;flex-direction:column;align-items:center;text-align:center;width:100%">
+      <div style="width:${lg}px;height:${lg}px;padding:${Math.round(lg*.14)}px;background:#fff;border-radius:${Math.round(lg*.22)}px;box-shadow:0 12px 30px rgba(10,42,74,.25)"><img src="${LOGO_URL}" alt="" style="display:block;width:100%;height:100%;object-fit:contain"></div>
+      ${d.sub?`<div style="color:${C.ink};font:700 ${P.land?60:68}px/1.2 ${F};margin-top:40px">${ml(d.sub)}</div>`:''}
+      <div style="margin-top:44px;width:min(100%,820px);height:100px;border-radius:50px;background:${C.card};border:1.5px solid ${C.stroke};box-shadow:0 12px 40px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;gap:14px;color:${C.ink};font:500 36px ${F};direction:ltr">🔒 ${esc(d.web)}</div>
+      ${d.cta?`<div style="margin-top:40px;background:linear-gradient(135deg,#e8c56a,#c2965c);color:#0a2a4a;font:700 40px ${F};padding:0 55px;height:104px;line-height:104px;border-radius:52px;box-shadow:0 10px 30px rgba(194,150,92,.45)">${esc(d.cta)}</div>`:''}
+      <div style="margin-top:30px;color:${C.sub};font:500 32px ${F};direction:ltr">${esc(d.phone)}</div>
+    </div></div>`}}},
+
 review:{n:'رأي عميل',i:'⭐',f:['badge','stars','sub','who','c1','cta'],
   L:{sub:'💬 نص الرأي',c1:'✈️ الرحلة اللي سافرها'},
   d:{badge:'⭐ رأي عميل',stars:'⭐⭐⭐⭐⭐',sub:'"التنظيم كان ممتاز والبرنامج مظبوط — رجعت مبسوط ومش هسافر غير مع Nook Tours 🙏"',who:'أحمد محمد',c1:'رحلة شرم الشيخ',cta:'احجز رحلتك دلوقتي',reviewMode:'text',reviewImage:''},
@@ -438,14 +483,14 @@ after:{n:'صور بعد الرحلة',i:'📸',f:['badge','title','sub','who','c
     </div>`}}}
 };
 
-const FL={badge:['🏷️ الشارة','t'],title:['📝 العنوان','a'],sub:['💬 التفاصيل','a'],c1:['📌 سطر مميز 1','t'],c2:['📌 سطر مميز 2','t'],c3:['📌 سطر مميز 3','t'],inc:['✅ المميزات (سطر لكل ميزة)','a'],rows:['📋 الأسعار','a'],pfrom:['نص قبل السعر','t'],price:['💰 السعر','t'],cur:['العملة / الوحدة','t'],old:['السعر القديم (اختياري)','t'],disc:['نسبة الخصم (اختياري)','t'],who:['👤 اسم العميل','t'],stars:['⭐ التقييم','s'],cta:['🔵 نص الزر','t']};
+const FL={stats:['📊 الأرقام (افصل بينها بـ ·)','t'],badge:['🏷️ الشارة','t'],title:['📝 العنوان','a'],sub:['💬 التفاصيل','a'],c1:['📌 سطر مميز 1','t'],c2:['📌 سطر مميز 2','t'],c3:['📌 سطر مميز 3','t'],inc:['✅ المميزات (سطر لكل ميزة)','a'],rows:['📋 الأسعار','a'],pfrom:['نص قبل السعر','t'],price:['💰 السعر','t'],cur:['العملة / الوحدة','t'],old:['السعر القديم (اختياري)','t'],disc:['نسبة الخصم (اختياري)','t'],who:['👤 اسم العميل','t'],stars:['⭐ التقييم','s'],cta:['🔵 نص الزر','t']};
 const HALF=['pfrom','price','cur','old','disc','stars'];
 const C=()=>({title:S.cTitle||'#e8c56a',badge:S.cBadge||'#c9a84c',sub:S.cSub||'#c8e6f5',cta:S.cCta||'#0a1628'});
 const SZ=(base,kind)=>{const m={title:S.szTitle,badge:S.szBadge,sub:S.szSub,cta:S.szCta}[kind]||1;return Math.round(base*m)};
 
 /* ================= الخطوط (كل النصوص ما عدا السلوجان) ================= */
 const FONTS_AR={'Cairo':'400;600;700;800;900','Tajawal':'400;500;700;800;900','Almarai':'400;700;800','Alexandria':'400;600;700;800;900','Readex Pro':'400;500;600;700','El Messiri':'400;500;600;700','Changa':'400;500;600;700;800','Noto Kufi Arabic':'400;600;700;800;900','IBM Plex Sans Arabic':'400;500;600;700','Reem Kufi':'400;500;600;700','Lemonada':'400;500;600;700','Marhey':'400;500;600;700','Lalezar':'400'};
-const FONTS_EN={'Montserrat':'500;600;700;800;900','Poppins':'500;600;700;800;900','Bebas Neue':'400','Oswald':'400;500;600;700','Anton':'400','Playfair Display':'500;600;700;800;900','Raleway':'500;600;700;800;900'};
+const FONTS_EN={'Montserrat':'500;600;700;800;900','Manrope':'500;600;700;800','Poppins':'500;600;700;800;900','Bebas Neue':'400','Oswald':'400;500;600;700','Anton':'400','Playfair Display':'500;600;700;800;900','Raleway':'500;600;700;800;900'};
 const FONT_DEF={ar:'Cairo',en:'Montserrat'};
 const fontSpec=n=>FONTS_AR[n]||FONTS_EN[n]||'400;700';
 const fontsURL=names=>'https://fonts.googleapis.com/css2?'+[...new Set(names)].map(n=>'family='+n.replace(/ /g,'+')+':wght@'+fontSpec(n)).join('&')+'&display=swap';
@@ -483,7 +528,7 @@ function logoHTML(P){const sz=Math.round($('lsz').value*2.1);
 function stripHTML(d,P){const s=d.slogan||'',ls=/[\u0600-\u06FF]/.test(s)?0:3;
   return `<div data-fixed-font="1" style="position:absolute;left:0;right:0;bottom:${P.sb}px;height:${STRIP_H}px;${P.sb?'border-bottom:3px solid '+G+';':''}background:linear-gradient(90deg,rgba(8,16,28,.97),rgba(12,22,40,.97));border-top:3px solid ${G};display:flex;align-items:center;justify-content:center;gap:18px;z-index:6"><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(201,168,76,.6);display:inline-block"></span><span style="color:${G2};font:800 22px ${EN};letter-spacing:${ls}px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.4)">${esc(s)}</span><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(201,168,76,.6);display:inline-block"></span></div>`}
 function buildUIRaw(d,P){const t=TPL[S.tpl].r(d,P),v=+$('dark').value,op=Math.min(1,v/66),ex=Math.max(0,(v-66)/100*.6);
-  const core=`<div style="position:absolute;inset:0;opacity:${op.toFixed(2)};background:${t.ov}"></div>${ex?`<div style="position:absolute;inset:0;background:rgba(0,0,0,${ex.toFixed(2)})"></div>`:''}${t.body}${$('tLogo').checked?logoHTML(P):''}`;
+  const core=`<div style="position:absolute;inset:0;opacity:${op.toFixed(2)};background:${t.ov}"></div>${ex?`<div style="position:absolute;inset:0;background:rgba(0,0,0,${ex.toFixed(2)})"></div>`:''}${t.body}${!t.noLogo&&$('tLogo').checked?logoHTML(P):''}`;
   return {core, strip:P.strip?stripHTML(d,P):''}
 }
 function scaleText(h){const k=S.ts||1;if(k===1)return h;return h.replace(/(font(?:-size)?:\s*(?:[\w-]+\s+)*?)(\d+(?:\.\d+)?)px/g,(m,a,n)=>a+(Math.round(n*k*10)/10)+'px')}
@@ -500,7 +545,7 @@ function autoFit(root,P){
   /* حاوية مثبّتة من فوق وتحت فيها كارت واحد (رأي عميل): لو الكارت أطول منها يتصغّر من المنتصف */
   kids.filter(e=>e.style.top&&e.style.bottom&&e.children.length===1&&e.style.top!=='0px').forEach(e=>{const c=e.firstElementChild;c.style.transform='';
     if(c.offsetHeight<=e.clientHeight)return;c.style.transformOrigin='center';c.style.transform=`scale(${(e.clientHeight/c.offsetHeight).toFixed(3)})`})}
-function render(){const P=geo();$('ui').innerHTML=buildUI(curData(),P);autoFit($('ui'),P)}
+function render(){stopAnim();const P=geo();$('ui').innerHTML=buildUI(curData(),P);autoFit($('ui'),P)}
 
 /* ================= المعاينة ================= */
 function fit(){const P=geo(),a=$('pv'),vb=$('vbar').style.display==='flex'?62:0,m=innerWidth<=900?20:56;
@@ -519,11 +564,18 @@ function buildFields(){const T=TPL[S.tpl],st=S.store[S.tpl];
     else if(t==='s')inp=`<select data-k="${k}"><option${st[k]==='⭐⭐⭐⭐⭐'?' selected':''}>⭐⭐⭐⭐⭐</option><option${st[k]==='⭐⭐⭐⭐'?' selected':''}>⭐⭐⭐⭐</option></select>`;
     else inp=`<input type="text" data-k="${k}" value="${esc(st[k])}">`;
     return `<div class="${full?'full':''}"><label>${lab}</label>${inp}</div>`}).join('');
-  const mf=$('reviewImageFile');if(mf)mf.onchange=e=>{const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast('اختار ملف صورة');const reader=new FileReader();reader.onload=()=>{st.reviewImage=reader.result;buildFields();render()};reader.onerror=()=>toast('تعذر قراءة الصورة');reader.readAsDataURL(f)};
+  const mf=$('reviewImageFile');if(mf)mf.onchange=e=>{const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast('اختار ملف صورة');const reader=new FileReader();reader.onload=()=>{if(!/^data:image\/(png|jpe?g|webp|gif);base64,/.test(String(reader.result)))return toast('الملف ده مش صورة'); /* بنقبل صور بس قبل ما تتحط في الصفحة */st.reviewImage=reader.result;buildFields();render()};reader.onerror=()=>toast('تعذر قراءة الصورة');reader.readAsDataURL(f)};
   $('fields').querySelectorAll('[data-review-mode]').forEach(b=>b.onclick=()=>{st.reviewMode=b.dataset.reviewMode;buildFields();render()});
   const rm=$('fields').querySelector('[data-remove-review-image]');if(rm)rm.onclick=()=>{st.reviewImage='';buildFields();render()};
 }
-function setTpl(t){S.tpl=t;if(!S.store[t])S.store[t]=Object.assign({},TPL[t].d);mark('[data-t]','t',t);buildFields();hint();render()}
+function setTpl(t){S.tpl=t;if(!S.store[t])S.store[t]=Object.assign({},TPL[t].d);mark('[data-t]','t',t);buildFields();hint();render();syncVidUI();
+  if(TPL[t].anim)loadFont(TPL[t].font||'Manrope').then(render).then(playAnim).catch(e=>{console.error(e);toast('تعذر تحميل خط الأنيميشن — اتأكد من النت')})}
+/* أزرار وإعدادات الفيديو تظهر مع خلفية فيديو أو مع قالب متحرك */
+function syncVidUI(){const anim=!!TPL[S.tpl].anim,show=S.media==='video'||anim;
+  $('bVid').style.display=$('mbVid').style.display=$('vqBox').style.display=show?'':'none';
+  $('animP').style.display=anim?'':'none';
+  $('aDur').parentNode.style.display=S.tpl==='explain'?'none':''; /* الشرح طوله ثابت (15.5 ثانية) */
+  $('bVid').textContent=anim?'🎬 تصدير الأنيميشن فيديو':'🎬 تصدير فيديو (بالصوت)'}
 function setFmt(k){S.fmt=k;mark('[data-f]','f',k);hint();fit();render()}
 
 /* ================= الميديا: صورة / فيديو (ركنين منفصلين) ================= */
@@ -533,7 +585,7 @@ function setVid(f){if(M.vurl)URL.revokeObjectURL(M.vurl);M.vurl=URL.createObject
   v.onerror=()=>toast('الفيديو ده مش مدعوم — جرب MP4 (H.264)');setMedia('video');v.play().catch(()=>{})}
 function setMedia(m){S.media=m;$('mT').classList.toggle('on',m==='photo');$('mV').classList.toggle('on',m==='video');
   $('pPhoto').style.display=m==='photo'?'':'none';$('pVideo').style.display=m==='video'?'':'none';
-  $('bVid').style.display=$('mbVid').style.display=m==='video'?'':'none';syncMedia();hint()}
+  syncVidUI();syncMedia();hint()}
 function syncMedia(){const v=S.media==='video'&&M.vurl,pv=$('pVid');
   pv.style.display=v?'block':'none';$('pImg').style.display=v?'none':'block';$('vbar').style.display=v?'flex':'none';
   if(v)pv.play().catch(()=>{});else pv.pause();fit()}
@@ -549,7 +601,7 @@ function mediaCanvas(W,H){const c=document.createElement('canvas');c.width=W;c.h
 
 /* ================= التصدير ================= */
 const imgsReady=r=>Promise.all([...r.querySelectorAll('img')].map(i=>i.complete&&i.naturalWidth?0:new Promise(res=>{i.onload=i.onerror=res;setTimeout(res,6000)})));
-async function renderOffscreen(withMedia,scale){
+async function renderOffscreen(withMedia,scale,prep){
   const P=geo(),W=P.W,H=P.H,host=document.createElement('div');
   host.style.cssText=`position:fixed;left:0;top:0;width:${W}px;height:${H}px;z-index:-1;pointer-events:none;overflow:hidden;direction:rtl;font-family:${AR};background:${withMedia?'#000':'transparent'}`;
   host.innerHTML=(withMedia?`<img src="${mediaCanvas(W,H).toDataURL('image/jpeg',.92)}" style="position:absolute;left:0;top:0;width:${W}px;height:${H}px" alt="">`:'')+buildUI(curData(),P);
@@ -557,6 +609,7 @@ async function renderOffscreen(withMedia,scale){
   try{await imgsReady(host);
     await Promise.all([document.fonts.load('900 40px Cairo'),document.fonts.load('700 28px Cairo'),document.fonts.load('600 22px Montserrat'),document.fonts.load(`900 40px "${S.fAr}"`),document.fonts.load(`800 40px "${S.fEn}"`),document.fonts.ready]);
     autoFit(host,P);
+    if(prep)prep(host);
     return await html2canvas(host,{width:W,height:H,windowWidth:W,windowHeight:H,scale:scale||1,useCORS:true,backgroundColor:withMedia?'#000':null,logging:false,imageTimeout:15000,ignoreElements:e=>e.id==='app'})
   }finally{host.remove()}}
 
@@ -589,7 +642,280 @@ let AC=null,monGain=null,recDest=null;
 function ensureAudio(){if(AC)return true;const A=window.AudioContext||window.webkitAudioContext;if(!A)return false;
   try{AC=new A();const src=AC.createMediaElementSource($('pVid'));monGain=AC.createGain();recDest=AC.createMediaStreamDestination();
     src.connect(monGain);monGain.connect(AC.destination);src.connect(recDest);return true}catch(e){AC=null;return false}}
+/* ================= أنيميشن افتتاحية الموقع =================
+   نفس توقيتات وحركات الـ splash في index.html بتاع الموقع (بالثواني). كل فريم بيترسم كدالة في الزمن t،
+   فالتصدير بيطلع فريم بفريم بالظبط من غير ما يعتمد على سرعة الجهاز. */
+const SPL={logoIn:1,ring1:.5,ring2:1.7,ringP:2.4,ringGrow:1.3,words1:.9,step1:.1,words2:1.15,step2:.15,wordDur:.85,
+  outAt:2.55,outDur:.45,l3At:2.85,l3Dur:.9,barAt:.7,barFade:.5,barP:1.25,reveal:3.7,fly:.85,txtOut:.3,mask:1.05,maskVmax:1.6,riseDelay:.2,rise:.9,
+  logoK:.3,baseLogo:148};
+const SPLASH_FONT='Manrope, "Readex Pro", sans-serif',SPLASH_BG={light:'#f5f5f7',dark:'#0a2a4a'},RING_C='rgba(191,132,80,.55)',BAR_C='#BF8450';
+const MUXER_URL='https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js';
+const AVC_CODECS=['avc1.640033','avc1.4d0033','avc1.420033'],ENC_BPP=.25,ENC_MAX=50e6,ENC_QUEUE=8,GOP_SEC=2;
+function bez(x1,y1,x2,y2){const a=(p,q)=>1-3*q+3*p,b=(p,q)=>3*q-6*p,c=p=>3*p,
+  f=(t,p,q)=>((a(p,q)*t+b(p,q))*t+c(p))*t,df=(t,p,q)=>3*a(p,q)*t*t+2*b(p,q)*t+c(p);
+  return x=>{if(x<=0)return 0;if(x>=1)return 1;let t=x;
+    for(let i=0;i<8;i++){const s=df(t,x1,x2);if(Math.abs(s)<1e-6)break;t-=(f(t,x1,x2)-x)/s}
+    if(!(t>=0&&t<=1)||Math.abs(f(t,x1,x2)-x)>1e-4){let lo=0,hi=1;t=x;for(let i=0;i<30;i++){if(f(t,x1,x2)<x)lo=t;else hi=t;t=(lo+hi)/2}}
+    return f(t,y1,y2)}}
+const E_OUT=bez(.22,1,.36,1),E_RING=bez(.2,.6,.3,1),E_BAR=bez(.45,0,.25,1),E_MASK=bez(.6,0,.2,1),E_EASE=bez(.25,.1,.25,1);
+const clamp01=v=>v<0?0:v>1?1:v,lerp=(a,b,p)=>a+(b-a)*p,even=n=>Math.round(n/2)*2;
+function rr(c,x,y,w,h,r){c.beginPath();if(c.roundRect){c.roundRect(x,y,w,h,r);return}
+  c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+/* سطر كلمات: كل كلمة بتظهر لوحدها (شفافية + طلوع لفوق + blur) */
+function wordsLine(s,text,o){text=String(text||'').trim();if(!text)return;if(o.upper)text=text.toUpperCase();
+  s.font=`${o.weight} ${o.size}px ${SPLASH_FONT}`;s.textBaseline='top';s.textAlign='left';
+  const hasLS='letterSpacing' in s;if(hasLS)s.letterSpacing=(o.ls*o.size).toFixed(2)+'px';
+  const words=o.whole?[text]:text.split(/\s+/),sp=s.measureText(' ').width,ws=words.map(w=>s.measureText(w).width);
+  const tot=ws.reduce((m,n)=>m+n,0)+sp*(words.length-1),rtl=/[؀-ۿ]/.test(text);
+  const order=words.map((_,i)=>rtl?words.length-1-i:i);let xx=o.cx-tot/2;
+  order.forEach(i=>{const p=E_OUT(clamp01((o.t-(o.start+o.step*i))/(o.dur||SPL.wordDur)));
+    if(p>0){s.save();s.globalAlpha=o.base*p*o.fade*(1-o.out);s.fillStyle=o.ink;const bl=8*o.u*(1-p);if(bl>.3)s.filter=`blur(${bl.toFixed(1)}px)`;
+      s.direction=rtl?'rtl':'ltr';s.fillText(words[i],xx,o.y+14*o.u*(1-p)-10*o.u*o.out);s.restore()}
+    xx+=ws[i]+sp});
+  if(hasLS)s.letterSpacing='0px'}
+
+function drawSplash(x,t,A,mp){const {W,H,u,Ls}=A,s=A.sc.getContext('2d'),cx=W/2,cy=H/2,ink=A.dark?'#fff':'#0a2a4a';
+  s.globalCompositeOperation='source-over';s.globalAlpha=1;s.filter='none';
+  s.fillStyle=A.dark?SPLASH_BG.dark:SPLASH_BG.light;s.fillRect(0,0,W,H);
+  [SPL.ring1,SPL.ring2].forEach(d=>{if(t<d)return;const e=E_RING(((t-d)%SPL.ringP)/SPL.ringP);
+    s.globalAlpha=.7*(1-e);s.strokeStyle=RING_C;s.lineWidth=1.5*u;s.beginPath();s.arc(cx,cy,Ls/2*(1+SPL.ringGrow*e),0,Math.PI*2);s.stroke()});
+  s.globalAlpha=1;
+  const fade=1-clamp01((t-SPL.reveal)/SPL.txtOut);
+  if(fade>0){const top=cy+Ls/2+26*u,out=E_EASE(clamp01((t-SPL.outAt)/SPL.outDur)),c={t,u,ink,cx,fade};
+    wordsLine(s,A.d.c1,{...c,size:13*u,weight:500,ls:.32,upper:true,base:.7,y:top,start:SPL.words1,step:SPL.step1,out});
+    wordsLine(s,A.d.c2,{...c,size:33.6*u,weight:700,ls:-.015,base:1,y:top+27*u,start:SPL.words2,step:SPL.step2,out});
+    wordsLine(s,A.d.c3,{...c,size:33.6*u,weight:600,ls:-.01,base:1,y:top+4*u,start:SPL.l3At,step:0,whole:true,dur:SPL.l3Dur,out:0});
+    const ba=clamp01((t-SPL.barAt)/SPL.barFade)*fade;
+    if(ba>0){const bw=112*u,bh=Math.max(2,3*u),bx=cx-bw/2,by=cy+Ls/2+128*u,fw=bw*.42,e=E_BAR((t%SPL.barP)/SPL.barP);
+      s.save();s.globalAlpha=ba;rr(s,bx,by,bw,bh,bh/2);s.fillStyle=A.dark?'rgba(255,255,255,.16)':'rgba(10,42,74,.12)';s.fill();s.clip();
+      rr(s,bx+fw*lerp(-1.1,2.6,e),by,fw,bh,bh/2);s.fillStyle=BAR_C;s.fill();s.restore()}}
+  if(mp>0){s.globalCompositeOperation='destination-out';s.beginPath();s.arc(cx,cy,mp*SPL.maskVmax*Math.max(W,H),0,Math.PI*2);s.fill();s.globalCompositeOperation='source-over'}
+  x.drawImage(A.sc,0,0)}
+
+/* كارت اللوجو: يظهر في النص، وبعدين يطير لمكانه في التصميم */
+function drawLogoCard(x,t,A){const {W,H,Ls,rect,u}=A,L=A.logo;if(!L||!L.naturalWidth)return;let s,X,Y,a=1,bl=0;
+  if(t<SPL.reveal||!rect){const p=E_OUT(clamp01(t/SPL.logoIn));s=Ls*(.7+.3*p);a=p;bl=12*u*(1-p);X=W/2-s/2;Y=H/2-s/2}
+  else{const p=E_OUT(clamp01((t-SPL.reveal)/SPL.fly));s=lerp(Ls,rect.s,p);X=lerp(W/2-Ls/2,rect.x,p);Y=lerp(H/2-Ls/2,rect.y,p)}
+  if(a<=0)return;
+  x.save();x.globalAlpha=a;if(bl>.3)x.filter=`blur(${bl.toFixed(1)}px)`;
+  x.shadowColor='rgba(10,42,74,.28)';x.shadowBlur=s*.19;x.shadowOffsetY=s*.12;rr(x,X,Y,s,s,s*.22);x.fillStyle='#fff';x.fill();
+  x.shadowColor='transparent';const pad=s*.14,iw=s-pad*2,k=Math.min(iw/L.naturalWidth,iw/L.naturalHeight),dw=L.naturalWidth*k,dh=L.naturalHeight*k;
+  x.drawImage(L,X+pad+(iw-dw)/2,Y+pad+(iw-dh)/2,dw,dh);x.restore()}
+
+function drawFrame(x,t,A){if(A.kind==='explain')return drawExplain(x,t,A);const {W,H}=A,v=$('pVid');
+  x.save();x.globalAlpha=1;x.filter='none';x.fillStyle='#000';x.fillRect(0,0,W,H);
+  if(S.media==='video'&&M.vurl&&v.videoWidth)coverDraw(x,v,v.videoWidth,v.videoHeight,W,H);
+  else if(M.img)coverDraw(x,M.img,M.img.naturalWidth,M.img.naturalHeight,W,H);
+  const rp=E_OUT(clamp01((t-SPL.reveal-SPL.riseDelay)/SPL.rise));
+  if(rp>0){const dy=(1-rp)*30*A.u;x.globalAlpha=rp;x.drawImage(A.ov,0,dy,W,H);
+    if(dy>0)x.drawImage(A.ov,0,0,A.ov.width,1,0,0,W,dy+1); /* يملا الفراغ اللي فوق بأول سطر من التعتيم */
+    x.globalAlpha=1}
+  x.restore();
+  const mp=E_MASK(clamp01((t-SPL.reveal)/SPL.mask));
+  if(mp<1)drawSplash(x,t,A,mp);
+  drawLogoCard(x,t,A)}
+
+/* تجهيز: طبقة التصميم النهائية (من غير اللوجو) + مكان اللوجو النهائي */
+async function prepAnim(q){const P=geo(),W=even(P.W*q),H=even(P.H*q);let rect=null;
+  if(S.tpl==='explain'){await loadFont('Readex Pro');const dark=$('aTheme').value==='dark',b=document.createElement('canvas');
+    b.width=Math.max(2,Math.round(W/10));b.height=Math.max(2,Math.round(H/10));
+    return{kind:'explain',W,H,q,P,u:Math.min(W,H)/1080,blur:b,dur:EXP.total,dark,C:dark?EXP_C.dark:EXP_C.light,d:curData()}}
+  await loadFont('Manrope');
+  const ov=await renderOffscreen(false,q,host=>{const el=host.querySelector('[data-splash-logo]');if(!el)return;
+    const h=host.getBoundingClientRect(),r=el.getBoundingClientRect();rect={x:(r.left-h.left)*q,y:(r.top-h.top)*q,s:r.width*q};el.style.visibility='hidden'});
+  const sc=document.createElement('canvas');sc.width=W;sc.height=H;
+  const Ls=Math.round(Math.min(W,H)*SPL.logoK);
+  return{W,H,ov,rect,sc,Ls,u:Ls/SPL.baseLogo,logo:LOGO_IMG,dur:+$('aDur').value||8,dark:$('aTheme').value==='dark',d:curData()}}
+
+let AP=null;
+function stopAnim(){if(AP){cancelAnimationFrame(AP.raf);AP=null}const c=$('acv');if(c)c.style.display='none'}
+async function playAnim(){stopAnim();if(!TPL[S.tpl].anim)return;const tok={};AP={raf:0,tok};
+  try{const A=await prepAnim(1);if(!AP||AP.tok!==tok)return;
+    const c=$('acv');c.width=A.W;c.height=A.H;c.style.display='block';const x=c.getContext('2d');
+    const v=$('pVid');if(S.media==='video'&&M.vurl){v.currentTime=0;v.play().catch(e=>console.error(e))}
+    const t0=performance.now(),tick=now=>{if(!AP||AP.tok!==tok)return;const t=(now-t0)/1000;if(t>A.dur){stopAnim();return}drawFrame(x,t,A);AP.raf=requestAnimationFrame(tick)};
+    AP.raf=requestAnimationFrame(tick)}
+  catch(e){console.error(e);stopAnim();toast('تعذر تشغيل الأنيميشن: '+e.message)}}
+
+function loadScript(src){return new Promise((res,rej)=>{if(window.Mp4Muxer)return res();const s=document.createElement('script');s.src=src;s.async=true;
+  s.onload=res;s.onerror=()=>{s.remove();rej(new Error('تعذر تحميل أداة الفيديو — اتأكد من النت'))};document.head.appendChild(s)})}
+function seekTo(v,t){return new Promise(res=>{if(Math.abs(v.currentTime-t)<1e-3&&v.readyState>=2)return res();
+  const done=()=>{clearTimeout(g);v.removeEventListener('seeked',done);res()},g=setTimeout(done,2000);v.addEventListener('seeked',done);v.currentTime=t})}
+async function pickAvc(W,H,fps,bitrate){for(const codec of AVC_CODECS){const cfg={codec,width:W,height:H,bitrate,framerate:fps,bitrateMode:'variable',latencyMode:'quality',avc:{format:'avc'}};
+    try{if((await VideoEncoder.isConfigSupported(cfg)).supported)return cfg}catch(e){console.error(codec,e)}}return null}
+
+/* تصدير فريم بفريم بـ WebCodecs → MP4 (H.264) */
+async function encodeOffline(A,fps,prog){await loadScript(MUXER_URL);const {W,H}=A;
+  const cfg=await pickAvc(W,H,fps,Math.round(Math.min(ENC_MAX,W*H*fps*ENC_BPP)));if(!cfg)return null;
+  const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H,frameRate:fps},fastStart:'in-memory'});
+  let encErr=null;const enc=new VideoEncoder({output:(c,m)=>muxer.addVideoChunk(c,m),error:e=>{encErr=e}});enc.configure(cfg);
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d',{alpha:false});x.imageSmoothingQuality='high';
+  const N=Math.round(A.dur*fps),v=$('pVid'),useVid=S.media==='video'&&M.vurl;if(useVid)v.pause();
+  for(let i=0;i<N;i++){if(encErr)throw encErr;const t=i/fps;
+    if(useVid)await seekTo(v,t%(v.duration||1));
+    drawFrame(x,t,A);
+    const fr=new VideoFrame(cv,{timestamp:Math.round(i*1e6/fps),duration:Math.round(1e6/fps)});enc.encode(fr,{keyFrame:i%(fps*GOP_SEC)===0});fr.close();
+    while(enc.encodeQueueSize>ENC_QUEUE)await sleep(4);
+    if(i%6===0){prog(i/N*100);await sleep(0)}}
+  await enc.flush();if(encErr)throw encErr;enc.close();muxer.finalize();
+  return new Blob([muxer.target.buffer],{type:'video/mp4'})}
+
+/* بديل للمتصفحات اللي مافيهاش WebCodecs: تسجيل في الوقت الحقيقي */
+async function recordRealtime(A,fps,prog){const {W,H}=A,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d',{alpha:false});
+  const mime=REC_MIMES.find(m=>MediaRecorder.isTypeSupported(m)),opts={videoBitsPerSecond:Math.round(Math.min(40e6,W*H*fps*.18))};if(mime)opts.mimeType=mime;
+  const rec=new MediaRecorder(cv.captureStream(fps),opts),chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};const stopped=new Promise(r=>rec.onstop=r);
+  const v=$('pVid');if(S.media==='video'&&M.vurl){v.currentTime=0;v.loop=true;await v.play().catch(e=>console.error(e))}
+  drawFrame(x,0,A);rec.start(250);const t0=performance.now();
+  await new Promise(res=>{const tick=now=>{const t=(now-t0)/1000;drawFrame(x,Math.min(t,A.dur),A);prog(t/A.dur*100);if(t>=A.dur)return res();requestAnimationFrame(tick)};requestAnimationFrame(tick)});
+  rec.stop();await stopped;return new Blob(chunks,{type:(rec.mimeType||mime||'video/webm').split(';')[0]})}
+
+async function exportAnim(){side(0);stopAnim();const P=geo(),q=+$('vq').value,fps=+$('vfps').value||60,v=$('pVid'),wasLoop=v.loop;
+  busy('جاري تجهيز الأنيميشن…',0);
+  try{const A=await prepAnim(q),label=`${Math.min(A.W,A.H)>=1000?'1080p':'720p'} · ${fps}fps`;
+    let blob=null;
+    if(window.VideoEncoder&&window.VideoFrame){blob=await encodeOffline(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p))}
+    if(!blob){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome حديث');
+      blob=await recordRealtime(A,fps,p=>busy(`جاري تسجيل الفيديو (${label})… ${Math.round(Math.min(99,p))}% — خليك في الصفحة`,Math.min(99,p)))}
+    busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}.${blob.type.indexOf('mp4')>=0?'mp4':'webm'}`)}
+  catch(e){console.error(e);toast('فشل تصدير الأنيميشن: '+e.message)}
+  finally{busy(0);v.loop=wasLoop;if(S.media==='video'&&M.vurl){v.muted=!S.sound;v.play().catch(e=>console.error(e))}}}
+
+/* ================= قالب «شرح الموقع» بستايل Apple =================
+   مشاهد: هوك ← البراند ← المميزات (كروت زجاج) ← الأرقام ← شريط Safari + زر الحجز. كل حاجة دالة في الزمن t. */
+const EXP={hookIn:.05,hookStep:.11,wordDur:.5,answerAt:1.2,hookOut:2.45,zoomOut:.4,brandAt:2.6,brandOut:4.35,
+  featAt:4.55,featFirst:4.9,featStep:.8,featOut:10.2,statsAt:10.5,statsStep:.14,statsOut:12.5,
+  ctaAt:12.7,typeAt:13.2,typeCps:24,btnAt:13.95,pressAt:14.55,press:.32,total:15.5,sceneOut:.4,maxRows:4,maxStats:4};
+const EXP_FONT='"Readex Pro", -apple-system, "SF Pro Display", system-ui, sans-serif';
+const EXP_C={light:{bg:'#ffffff',ink:'#1d1d1f',sub:'rgba(60,60,67,.66)',card:'rgba(255,255,255,.72)',stroke:'rgba(0,0,0,.07)',tint:'rgba(255,255,255,.55)',num:'#0a2a4a',g1:'#a0713a',g2:'#c2965c'},
+  dark:{bg:'#000000',ink:'#f5f5f7',sub:'rgba(235,235,245,.62)',card:'rgba(30,30,30,.7)',stroke:'rgba(255,255,255,.1)',tint:'rgba(0,0,0,.5)',num:'#e8c56a',g1:'#c2965c',g2:'#e8c56a'}};
+const SYS_C=['#007AFF','#34C759','#5856D6','#FF9500','#FF2D55','#AF52DE'];
+/* أيقونات خطية من رموز SVG اللي في الموقع نفسه (viewBox 24) */
+const ICONS={hotel:['M3 21h18M5 21V7l7-4 7 4v14','M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01'],
+  chat:['M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z'],user:['M16 8a4 4 0 1 1-8 0 4 4 0 0 1 8 0z','M4 21c0-4 4-6 8-6s8 2 8 6'],
+  shield:['M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z','m9 12 2 2 4-4'],pin:['M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z','M14.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z'],
+  clock:['M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z','M12 7v5l3 2'],star:['M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'],
+  lock:['M5 11h14v10H5z','M8 11V8a4 4 0 0 1 8 0v3']};
+const ICON_P={},iconPaths=k=>ICON_P[k]||(ICON_P[k]=(ICONS[k]||ICONS.star).map(p=>new Path2D(p)));
+const expFont=(w,px)=>`${w} ${Math.round(px)}px ${EXP_FONT}`;
+/* زنبرك مُخمَّد (spring) — نفس إحساس حركة iOS */
+function spring(t,resp,z){if(t<=0)return 0;const w=2*Math.PI/resp;if(z>=1)return 1-Math.exp(-w*t)*(1+w*t);
+  const wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+(z*w/wd)*Math.sin(wd*t))}
+function wrapLines(x,text,maxW){const out=[];String(text||'').split('\n').forEach(l=>{let cur='';
+  l.trim().split(/\s+/).filter(Boolean).forEach(w=>{const n=cur?cur+' '+w:w;if(cur&&x.measureText(n).width>maxW){out.push(cur);cur=w}else cur=n});if(cur)out.push(cur)});return out}
+function fitText(x,s,X,Y,maxW,w,px){let f=px;x.font=expFont(w,f);while(f>12&&x.measureText(s).width>maxW){f-=2;x.font=expFont(w,f)}x.fillText(s,X,Y)}
+function drawIcon(x,key,cx,cy,size,color){const k=size/24;x.save();x.translate(cx-size/2,cy-size/2);x.scale(k,k);
+  x.strokeStyle=color;x.lineWidth=2;x.lineCap='round';x.lineJoin='round';iconPaths(key).forEach(p=>x.stroke(p));x.restore()}
+const goldFill=A=>(x,w)=>{const g=x.createLinearGradient(-w/2,0,w/2,0);g.addColorStop(0,A.C.g1);g.addColorStop(1,A.C.g2);return g};
+/* كلمات بتنط لمكانها بالزنبرك + blur (عربي من اليمين) */
+function animWords(x,ls,o){x.font=expFont(o.weight,o.size);x.textBaseline='middle';x.textAlign='left';x.direction='ltr';
+  const lh=o.size*o.lh;let y=o.cy-ls.length*lh/2+lh/2,idx=0;
+  ls.forEach(line=>{const words=line.split(/\s+/).filter(Boolean),sp=x.measureText(' ').width,ws=words.map(w=>x.measureText(w).width),
+      tot=ws.reduce((m,n)=>m+n,0)+sp*(words.length-1),rtl=/[؀-ۿ]/.test(line);let xx=o.cx+(rtl?tot/2:-tot/2);
+    words.forEach((w,i)=>{const lt=o.t-(o.t0+o.step*idx++),a=E_OUT(clamp01(lt/o.dur)),sp2=spring(lt,.5,.72),wx=rtl?xx-ws[i]:xx;
+      if(a>0){x.save();x.globalAlpha=a*o.alpha;const bl=10*o.u*(1-a);if(bl>.4)x.filter=`blur(${bl.toFixed(1)}px)`;
+        const sc=.86+.14*sp2;x.translate(wx+ws[i]/2,y+(1-sp2)*o.size*.35);x.scale(sc,sc);
+        x.fillStyle=typeof o.fill==='function'?o.fill(x,ws[i]):o.fill;x.direction=rtl?'rtl':'ltr';x.fillText(w,-ws[i]/2,0);x.restore()}
+      xx+=rtl?-(ws[i]+sp):ws[i]+sp});
+    y+=lh})}
+/* كارت زجاج: نسخة مموّهة من الخلفية جوه الكارت + طبقة لون + حد رفيع */
+function glassCard(x,A,X,Y,w,h,r){x.save();x.shadowColor=A.dark?'rgba(0,0,0,.45)':'rgba(0,0,0,.12)';x.shadowBlur=40*A.u;x.shadowOffsetY=12*A.u;
+  rr(x,X,Y,w,h,r);x.fillStyle=A.C.card;x.fill();x.restore();
+  x.save();rr(x,X,Y,w,h,r);x.clip();x.imageSmoothingQuality='high';x.drawImage(A.blur,0,0,A.W,A.H);x.fillStyle=A.C.card;x.fill();x.restore();
+  x.save();rr(x,X,Y,w,h,r);x.lineWidth=1.5*A.u;x.strokeStyle=A.C.stroke;x.stroke();x.restore()}
+function logoTile(x,X,Y,s,u){const L=LOGO_IMG;x.save();x.shadowColor='rgba(10,42,74,.25)';x.shadowBlur=s*.2;x.shadowOffsetY=s*.1;
+  rr(x,X,Y,s,s,s*.22);x.fillStyle='#fff';x.fill();x.restore();if(!L||!L.naturalWidth)return;
+  const pad=s*.14,iw=s-pad*2,k=Math.min(iw/L.naturalWidth,iw/L.naturalHeight),dw=L.naturalWidth*k,dh=L.naturalHeight*k;x.drawImage(L,X+pad+(iw-dw)/2,Y+pad+(iw-dh)/2,dw,dh)}
+function countUp(s,p){const m=String(s).match(/^(\D*)(\d[\d,]*)(\D*)$/);if(!m)return s;const n=parseInt(m[2].replace(/,/g,''),10);
+  return isFinite(n)?m[1]+Math.round(n*p).toLocaleString('en-US')+m[3]:s}
+const hasMedia=()=>!!(M.img||(S.media==='video'&&M.vurl));
+function drawMediaCover(x,W,H){const v=$('pVid');if(S.media==='video'&&M.vurl&&v.videoWidth)coverDraw(x,v,v.videoWidth,v.videoHeight,W,H);
+  else if(M.img)coverDraw(x,M.img,M.img.naturalWidth,M.img.naturalHeight,W,H)}
+const sceneOut=(t,at)=>E_EASE(clamp01((t-at)/EXP.sceneOut));
+
+function expHook(x,t,A,L){const o=E_EASE(clamp01((t-EXP.hookOut)/EXP.zoomOut));if(o>=1)return;const {u,P,d}=A;
+  const base=(P.land?80:P.tall?100:P.sq?84:92)*u,lh=1.18;
+  x.save();x.font=expFont(800,base);
+  /* الخط يصغر لحد ما أطول سطر يدخل (لحد 70% من الحجم) */
+  const longest=Math.max(1,...String(d.title||'').split('\n').map(l=>x.measureText(l.trim()).width)),fs=Math.floor(Math.max(base*.7,Math.min(base,base*L.aw*.92/longest))),afs=Math.floor(fs*.8);
+  x.font=expFont(800,fs);const tl=wrapLines(x,d.title,L.aw*.96);x.font=expFont(800,afs);const al=wrapLines(x,d.c1,L.aw*.96);
+  const th=tl.length*fs*lh,ah=al.length*afs*lh,gap=al.length?fs*.45:0,y0=L.cy-(th+gap+ah)/2;
+  x.translate(L.cx,L.cy);x.scale(1+.12*o,1+.12*o);x.translate(-L.cx,-L.cy);if(o>0)x.filter=`blur(${(14*u*o).toFixed(1)}px)`;
+  animWords(x,tl,{cx:L.cx,cy:y0+th/2,size:fs,weight:800,lh,t0:EXP.hookIn,step:EXP.hookStep,dur:EXP.wordDur,fill:A.C.ink,t,u,alpha:1-o});
+  if(al.length)animWords(x,al,{cx:L.cx,cy:y0+th+gap+ah/2,size:afs,weight:800,lh,t0:EXP.answerAt,step:EXP.hookStep,dur:EXP.wordDur,fill:goldFill(A),t,u,alpha:1-o});
+  x.restore()}
+
+function expBrand(x,t,A,L){const lt=t-EXP.brandAt,out=sceneOut(t,EXP.brandOut);if(lt<0||out>=1)return;const {u,P,d,C}=A;
+  const s=Math.min(A.W,A.H)*.26,nfs=(P.land?84:96)*u,wfs=40*u,bh=s+40*u+nfs+22*u+wfs,y0=L.cy-bh/2-out*50*u;
+  const sp=spring(lt,.55,.6),ss=s*(.6+.4*sp);x.save();x.globalAlpha=E_OUT(clamp01(lt/.3))*(1-out);logoTile(x,L.cx-ss/2,y0+(s-ss)/2,ss,u);x.restore();
+  const step=(k,off)=>{const p=clamp01((lt-off)/.5);return{a:E_OUT(p)*(1-out),dy:(1-E_OUT(p))*30*u}};
+  x.save();x.textAlign='center';x.textBaseline='middle';
+  let e=step(0,.2);x.globalAlpha=e.a;x.direction='ltr';x.font=expFont(700,nfs);x.fillStyle=C.ink;
+  if('letterSpacing' in x)x.letterSpacing=(-.02*nfs).toFixed(1)+'px';x.fillText(d.c2||'Nook Tours',L.cx,y0+s+40*u+nfs/2+e.dy);if('letterSpacing' in x)x.letterSpacing='0px';
+  if(d.who){e=step(0,.38);x.globalAlpha=e.a;x.direction='rtl';x.fillStyle=C.sub;fitText(x,d.who,L.cx,y0+s+40*u+nfs+22*u+wfs/2+e.dy,L.aw,400,wfs)}
+  x.restore()}
+
+function expFeatures(x,t,A,L){const lt=t-EXP.featAt,out=sceneOut(t,EXP.featOut);if(lt<0||out>=1)return;const {u,P,d,C}=A;
+  const rows=lines(d.rows).slice(0,EXP.maxRows).map(r=>{const p=r.split('|').map(s=>s.trim());return p.length>=3?{icon:p[0],title:p[1],sub:p[2]}:{icon:'star',title:p[0]||'',sub:p[1]||''}});
+  const ch=(P.tall?190:150)*u,gap=(P.tall?28:22)*u,cw=Math.min(L.aw,900*u),hfs=(P.land?52:60)*u,hg=36*u;
+  const tot=(d.badge?hfs+hg:0)+rows.length*ch+Math.max(0,rows.length-1)*gap;let y=L.cy-tot/2-out*40*u;const X=L.cx-cw/2;
+  if(d.badge){const a=E_OUT(clamp01(lt/.45))*(1-out);x.save();x.globalAlpha=a;x.textAlign='center';x.textBaseline='middle';x.direction='rtl';x.fillStyle=C.ink;
+    fitText(x,d.badge,L.cx,y+hfs/2+(1-a)*20*u,L.aw,700,hfs);x.restore();y+=hfs+hg}
+  rows.forEach((r,i)=>{const ct=t-(EXP.featFirst+i*EXP.featStep);if(ct>=0){const sp=spring(ct,.55,.7),a=E_OUT(clamp01(ct/.35))*(1-out),cy=y+ch/2,sc=.94+.06*sp;
+      x.save();x.globalAlpha=a;x.translate(L.cx,cy+(1-sp)*90*u);x.scale(sc,sc);x.translate(-L.cx,-cy);glassCard(x,A,X,y,cw,ch,34*u);
+      const tile=ch*.56,tx=X+cw-28*u-tile,ty=y+(ch-tile)/2;rr(x,tx,ty,tile,tile,tile*.24);x.fillStyle=SYS_C[i%SYS_C.length];x.fill();drawIcon(x,r.icon,tx+tile/2,ty+tile/2,tile*.56,'#fff');
+      const tr=tx-24*u,mw=tr-(X+28*u),tfs=(P.tall?42:38)*u,sfs=(P.tall?31:29)*u;x.textAlign='right';x.direction='rtl';x.textBaseline='middle';
+      x.fillStyle=C.ink;fitText(x,r.title,tr,cy-(r.sub?sfs*.78:0),mw,600,tfs);if(r.sub){x.fillStyle=C.sub;fitText(x,r.sub,tr,cy+tfs*.68,mw,400,sfs)}
+      x.restore()}
+    y+=ch+gap})}
+
+function expStats(x,t,A,L){const lt=t-EXP.statsAt,out=sceneOut(t,EXP.statsOut);if(lt<0||out>=1)return;const {u,P,d,C}=A;
+  const items=String(d.stats||'').split('·').map(s=>s.trim()).filter(Boolean).slice(0,EXP.maxStats).map(s=>{const m=s.match(/^(\d+\/\d+|[+]?\d[\d,]*\+?)\s*(.*)$/);return m?{num:m[1],label:m[2]}:{num:s,label:''}});
+  if(!items.length)return;const n=items.length,gap=20*u,cw=Math.min(300*u,(L.aw-gap*(n-1))/n),chh=(P.tall?300:260)*u,tw=n*cw+(n-1)*gap,nfs=Math.min(cw*.36,(P.tall?104:92)*u),lfs=30*u;
+  items.forEach((it,i)=>{const ct=lt-i*EXP.statsStep;if(ct<0)return;const sp=spring(ct,.55,.68),a=E_OUT(clamp01(ct/.35))*(1-out);
+    const X=L.cx+tw/2-(i+1)*cw-i*gap,Y=L.cy-chh/2-out*40*u+(1-sp)*70*u;
+    x.save();x.globalAlpha=a;glassCard(x,A,X,Y,cw,chh,36*u);x.textAlign='center';x.textBaseline='middle';
+    x.direction='ltr';x.fillStyle=C.num;fitText(x,countUp(it.num,E_OUT(clamp01(ct))),X+cw/2,Y+chh*.42,cw*.9,700,nfs);
+    if(it.label){x.direction='rtl';x.fillStyle=C.sub;fitText(x,it.label,X+cw/2,Y+chh*.72,cw*.88,400,lfs)}x.restore()})}
+
+function expCta(x,t,A,L){const lt=t-EXP.ctaAt;if(lt<0)return;const {P,d,C}=A,u=A.u*(P.tall?1.15:1); /* الريل أطول، فنكبّر شاشة الحجز شوية */
+  const s=Math.min(A.W,A.H)*.17,bH=100*u,bW=Math.min(L.aw,820*u),btH=104*u,pfs=32*u,hb=(P.land?60:68)*u;
+  x.save();x.font=expFont(700,hb);const lw=Math.max(1,...String(d.sub||'').split('\n').map(l=>x.measureText(l.trim()).width)),
+    hfs=Math.floor(Math.max(hb*.72,Math.min(hb,hb*L.aw*.94/lw)));x.font=expFont(700,hfs);const hl=wrapLines(x,d.sub,L.aw*.98);x.restore();
+  const g=[40*u,44*u,40*u,30*u],tot=s+g[0]+hl.length*hfs*1.2+g[1]+bH+g[2]+btH+g[3]+pfs;let y=L.cy-tot/2;
+  const ap=off=>{const p=clamp01((lt-off)/.45);return{a:E_OUT(p),dy:(1-spring(lt-off,.55,.7))*50*u}};
+  let e=ap(0);const ss=s*(.7+.3*spring(lt,.55,.6));x.save();x.globalAlpha=e.a;logoTile(x,L.cx-ss/2,y+(s-ss)/2,ss,u);x.restore();y+=s+g[0];
+  e=ap(.12);x.save();x.globalAlpha=e.a;x.textAlign='center';x.textBaseline='middle';x.direction='rtl';x.font=expFont(700,hfs);x.fillStyle=C.ink;
+  hl.forEach((l,i)=>x.fillText(l,L.cx,y+hfs*1.2*i+hfs*.6+e.dy));x.restore();y+=hl.length*hfs*1.2+g[1];
+  e=ap(.28);x.save();x.globalAlpha=e.a;x.translate(0,e.dy);glassCard(x,A,L.cx-bW/2,y,bW,bH,bH/2);
+  const url=String(d.web||''),n=Math.max(0,Math.min(url.length,Math.floor((t-EXP.typeAt)*EXP.typeCps))),ufs=36*u,ls=30*u;
+  x.font=expFont(500,ufs);x.direction='ltr';x.textAlign='left';x.textBaseline='middle';const fw=Math.min(x.measureText(url).width,bW-ls-90*u),sx=L.cx-(fw+ls+14*u)/2+ls+14*u;
+  drawIcon(x,'lock',sx-14*u-ls/2,y+bH/2,ls,C.sub);x.fillStyle=C.ink;const shown=url.slice(0,n);x.fillText(shown,sx,y+bH/2,fw);
+  if(t>=EXP.typeAt&&(n<url.length||(t*1.1)%1<.55)){const cw=Math.min(x.measureText(shown).width,fw);x.fillStyle='#007AFF';x.fillRect(sx+cw+3*u,y+bH/2-ufs*.6,3*u,ufs*1.2)}
+  x.restore();y+=bH+g[2];
+  const bt=t-EXP.btnAt;if(bt>=0&&d.cta){const sp=spring(bt,.5,.6),pp=clamp01((t-EXP.pressAt)/EXP.press),sc=(.85+.15*sp)*(1-.03*Math.sin(Math.PI*pp));
+    x.save();x.globalAlpha=E_OUT(clamp01(bt/.3));x.font=expFont(700,40*u);const bw=Math.min(L.aw,x.measureText(d.cta).width+110*u),bx=L.cx-bw/2;
+    x.translate(L.cx,y+btH/2);x.scale(sc,sc);x.translate(-L.cx,-(y+btH/2));x.shadowColor='rgba(194,150,92,.45)';x.shadowBlur=30*u;x.shadowOffsetY=10*u;
+    const gr=x.createLinearGradient(bx,y,bx+bw,y+btH);gr.addColorStop(0,'#e8c56a');gr.addColorStop(1,'#c2965c');rr(x,bx,y,bw,btH,btH/2);x.fillStyle=gr;x.fill();
+    x.shadowColor='transparent';x.fillStyle='#0a2a4a';x.textAlign='center';x.textBaseline='middle';x.direction='rtl';x.fillText(d.cta,L.cx,y+btH/2);x.restore()}
+  y+=btH+g[3];
+  const pt=bt-.25;if(pt>=0&&d.phone){x.save();x.globalAlpha=E_OUT(clamp01(pt/.4));x.font=expFont(500,pfs);x.textBaseline='middle';x.textAlign='center';x.direction='ltr';
+    const pw=x.measureText(d.phone).width,is=pfs*1.1;drawIcon(x,'chat',L.cx-pw/2-is/2-10*u,y+pfs/2,is,C.sub);x.fillStyle=C.sub;x.fillText(d.phone,L.cx+is/2,y+pfs/2);x.restore()}}
+
+function drawExplain(x,t,A){const {W,H,P,q,C}=A,L={pad:P.pad*q,top:P.top*q,bot:H-(P.tall?REEL_SAFE.bottom:60)*q};
+  L.cy=(L.top+L.bot)/2;L.cx=W/2;L.aw=W-2*L.pad;
+  x.save();x.filter='none';x.globalAlpha=1;x.fillStyle=C.bg;x.fillRect(0,0,W,H);
+  const ph=E_EASE(clamp01((t-EXP.featAt+.35)/.8));
+  if(ph>0&&hasMedia()){x.globalAlpha=ph;const z=1.1-.1*clamp01((t-EXP.featAt)/(EXP.total-EXP.featAt));
+    x.translate(W/2,H/2);x.scale(z,z);x.translate(-W/2,-H/2);drawMediaCover(x,W,H);x.setTransform(1,0,0,1,0,0);x.fillStyle=C.tint;x.fillRect(0,0,W,H)}
+  x.restore();
+  const bx=A.blur.getContext('2d');bx.imageSmoothingQuality='high';bx.filter='blur(2px)';bx.drawImage(x.canvas,0,0,A.blur.width,A.blur.height);bx.filter='none';
+  expHook(x,t,A,L);expBrand(x,t,A,L);expFeatures(x,t,A,L);expStats(x,t,A,L);expCta(x,t,A,L)}
+
+/* H.264 High@5.1 أولاً (يدعم 1080×1920 بـ60fps) ثم بدائل أقل */
+const REC_MIMES=['video/mp4;codecs=avc1.640033,mp4a.40.2','video/mp4;codecs=avc1.4D4033,mp4a.40.2','video/mp4;codecs=avc1.42E033,mp4a.40.2','video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
 async function exportVideo(){
+  if(TPL[S.tpl].anim)return exportAnim();
   const v=$('pVid');
   if(!M.vurl||S.media!=='video')return toast('ارفع فيديو الأول من تبويب 🎥 فيديو');
   if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)return toast('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome أو Safari حديث');
@@ -600,8 +926,7 @@ async function exportVideo(){
   const P=geo(),q=+$('vq').value,fps=+$('vfps').value||60,W=Math.round(P.W*q/2)*2,H=Math.round(P.H*q/2)*2;
   const BPP=0.18,bitrate=Math.round(Math.min(40e6,Math.max(6e6,W*H*fps*BPP)));
   /* H.264 High@5.1 أولاً (يدعم 1080×1920 بـ60fps) ثم بدائل أقل */
-  const mimes=['video/mp4;codecs=avc1.640033,mp4a.40.2','video/mp4;codecs=avc1.4D4033,mp4a.40.2','video/mp4;codecs=avc1.42E033,mp4a.40.2','video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
-  const mime=mimes.find(m=>MediaRecorder.isTypeSupported(m));
+  const mime=REC_MIMES.find(m=>MediaRecorder.isTypeSupported(m));
   const wasLoop=v.loop;let noAudio=!hasAudio;
   busy('جاري تجهيز طبقة التصميم…',0);
   try{
@@ -637,7 +962,8 @@ async function exportVideo(){
 async function prepLogo(){const im=new Image();await new Promise(r=>{im.onload=im.onerror=r;im.src=LOGO_SRC});
   const k=Math.min(1,360/Math.max(im.naturalWidth||360,im.naturalHeight||360)),c=document.createElement('canvas');
   c.width=Math.round((im.naturalWidth||360)*k);c.height=Math.round((im.naturalHeight||360)*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
-  LOGO_DATA=c.toDataURL('image/jpeg',.92);LOGO_URL=URL.createObjectURL(dataBlob(LOGO_DATA))}
+  LOGO_DATA=c.toDataURL('image/jpeg',.92);LOGO_URL=URL.createObjectURL(dataBlob(LOGO_DATA));
+  LOGO_IMG=new Image();LOGO_IMG.src=LOGO_DATA;try{await LOGO_IMG.decode()}catch(e){console.error('logo decode',e)}}
 
 function bind(){
   $('tplG').innerHTML=Object.keys(TPL).map(k=>`<button class="tb" type="button" data-t="${k}">${TPL[k].i} ${TPL[k].n}</button>`).join('');
@@ -659,6 +985,9 @@ function bind(){
   $('fAr').value=S.fAr;$('fEn').value=S.fEn;
   $('fAr').onchange=e=>setFont('ar',e.target.value);
   $('fEn').onchange=e=>setFont('en',e.target.value);
+  $('aPlay').onclick=()=>{side(0);playAnim()};
+  $('aDur').onchange=()=>playAnim();
+  $('aTheme').onchange=()=>{render();playAnim()};
   $('fields').addEventListener('input',e=>{const k=e.target.dataset.k;if(k){S.store[S.tpl][k]=e.target.value;render()}});
   ['gPhone','gWeb','gSlogan','dark','lsz','tLogo','tStrip'].forEach(id=>$(id).addEventListener('input',()=>{$('lv').textContent=$('lsz').value;$('dv').textContent=$('dark').value;render()}));
   $('tStrip').addEventListener('change',()=>{render()});
