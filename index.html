@@ -453,6 +453,86 @@ explain:{n:'شرح الموقع (متحرك)',i:'📱',anim:true,font:'Readex Pr
       <div style="margin-top:30px;color:${C.sub};font:500 32px ${F};direction:ltr">${esc(d.phone)}</div>
     </div></div>`}}},
 
+/* ===== عرض عاجل + محادثة واتساب (مناسب للستوري 9:16) ===== */
+urgency:{n:'عرض عاجل + واتساب',i:'⚡',f:['badge','title','c1','c2','old','price','cur','sub','cta'],
+  L:{badge:'⏳ الشارة العاجلة',title:'📝 العنوان',c1:'💬 رسالة العميل',c2:'💬 رد Nook Tours',sub:'📌 تحت السعر',cta:'🔗 نص الستيكر'},
+  d:{badge:'⏳ عرض لفترة محدودة',title:'ويك إند في دهب',c1:'متاح حجز لشخصين في دهب الويك إند ده؟',c2:'متاح يا فندم! ابعتلنا التواريخ ونأكدلك السعر الحالي فوراً ✅',old:'1,899',price:'1,499',cur:'ج.م / للفرد',sub:'شامل الإقامة والانتقالات',cta:'احجز عبر واتساب'},
+  r:(d,P)=>{const col=C(),k=P.tall?1.32:P.land?.82:P.sq?.84:1;
+    const bubble=(t,cust)=>t?`<div style="display:flex;justify-content:${cust?'flex-start':'flex-end'};margin:${12*k}px 0"><div style="max-width:80%;background:${cust?'#fff':'#d9fdd3'};color:#111b21;font:500 ${SZ(30*k,'sub')}px/1.45 ${AR};padding:${16*k}px ${22*k}px;border-radius:${22*k}px;text-align:right;box-shadow:0 2px 6px rgba(0,0,0,.12)">${esc(t)}</div></div>`:'';
+    const chat=`<div style="background:#efe7dd;border-radius:${28*k}px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.35);margin:${26*k}px 0">
+      <div style="background:#0b5d4f;display:flex;align-items:center;gap:${14*k}px;padding:${16*k}px ${22*k}px"><div style="width:${58*k}px;height:${58*k}px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none"><img src="${LOGO_URL}" alt="" style="width:80%;height:80%;object-fit:contain"></div>
+      <div style="text-align:right"><div style="color:#fff;font:700 ${26*k}px ${EN}">Nook Tours</div><div style="color:rgba(255,255,255,.8);font:400 ${20*k}px ${AR}">متصل الآن</div></div></div>
+      <div style="padding:${14*k}px ${20*k}px">${bubble(d.c1,true)}${bubble(d.c2,false)}</div></div>`;
+    const priceBox=d.price?`<div style="display:inline-flex;align-items:center;gap:${22*k}px;background:linear-gradient(160deg,rgba(8,14,24,.93),rgba(12,22,40,.9));border:2px solid rgba(201,168,76,.5);border-radius:${26*k}px;padding:${16*k}px ${32*k}px">
+      ${d.old?`<span style="color:rgba(255,255,255,.55);font:700 ${SZ(34*k,'sub')}px ${EN};text-decoration:line-through">${esc(d.old)}</span>`:''}
+      <span style="color:${col.title};font:900 ${SZ(70*k,'title')}px/1 ${EN}">${esc(d.price)}</span><span style="color:#fff;font:700 ${SZ(24*k,'sub')}px ${AR}">${esc(d.cur)}</span></div>
+      ${d.sub?`<div style="color:${col.sub};font:600 ${SZ(24*k,'sub')}px ${AR};margin-top:${10*k}px">${esc(d.sub)}</div>`:''}`:'';
+    const sticker=d.cta?`<div style="display:inline-flex;align-items:center;gap:${12*k}px;background:#fff;border-radius:${16*k}px;padding:${16*k}px ${28*k}px;margin-top:${30*k}px;transform:rotate(-3deg);box-shadow:0 10px 30px rgba(0,0,0,.35)"><span style="font-size:${30*k}px">🔗</span><span style="color:#0a84ff;font:800 ${SZ(30*k,'cta')}px ${AR}">${esc(d.cta)}</span></div>`:'';
+    return{ov:`linear-gradient(rgba(6,12,22,.55),rgba(6,12,22,.82))`,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;max-width:${900*k}px;text-align:center">
+      ${d.badge?`<div style="display:inline-flex;align-items:center;gap:${12*k}px;background:linear-gradient(135deg,#ff6b4a,#e63946);color:#fff;font:800 ${SZ(28*k,'badge')}px ${AR};padding:${12*k}px ${28*k}px;border-radius:40px;box-shadow:0 8px 24px rgba(230,57,70,.45)"><span style="width:${12*k}px;height:${12*k}px;border-radius:50%;background:#fff;display:inline-block"></span>${esc(d.badge)}</div>`:''}
+      <div style="color:${col.title};font:900 ${SZ(ts(P)-6,'title')}px/1.2 ${AR};margin-top:${20*k}px;text-shadow:0 4px 22px rgba(0,0,0,.5)">${ml(d.title)}</div>
+      ${chat}${priceBox}<div>${sticker}</div></div></div>`}}},
+
+/* ===== مقارنة 3 باقات (اقتصادي / قياسي / VIP) والمميزة بإطار دهبي ===== */
+compare:{n:'مقارنة الباقات',i:'⚖️',f:['badge','title','sub','rows','c1','cur','cta'],
+  L:{badge:'🏷️ شارة الباقة المميزة',title:'📝 العنوان',sub:'💬 سطر تحت العنوان',rows:'📋 كل سطر باقة: الاسم | الفندق | السعر | ميزة، ميزة، ميزة',c1:'⭐ رقم الباقة المميزة (1-3)',cur:'العملة'},
+  d:{badge:'الأكثر طلباً',title:'اختار باقتك',sub:'الغردقة · 4 أيام 3 ليالي · الأسعار للفرد',rows:'اقتصادي | فندق 3 نجوم | 2,499 | إقامة 4 أيام، فطار يومي، انتقالات\nقياسي | فندق 4 نجوم | 3,999 | إقامة 4 أيام، فطار وعشا، انتقالات، رحلة بحرية\nVIP فاخر | فندق 5 نجوم | 6,499 | إقامة 4 أيام، كل الوجبات، انتقالات خاصة، مرشد سياحي',c1:'2',cur:'ج.م',cta:'احجز باقتك'},
+  r:(d,P)=>{const col=C(),best=Math.max(1,Math.min(3,parseInt(d.c1,10)||2))-1,k=P.land?.85:P.tall?1.05:P.sq?.8:.92;
+    const tiers=lines(d.rows).slice(0,3).map((x,i)=>{const p=x.split('|').map(s=>s.trim()),feats=(p[3]||'').split(/[،,]/).map(s=>s.trim()).filter(Boolean),hi=i===best;
+      return `<div style="flex:1;min-width:0;position:relative;background:${hi?'linear-gradient(180deg,rgba(201,168,76,.24),rgba(10,22,40,.9))':'linear-gradient(180deg,rgba(255,255,255,.09),rgba(10,22,40,.84))'};border:${hi?3:1.5}px solid ${hi?G:'rgba(255,255,255,.18)'};border-radius:${30*k}px;padding:${hi?46*k:32*k}px ${18*k}px ${26*k}px;text-align:center;${hi?'box-shadow:0 0 44px rgba(201,168,76,.45);transform:scale(1.04)':''}">
+        ${hi&&d.badge?`<div style="position:absolute;top:-${22*k}px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,${G2},${G});color:${NV};font:800 ${SZ(20*k,'badge')}px ${AR};padding:${8*k}px ${20*k}px;border-radius:30px;white-space:nowrap">⭐ ${esc(d.badge)}</div>`:''}
+        <div style="color:${hi?G2:col.badge};font:800 ${SZ(30*k,'title')}px ${AR}">${esc(p[0]||'')}</div>
+        <div style="color:${col.sub};font:500 ${SZ(22*k,'sub')}px ${AR};margin-top:${6*k}px">${esc(p[1]||'')}</div>
+        <div style="margin:${18*k}px 0 ${4*k}px;color:#fff;font:900 ${SZ(54*k,'title')}px/1 ${EN}">${esc(p[2]||'')}</div>
+        <div style="color:${col.sub};font:600 ${20*k}px ${AR};margin-bottom:${16*k}px">${esc(d.cur)}</div>
+        <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:${14*k}px;text-align:right">${feats.map(f=>`<div style="color:#fff;font:500 ${SZ(21*k,'sub')}px/1.5 ${AR};margin:${6*k}px 0"><span style="color:${G}">✓</span> ${esc(f)}</div>`).join('')}</div></div>`}).join('');
+    return{ov:`linear-gradient(rgba(6,12,22,.72),rgba(6,12,22,.88))`,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
+      <div style="color:${col.title};font:900 ${SZ(ts(P)-10,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(26,'sub')}px ${AR};margin-top:10px">${esc(d.sub)}</div>`:''}
+      <div style="display:flex;gap:${16*k}px;align-items:stretch;margin-top:${44*k}px">${tiers}</div>
+      <div style="margin-top:${34*k}px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">${d.cta?cta(d.cta,`font-size:${SZ(30,'cta')}px;padding:14px 38px`):''}${contactRow(d)}</div></div></div>`}}},
+
+/* ===== هوك فيروسي فوق الصورة/الفيديو: تغريدة أو شريط بحث أو إشعار iPhone ===== */
+hook:{n:'هوك فيروسي',i:'🔥',f:['title','who','c1'],
+  modes:[{key:'hookStyle',label:'شكل الهوك',opts:[['tweet','🐦 تغريدة'],['search','🔍 بحث'],['notify','🔔 إشعار']]},{key:'hookPos',label:'مكانه',opts:[['top','⬆️ فوق'],['mid','⏺ نص'],['bot','⬇️ تحت']]}],
+  L:{title:'🔥 نص الهوك',who:'👤 اسم الحساب',c1:'@ اليوزرنيم'},
+  d:{title:'لو معاك ويك إند فاضي، ده المكان اللي لازم تسافرله 👇',who:'Nook Tours Egypt',c1:'@nooktours',hookStyle:'tweet',hookPos:'mid'},
+  r:(d,P)=>{const k=P.land?.8:P.tall?1.1:P.sq?.85:1,w=Math.min(P.W-2*P.pad,(P.land?1100:960)*k),style=d.hookStyle||'tweet',pos=d.hookPos||'mid';let card;
+    if(style==='tweet')card=`<div style="width:${w}px;background:#fff;border-radius:${30*k}px;padding:${32*k}px ${36*k}px;box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:right">
+      <div style="display:flex;align-items:center;gap:${16*k}px;margin-bottom:${20*k}px"><div style="width:${76*k}px;height:${76*k}px;border-radius:50%;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;background:#fff"><img src="${LOGO_URL}" alt="" style="width:78%;height:78%;object-fit:contain"></div>
+      <div style="min-width:0"><div style="color:#0f1419;font:800 ${SZ(30*k,'badge')}px ${AR}">${esc(d.who)} <span style="display:inline-block;width:${28*k}px;height:${28*k}px;border-radius:50%;background:#1d9bf0;color:#fff;font:900 ${18*k}px/${28*k}px ${EN};text-align:center;vertical-align:middle">✓</span></div><div style="color:#536471;font:500 ${24*k}px ${EN};direction:ltr;text-align:right">${esc(d.c1)}</div></div></div>
+      <div style="color:#0f1419;font:700 ${SZ(44*k,'title')}px/1.45 ${AR}">${ml(d.title)}</div>
+      <div style="color:#536471;font:500 ${22*k}px ${AR};margin-top:${20*k}px">10:24 م · Nook Tours</div></div>`;
+    else if(style==='search')card=`<div style="width:${w}px;text-align:center"><div style="display:flex;align-items:center;gap:${18*k}px;background:#fff;border-radius:${60*k}px;padding:${26*k}px ${34*k}px;box-shadow:0 24px 60px rgba(0,0,0,.35)"><span style="font-size:${38*k}px">🔍</span><span style="flex:1;color:#202124;font:600 ${SZ(38*k,'title')}px/1.35 ${AR};text-align:right">${ml(d.title)}<span style="display:inline-block;width:3px;height:${40*k}px;background:#1a73e8;vertical-align:middle;margin-right:6px"></span></span></div>
+      <div style="margin-top:${18*k}px;color:#fff;font:600 ${24*k}px ${AR};text-shadow:0 2px 10px rgba(0,0,0,.5)">${esc(d.who)}</div></div>`;
+    else card=`<div style="width:${w}px;background:rgba(245,245,247,.9);border-radius:${36*k}px;padding:${26*k}px ${30*k}px;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:right">
+      <div style="display:flex;align-items:center;gap:${14*k}px;margin-bottom:${12*k}px"><div style="width:${52*k}px;height:${52*k}px;border-radius:${12*k}px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none"><img src="${LOGO_URL}" alt="" style="width:82%;height:82%;object-fit:contain"></div><div style="flex:1;color:#6e6e73;font:600 ${22*k}px ${EN};letter-spacing:1px;direction:ltr;text-align:left">${esc(String(d.who||'').toUpperCase())}</div><div style="color:#6e6e73;font:500 ${22*k}px ${AR}">الآن</div></div>
+      <div style="color:#1d1d1f;font:700 ${SZ(36*k,'title')}px/1.4 ${AR}">${ml(d.title)}</div></div>`;
+    const v=pos==='top'?`top:${P.top+logoSpace(20)}px`:pos==='bot'?`bottom:${P.bot+20}px`:'top:50%;transform:translateY(-50%)';
+    return{ov:`linear-gradient(rgba(6,12,22,.15),rgba(6,12,22,.35))`,body:`<div style="position:absolute;left:0;right:0;${v};display:flex;justify-content:center">${card}</div>`}}},
+
+/* ===== نشرة الوجهات الأسبوعية: شبكة وجهات بالحرارة والجو ونصيحة ===== */
+weekly:{n:'وجهات الأسبوع',i:'☀️',f:['title','c1','rows','cta'],
+  L:{title:'📝 العنوان',c1:'📅 الفترة (اختياري)',rows:'📋 كل سطر وجهة: المدينة | الحرارة | أيقونة | نصيحة\n(عدّل درجات الحرارة كل أسبوع)'},
+  d:{title:'أجواء وجهاتنا الأسبوع ده ☀️🌊',c1:'',rows:'دهب | 27° | ☀️ | بحر هادي ومثالي للغطس\nشرم الشيخ | 28° | ☀️ | مناسب للسنوركل والرحلات البحرية\nالغردقة | 27° | 🌤️ | جو لطيف للأكوا بارك\nسيوة | 24° | 🌙 | ليالي صافية للسفاري والنجوم\nنويبع | 26° | 🌊 | هدوء وكامبات على البحر\nمرسى علم | 29° | ☀️ | شعاب مرجانية ودلافين',cta:'احجز رحلة الويك إند'},
+  r:(d,P)=>{const col=C(),cols=P.land||P.sq?3:2,k=P.land?.8:P.tall?1.08:P.sq?.76:.92;
+    const cards=lines(d.rows).slice(0,6).map(x=>{const p=x.split('|').map(s=>s.trim());return `<div style="background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(10,22,40,.8));border:1.5px solid rgba(201,168,76,.35);border-radius:${28*k}px;padding:${22*k}px ${18*k}px;text-align:center">
+      <div style="font-size:${54*k}px;line-height:1.15">${esc(p[2]||'')}</div>
+      <div style="color:#fff;font:800 ${SZ(32*k,'title')}px ${AR};margin-top:${8*k}px">${esc(p[0]||'')}</div>
+      <div style="color:${G2};font:800 ${SZ(48*k,'title')}px ${EN};margin:${4*k}px 0 ${8*k}px;direction:ltr">${esc(p[1]||'')}</div>
+      <div style="color:${col.sub};font:500 ${SZ(21*k,'sub')}px/1.45 ${AR}">${esc(p[3]||'')}</div></div>`}).join('');
+    return{ov:`linear-gradient(rgba(6,12,22,.62),rgba(6,12,22,.86))`,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
+      <div style="color:${col.title};font:900 ${SZ(ts(P)-14,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
+      ${d.c1?`<div style="color:${col.sub};font:500 ${SZ(24,'sub')}px ${AR};margin-top:8px">${esc(d.c1)}</div>`:''}
+      <div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:${18*k}px;margin-top:${30*k}px">${cards}</div>
+      <div style="margin-top:${30*k}px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">${d.cta?cta(d.cta,`font-size:${SZ(28,'cta')}px;padding:14px 36px`):''}${contactRow(d)}</div></div></div>`}}},
+
+/* ===== فاضي: الصورة/الفيديو كاملة من غير تعتيم ولا لوجو — شريط السلوجان تحت بس ===== */
+blank:{n:'فاضي (سلوجان بس)',i:'⬜',f:[],d:{},r:()=>({noLogo:true,ov:'transparent',body:''})},
+
 review:{n:'رأي عميل',i:'⭐',f:['badge','stars','sub','who','c1','cta'],
   L:{sub:'💬 نص الرأي',c1:'✈️ الرحلة اللي سافرها'},
   d:{badge:'⭐ رأي عميل',stars:'⭐⭐⭐⭐⭐',sub:'"التنظيم كان ممتاز والبرنامج مظبوط — رجعت مبسوط ومش هسافر غير مع Nook Tours 🙏"',who:'أحمد محمد',c1:'رحلة شرم الشيخ',cta:'احجز رحلتك دلوقتي',reviewMode:'text',reviewImage:''},
@@ -559,11 +639,14 @@ function mark(sel,attr,val){document.querySelectorAll(sel).forEach(b=>b.classLis
 
 function buildFields(){const T=TPL[S.tpl],st=S.store[S.tpl];
   const modeUI=S.tpl==='review'?`<div class="full"><label>طريقة عرض رأي العميل</label><div class="grid"><button class="tb ${st.reviewMode!=='image'?'on':''}" type="button" data-review-mode="text">✍️ كتابة كلام</button><button class="tb ${st.reviewMode==='image'?'on':''}" type="button" data-review-mode="image">🖼️ إضافة صورة</button></div></div>${st.reviewMode==='image'?`<div class="full"><label>صورة رأي العميل (Screenshot من WhatsApp)</label><div class="up"><input type="file" id="reviewImageFile" accept="image/*"><p>اضغط لاختيار <span>صورة الريفيو</span></p>${st.reviewImage?`<img src="${st.reviewImage}" alt="معاينة الصورة" style="display:block;width:auto;max-width:100%;height:90px;object-fit:contain">`:''}</div><div class="hint" style="margin-top:7px">الصورة هتظهر مكان نص الريفيو داخل المستطيل، من غير قص أو تشويه.</div>${st.reviewImage?`<button class="tb" type="button" data-remove-review-image="1" style="margin-top:7px;width:100%">إزالة الصورة</button>`:''}</div>`:''}`:'';
-  $('fields').innerHTML=modeUI+T.f.filter(k=>!(S.tpl==='review'&&st.reviewMode==='image'&&k==='sub')).map(k=>{const [l,t]=FL[k],lab=(T.L&&T.L[k])||l,full=HALF.indexOf(k)<0;let inp;
+  /* اختيارات بأزرار لأي قالب فيه T.modes (زي شكل الهوك ومكانه) */
+  const optsUI=(T.modes||[]).map(m=>`<div class="full"><label>${m.label}</label><div class="grid" style="grid-template-columns:repeat(${m.opts.length},1fr)">${m.opts.map(([v,l])=>`<button class="tb ${(st[m.key]||m.opts[0][0])===v?'on':''}" type="button" data-mode-key="${esc(m.key)}" data-mode-val="${esc(v)}">${l}</button>`).join('')}</div></div>`).join('');
+  $('fields').innerHTML=optsUI+modeUI+T.f.filter(k=>!(S.tpl==='review'&&st.reviewMode==='image'&&k==='sub')).map(k=>{const [l,t]=FL[k],lab=(T.L&&T.L[k])||l,full=HALF.indexOf(k)<0;let inp;
     if(t==='a')inp=`<textarea data-k="${k}" rows="${k==='inc'||k==='rows'?5:2}">${esc(st[k])}</textarea>`;
     else if(t==='s')inp=`<select data-k="${k}"><option${st[k]==='⭐⭐⭐⭐⭐'?' selected':''}>⭐⭐⭐⭐⭐</option><option${st[k]==='⭐⭐⭐⭐'?' selected':''}>⭐⭐⭐⭐</option></select>`;
     else inp=`<input type="text" data-k="${k}" value="${esc(st[k])}">`;
     return `<div class="${full?'full':''}"><label>${lab}</label>${inp}</div>`}).join('');
+  $('fields').querySelectorAll('[data-mode-key]').forEach(b=>b.onclick=()=>{st[b.dataset.modeKey]=b.dataset.modeVal;buildFields();render()});
   const mf=$('reviewImageFile');if(mf)mf.onchange=e=>{const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast('اختار ملف صورة');const reader=new FileReader();reader.onload=()=>{if(!/^data:image\/(png|jpe?g|webp|gif);base64,/.test(String(reader.result)))return toast('الملف ده مش صورة'); /* بنقبل صور بس قبل ما تتحط في الصفحة */st.reviewImage=reader.result;buildFields();render()};reader.onerror=()=>toast('تعذر قراءة الصورة');reader.readAsDataURL(f)};
   $('fields').querySelectorAll('[data-review-mode]').forEach(b=>b.onclick=()=>{st.reviewMode=b.dataset.reviewMode;buildFields();render()});
   const rm=$('fields').querySelector('[data-remove-review-image]');if(rm)rm.onclick=()=>{st.reviewImage='';buildFields();render()};
