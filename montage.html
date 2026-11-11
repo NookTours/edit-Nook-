@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nook Tours Montage</title>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0C2840;--gold:#D9B07A;--sub:#7eb8d4}
+body{margin:0;background:var(--navy);color:#fff;font-family:'Readex Pro',sans-serif}
+#bar{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px}
+#bar button{background:rgba(217,176,122,.15);border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:8px 14px;font:600 13px 'Readex Pro',sans-serif;cursor:pointer}
+#bar button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#log{color:var(--sub);font-size:13px;text-align:center;min-height:18px}
+canvas{display:block;margin:8px auto;max-height:82vh;max-width:96vw;border-radius:12px}
+</style>
+</head>
+<body>
+<div id="bar">
+  <button type="button" data-f="reel">▶ معاينة ريل</button>
+  <button type="button" data-f="post">▶ معاينة بوست</button>
+  <button type="button" data-x="reel">⬇ تصدير ريل</button>
+  <button type="button" data-x="post">⬇ تصدير بوست</button>
+</div>
+<div id="log">جاري التحميل…</div>
+<canvas id="cv"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js"></script>
+<script>
+/* ============ مونتاج فيديو شرح موقع Nook Tours ============
+   كل فريم دالة في الزمن t → تصدير فريم بفريم (60fps) + فويس أوفر ElevenLabs في MP4 واحد. */
+const BASE='videos/',FPS=60,SR=48000,HDR=60,SHOT_W=390,SHOT_H=844,SHOT_DPR=3;
+const FMT={reel:{W:1080,H:1920},post:{W:1080,H:1350}};
+const COL={navy:'#0C2840',navy2:'#123859',gold:'#D9B07A',gold2:'#BF8C4E',ink:'#ffffff',sub:'#c8e6f5'};
+const FONT='"Readex Pro", system-ui, sans-serif';
+const $=id=>document.getElementById(id),log=t=>{$('log').textContent=t};
+const clamp01=v=>v<0?0:v>1?1:v,lerp=(a,b,p)=>a+(b-a)*p,font=(w,px)=>`${w} ${Math.round(px)}px ${FONT}`;
+function bez(x1,y1,x2,y2){const a=(p,q)=>1-3*q+3*p,b=(p,q)=>3*q-6*p,c=p=>3*p,f=(t,p,q)=>((a(p,q)*t+b(p,q))*t+c(p))*t,df=(t,p,q)=>3*a(p,q)*t*t+2*b(p,q)*t+c(p);
+  return x=>{if(x<=0)return 0;if(x>=1)return 1;let t=x;for(let i=0;i<8;i++){const s=df(t,x1,x2);if(Math.abs(s)<1e-6)break;t-=(f(t,x1,x2)-x)/s}
+    if(!(t>=0&&t<=1)||Math.abs(f(t,x1,x2)-x)>1e-4){let lo=0,hi=1;t=x;for(let i=0;i<30;i++){if(f(t,x1,x2)<x)lo=t;else hi=t;t=(lo+hi)/2}}return f(t,y1,y2)}}
+const E_OUT=bez(.22,1,.36,1),E_IO=bez(.65,0,.35,1),E_IN=bez(.55,0,1,.45);
+function spring(t,resp,z){if(t<=0)return 0;const w=2*Math.PI/resp,wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+(z*w/wd)*Math.sin(wd*t))}
+function rr(c,x,y,w,h,r){c.beginPath();if(c.roundRect){c.roundRect(x,y,w,h,r);return}c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+/* ============ الأصول ============ */
+const AS={img:{},shots:null,voice:null,logo:null};
+/* onload مش decode(): decode بيعلق لو النافذة مش ظاهرة */
+function loadImg(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('تعذر تحميل '+src));im.src=src})}
+async function loadAll(){
+  AS.shots=await (await fetch(BASE+LC.site+'shots.json')).json();
+  for(const k of Object.keys(AS.shots.shots))AS.img[k]=await loadImg(BASE+LC.site+k+'.jpg');
+  AS.voice=await new OfflineAudioContext(2,SR,SR).decodeAudioData(await (await fetch(BASE+VO_FILE)).arrayBuffer());
+  const tj=await fetch(BASE+(LC.tl||VO_FILE.replace('.mp3','.json'))+'?t='+Date.now());if(tj.ok){const j=await tj.json();CAPS=j.caps;SCENES=j.scenes;if(j.clips)AS.voice=spliceVoice(AS.voice,j.clips)}
+  /* الموسيقى اختيارية: لو الملف موجود بتتحط تحت الصوت */
+  const mr=await fetch(BASE+MUSIC_FILE);if(mr.ok)AS.music=await new OfflineAudioContext(2,SR,SR).decodeAudioData(await mr.arrayBuffer());
+  const studio=await (await fetch('index.html')).text(),m=studio.match(/LOGO_SRC="(data:image\/[a-z]+;base64,[^"]+)"/);
+  if(m)AS.logo=await loadImg(m[1]);
+  await Promise.all(['700 60px','600 40px','500 40px','400 30px'].map(f=>document.fonts.load(`${f} "Readex Pro"`)));
+}
+
+/* قص الفويس: بيلزق مقاطع [من, لحد] ورا بعض، بفيد 20ms عند كل لزقة (اللزق بيكون في سكوت) */
+const SPLICE_FADE=.02;
+function spliceVoice(buf,clips){const sr=buf.sampleRate,ch=buf.numberOfChannels,len=clips.reduce((a,[s,e])=>a+Math.round((e-s)*sr),0),out=new AudioBuffer({length:len,numberOfChannels:ch,sampleRate:sr}),f=Math.round(SPLICE_FADE*sr);
+  for(let c=0;c<ch;c++){const src=buf.getChannelData(c),dst=out.getChannelData(c);let o=0;
+    clips.forEach(([s,e])=>{const a=Math.round(s*sr),n=Math.round((e-s)*sr);for(let i=0;i<n;i++){const g=Math.min(1,i/f,(n-1-i)/f);dst[o+i]=(src[a+i]||0)*g}o+=n})}
+  return out}
+
+/* ============ التايملاين: من توقيتات فويس ElevenLabs (اتقاست من فترات السكوت في الصوت) ============ */
+/* اللغة من الرابط: montage.html?lang=en */
+const LANG=new URLSearchParams(location.search).get('lang')==='en'?'en':'ar',RTL=LANG==='ar';
+const L10N={
+ ar:{vo:'vo11/ar-v3.mp3',site:'site/',btn:'احجز دلوقتي',goWord:'ادخل',founder:['ب','بيشوي جورج','المؤسس وصاحب الشركة'],online:'متصل الآن',typing:'بيكتب…',
+  caps:[[0.35,2.97,'بطّل تسأل في 10 جروبات عن سعر فندق!'],[3.35,4.90,'كل واحد يقولك سعر…'],[5.44,7.00,'والرد ييجي بعد يومين'],
+  [7.58,8.46,'عشان كدا…'],[9.34,10.82,'عملنا ليك Nook Tours'],[11.40,12.58,'تدخل على الموقع'],[12.75,13.70,'وتختار وجهتك'],
+  [14.29,15.20,'العين السخنة'],[15.47,15.80,'دهب'],[15.96,16.55,'الغردقة'],[16.68,17.09,'أو سيوة'],
+  [17.43,19.57,'وتشوف كل الفنادق والعروض بالصور'],[19.79,22.03,'تملى بيانات الحجز في أقل من دقيقة'],
+  [22.52,24.91,'وإحنا نكلمك على طول على الواتساب'],[25.06,26.70,'بالسعر المظبوط في وقتها'],
+  [27.45,29.37,'ونتابع معاك خطوة بخطوة'],[29.85,32.47,'لحد ما ترجع بالسلامة'],
+  [33.33,34.00,'Nook Tours'],[34.05,35.26,'رحلتك الجاية تبدأ من هنا'],[35.77,36.69,'ادخل دلوقتي'],[36.88,37.71,'واحجز معانا!']],
+  scenes:[['hook',0],['problem',3.2],['hero',7.4],['dest',11.2],['offers',17.3],['book',19.7],['whatsapp',22.4],['reviews',27.2],['cta',32.9]],
+  chaos:['بكام الليلة في دهب؟','حد رد عليك؟ 😩','السعر اتغيّر تاني!','مستني الرد من امبارح','فيه مكان لـ 4 أفراد؟','؟؟؟','ابعتلي على الخاص','حد جرّب الفندق ده؟'],
+  chat:['عايز أحجز دهب 3 ليالي لفردين 🙏','أهلاً بيك! 👋 بعتلك السعر الحالي وكل التفاصيل','ولو حابب نأكد الحجز، إحنا معاك خطوة بخطوة ✅']},
+ en:{vo:'vo11/en-kyle.mp3',tl:'vo11/'+(/^[a-z0-9-]+$/.test(new URLSearchParams(location.search).get('tl')||'')?new URLSearchParams(location.search).get('tl'):'en-kyle')+'.json', /* ?tl=en-montage للنسخة الطويلة */site:'site_en/',btn:'Book now',goWord:'Book',founder:['B','Bishoy George','Founder & Owner'],online:'online',typing:'typing…',caps:[],scenes:[],
+  chaos:['How much per night in Dahab?','Anyone got a reply? 😩','Price changed again!','Still waiting since yesterday','Room for 4 people?','???','DM me the price','Anyone tried this hotel?'],
+  chat:['Hi! Dahab, 3 nights for 2 please 🙏','Hello! 👋 Here’s the current price and all the details','Want us to confirm? We’re with you step by step ✅']}};
+const LC=L10N[LANG],VO_FILE=LC.vo,MUSIC_FILE='vo11/music.mp3';
+let CAPS=LC.caps,SCENES=LC.scenes; /* الإنجليزي بيتملى من vo11/en-campaign.json بعد قياس الفويس */
+const END_HOLD=1.5;
+function buildTL(){const total=Math.max(CAPS[CAPS.length-1][1]+END_HOLD,AS.voice.duration+.3);
+  const scenes=SCENES.map(([id,start],i)=>({id,start,end:i+1<SCENES.length?SCENES[i+1][1]:total}));
+  /* توقيت كل كلمة جوه الجملة بالتناسب مع طولها */
+  const phr=CAPS.map(([s,e,text])=>{const words=text.split(/\s+/),lens=words.map(w=>w.length+1),tot=lens.reduce((a,b)=>a+b,0);let acc=0;
+    const wt=words.map((_,i)=>{const v=s+(e-s)*acc/tot;acc+=lens[i];return v});return{words,wt,end:e}});
+  return{scenes,phr,total}}
+const sceneAt=(TL,t)=>TL.scenes.find(s=>t<s.end)||TL.scenes[TL.scenes.length-1];
+
+/* ============ التخطيط حسب المقاس ============ */
+function layout(f){const {W,H}=FMT[f],u=W/1080;
+  if(f==='reel'){const sw=600*u,sh=sw*SHOT_H/SHOT_W;return{f,W,H,u,scr:{x:(W-sw)/2,y:250*u,w:sw,h:sh},cap:{cx:W/2,cy:1370*u,w:960*u,fs:84*u},hookFs:110*u}}
+  const sw=410*u,sh=sw*SHOT_H/SHOT_W;return{f,W,H,u,scr:{x:100*u,y:(H-sh)/2,w:sw,h:sh},cap:{cx:790*u,cy:H/2,w:470*u,fs:72*u},hookFs:100*u}}
+
+/* ============ الخلفية: كحلي + إضاءة دهبي متحركة ============ */
+function drawBg(x,L,t){const {W,H,u}=L,g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,COL.navy);g.addColorStop(1,COL.navy2);x.fillStyle=g;x.fillRect(0,0,W,H);
+  [[.25,.2,'232,197,106',.22,.35],[.8,.75,'126,184,212',.16,.27]].forEach(([px,py,c,a,sp],i)=>{const cx=W*(px+.08*Math.sin(t*sp+i*2)),cy=H*(py+.06*Math.cos(t*sp*1.3+i)),r=Math.max(W,H)*.55,
+    rg=x.createRadialGradient(cx,cy,0,cx,cy,r);rg.addColorStop(0,`rgba(${c},${a})`);rg.addColorStop(1,`rgba(${c},0)`);x.fillStyle=rg;x.fillRect(0,0,W,H)})}
+
+/* ============ شاشة الموقع: صور مخيّطة بتعمل scroll حقيقي ============ */
+function drawStrip(x,R,names,scrollY){const k=R.w/SHOT_W,list=names.map(n=>({n,sy:AS.shots.shots[n].scrollY,im:AS.img[n]})).sort((a,b)=>a.sy-b.sy);
+  x.fillStyle='#f5f5f7';x.fillRect(R.x,R.y,R.w,R.h);
+  list.forEach((s,i)=>{const crop=i===0?0:HDR,top=s.sy+crop,bot=s.sy+SHOT_H;if(bot<=scrollY||top>=scrollY+SHOT_H)return;
+    x.drawImage(s.im,0,crop*SHOT_DPR,SHOT_W*SHOT_DPR,(SHOT_H-crop)*SHOT_DPR,R.x,R.y+(top-scrollY)*k,R.w,(SHOT_H-crop)*k)});
+  if(scrollY>0){const hs=list.filter(s=>s.sy>0&&s.sy<=scrollY+1).pop()||list.find(s=>s.sy>0);
+    if(hs)x.drawImage(hs.im,0,0,SHOT_W*SHOT_DPR,HDR*SHOT_DPR,R.x,R.y,R.w,HDR*k)}}
+const shotRect=(name,sel)=>{const r=AS.shots.shots[name].rects[sel];return r&&r[2]?r:null};
+
+/* شاشة شات (واتساب): رسالة العميل ← بيكتب… ← رد Nook Tours */
+function drawChat(x,R,p,u){const k=R.w/SHOT_W;x.save();x.beginPath();x.rect(R.x,R.y,R.w,R.h);x.clip();
+  x.fillStyle='#efe7dd';x.fillRect(R.x,R.y,R.w,R.h);
+  const hh=64*k;x.fillStyle='#0b5d4f';x.fillRect(R.x,R.y,R.w,hh);
+  const av=38*k,ax=RTL?R.x+R.w-16*k-av:R.x+16*k,ay=R.y+(hh-av)/2,tx=RTL?ax-10*k:ax+av+10*k;x.fillStyle='#fff';x.beginPath();x.arc(ax+av/2,ay+av/2,av/2,0,7);x.fill();
+  if(AS.logo){x.save();x.beginPath();x.arc(ax+av/2,ay+av/2,av/2-2*k,0,7);x.clip();x.drawImage(AS.logo,ax+3*k,ay+3*k,av-6*k,av-6*k);x.restore()}
+  x.textAlign=RTL?'right':'left';x.textBaseline='middle';x.direction=RTL?'rtl':'ltr';x.fillStyle='#fff';x.font=font(600,16*k);x.fillText('Nook Tours',tx,R.y+hh*.38);
+  x.font=font(400,12*k);x.fillStyle='rgba(255,255,255,.8)';x.fillText(p>.18&&p<.36?LC.typing:LC.online,tx,R.y+hh*.7);
+  const msgs=[{me:true,at:0,t:LC.chat[0]},{me:false,at:.36,t:LC.chat[1]},{me:false,at:.62,t:LC.chat[2]}];
+  let y=R.y+hh+18*k;x.font=font(400,15*k);
+  msgs.forEach(m=>{const lt=p-m.at;if(lt<0)return;const sp=spring(lt*3.2,.5,.65),a=clamp01(lt*8),mw=R.w*.72,lines=wrap(x,m.t,mw-24*k),
+      bw=Math.max(...lines.map(l=>x.measureText(l).width))+26*k,bh=lines.length*21*k+18*k,bx=m.me?R.x+R.w-12*k-bw:R.x+12*k;
+    x.save();x.globalAlpha=a;const cx=m.me?bx+bw:bx,cy=y+bh;x.translate(cx,cy);x.scale(.7+.3*sp,.7+.3*sp);x.translate(-cx,-cy);
+    x.shadowColor='rgba(0,0,0,.12)';x.shadowBlur=3*k;x.shadowOffsetY=1*k;rr(x,bx,y,bw,bh,10*k);x.fillStyle=m.me?'#d9fdd3':'#fff';x.fill();x.shadowColor='transparent';
+    x.fillStyle='#111b21';x.textAlign=RTL?'right':'left';lines.forEach((l,i)=>x.fillText(l,RTL?bx+bw-13*k:bx+13*k,y+9*k+10.5*k+i*21*k));x.restore();y+=bh+10*k});
+  if(p>.18&&p<.36){const bx=R.x+12*k,by=y,bw=64*k,bh=36*k;rr(x,bx,by,bw,bh,10*k);x.fillStyle='#fff';x.fill();
+    for(let i=0;i<3;i++){const o=.5+.5*Math.sin(p*60-i*1.2);x.fillStyle=`rgba(17,27,33,${.3+.5*o})`;x.beginPath();x.arc(bx+18*k+i*14*k,by+bh/2-3*k*o,4.5*k,0,7);x.fill()}}
+  x.restore()}
+function wrap(x,text,maxW){const out=[];let cur='';String(text).split(/\s+/).forEach(w=>{const n=cur?cur+' '+w:w;if(cur&&x.measureText(n).width>maxW){out.push(cur);cur=w}else cur=n});if(cur)out.push(cur);return out}
+
+/* إطار الموبايل + كاميرا (زووم حوالين نقطة جوه الشاشة) */
+function drawPhone(x,L,cam,content){const R=L.scr,u=L.u,b=16*u;x.save();
+  const cx=R.x+R.w/2,cy=R.y+R.h/2;x.translate(cx+(cam.dx||0),cy+(cam.dy||0));x.rotate(cam.rot||0);x.translate(-cx,-cy);
+  if(cam.s&&cam.s!==1){const fx=R.x+R.w*(cam.fx??.5),fy=R.y+R.h*(cam.fy??.5);x.translate(fx,fy);x.scale(cam.s,cam.s);x.translate(-fx,-fy)}
+  if(cam.blur>.5)x.filter=`blur(${cam.blur.toFixed(1)}px)`;
+  x.save();x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=60*u;x.shadowOffsetY=30*u;rr(x,R.x-b,R.y-b,R.w+2*b,R.h+2*b,72*u);x.fillStyle='#0b0d10';x.fill();x.restore();
+  rr(x,R.x-b,R.y-b,R.w+2*b,R.h+2*b,72*u);x.lineWidth=3*u;x.strokeStyle='#3a3f47';x.stroke();
+  x.save();rr(x,R.x,R.y,R.w,R.h,56*u);x.clip();content(x,R);
+  if(cam.glare>0&&cam.glare<1){const gx=R.x-R.w+cam.glare*R.w*3,g=x.createLinearGradient(gx,R.y,gx+R.w*.6,R.y+R.h*.5);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.5,'rgba(255,255,255,.22)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(R.x,R.y,R.w,R.h)} /* لمعة زجاج بتعدي على الشاشة */
+  x.restore();
+  x.restore()}
+function tapRipple(x,X,Y,p,u){if(p<=0||p>=1)return;const e=E_OUT(p);x.save();x.globalAlpha=1-p;x.strokeStyle=COL.gold;x.lineWidth=5*u;x.beginPath();x.arc(X,Y,20*u+60*u*e,0,7);x.stroke();
+  x.globalAlpha=(1-p)*.9;x.fillStyle='rgba(255,255,255,.85)';x.beginPath();x.arc(X,Y,22*u*(1-.3*e),0,7);x.fill();x.restore()}
+
+/* ============ المشاهد ============ */
+const STRIPS={hero:['hero','hero_title'],dest:['dest','dest_cards'],offers:['gallery'],book:['book','book_fields','book_submit'],reviews:['reviews']};
+function screenFor(id,p){const S=AS.shots.shots;
+  if(id==='hero')return{names:STRIPS.hero,y:lerp(0,S.hero_title.scrollY,E_IO(clamp01((p-.45)/.35)))};
+  if(id==='dest')return{names:STRIPS.dest,y:lerp(S.dest.scrollY,S.dest_cards.scrollY,E_IO(clamp01((p-.15)/.7)))};
+  if(id==='offers')return{names:STRIPS.offers,y:S.gallery.scrollY};
+  if(id==='book'){const a=E_IO(clamp01(p/.5)),b=E_IO(clamp01((p-.55)/.18));return{names:STRIPS.book,y:lerp(lerp(S.book.scrollY,S.book_fields.scrollY,a),S.book_submit.scrollY,b)}}
+  if(id==='reviews')return{names:STRIPS.reviews,y:S.reviews.scrollY};return null}
+/* كاميرا لكل مشهد: زووم بطيء + ضربات زووم على العناصر المهمة */
+function camFor(id,p,L){const punch=1+.06*(1-spring(p*8,.45,.5)); /* ضربة زووم مع بداية كل مشهد */
+  if(id==='hero'){const r=shotRect('hero','.hero-logo');return{s:punch*lerp(1,1.12,E_IO(p)),fx:r?(r[0]+r[2]/2)/SHOT_W:.5,fy:.3}}
+  if(id==='dest')return{s:punch*1.04,fy:.55};
+  if(id==='offers'){const r=shotRect('gallery','#galGrid');return{s:punch*lerp(1,1.45,E_IO(clamp01(p*1.1))),fx:.5,fy:r?(r[1]+r[3]/2)/SHOT_H:.5}}
+  if(id==='book'){const r=shotRect('book_submit','#go'),z=E_IO(clamp01((p-.74)/.12));return{s:punch*lerp(1,1.7,z),fx:r?(r[0]+r[2]/2)/SHOT_W:.5,fy:r?(r[1]+r[3]/2)/SHOT_H:.75}}
+  if(id==='whatsapp')return L.f==='post'?{s:punch*lerp(1,1.1,E_IO(p)),fy:.3}:{s:punch*lerp(1.15,1.35,E_IO(p)),fy:.22};
+  if(id==='reviews'){const r=shotRect('reviews','.rev-grid');return{s:punch*lerp(1.02,1.4,E_IO(p)),fy:r?(r[1]+r[3]/2)/SHOT_H:.4}}
+  return{s:1}}
+
+/* الهوك: قطعات سريعة على صور الموقع + فلاش + هزة */
+const CUT=.4; /* طول القطعة في الهوك */
+function blurredShot(x,L,name,z,dim){const {W,H,u}=L,im=AS.img[name],k=Math.max(W/im.width,H/im.height)*z;
+  x.save();x.filter=`blur(${(6*u).toFixed(1)}px) brightness(${dim})`;x.drawImage(im,(W-im.width*k)/2,(H-im.height*k)/2,im.width*k,im.height*k);x.restore()}
+function drawHook(x,L,t,s,TL){const {W,H}=L,cut=Math.floor(t/CUT),names=['hero','dest_cards','gallery','book_fields','reviews'],lt=t%CUT;
+  blurredShot(x,L,names[cut%names.length],1.18-.1*E_OUT(clamp01(lt/CUT)),.5);x.fillStyle='rgba(10,22,40,.45)';x.fillRect(0,0,W,H);
+  const out=clamp01((t-(s.end-.25))/.25);drawWords(x,L,t,TL.phr,{cx:W/2,cy:H*.47,w:W*.86,fs:L.hookFs,box:false,alpha:1-out,scale:1+.25*E_IN(out)});
+  const fl=1-clamp01(t/.14);if(fl>0){x.fillStyle=`rgba(255,255,255,${fl})`;x.fillRect(0,0,W,H)}}
+
+/* المشكلة: سيل رسايل جروبات بتنط (بكام؟ حد رد؟…) */
+const CHAOS=[[.27,.17,-4],[.73,.27,5],[.3,.36,3],[.7,.62,-3],[.3,.72,4],[.76,.8,-6],[.68,.12,3],[.28,.86,-2]].map((q,i)=>[LC.chaos[i],...q]);
+function drawProblem(x,L,t,s,TL){const {W,H,u}=L,lt=t-s.start,out=clamp01((t-(s.end-.3))/.3);
+  blurredShot(x,L,'reviews',1.1+.05*lt/(s.end-s.start),.35);x.fillStyle='rgba(10,22,40,.5)';x.fillRect(0,0,W,H);
+  x.save();x.font=font(500,40*u);x.direction=RTL?'rtl':'ltr';x.textBaseline='middle';x.textAlign='center';
+  CHAOS.forEach(([txt,fx,fy,rot],i)=>{const bt=lt-i*.3;if(bt<0)return;const sp=spring(bt,.42,.5),a=clamp01(bt*8)*(1-out),bw=x.measureText(txt).width+70*u,bh=84*u,X=W*fx,Y=H*fy;
+    x.save();x.globalAlpha=a;x.translate(X,Y);x.rotate(rot*Math.PI/180);x.scale(sp*(1-.3*out),sp*(1-.3*out));
+    x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=24*u;x.shadowOffsetY=8*u;rr(x,-bw/2,-bh/2,bw,bh,24*u);x.fillStyle='#fff';x.fill();x.shadowColor='transparent';
+    x.fillStyle='#111b21';x.fillText(txt,0,2*u);x.fillStyle='#e5484d';x.beginPath();x.arc(bw/2-6*u,-bh/2+6*u,20*u,0,7);x.fill();
+    x.fillStyle='#fff';x.font=font(700,24*u);x.direction='ltr';x.fillText(String(i+3),bw/2-6*u,-bh/2+7*u);x.font=font(500,40*u);x.direction=RTL?'rtl':'ltr';x.restore()});
+  x.restore();
+  drawWords(x,L,t,TL.phr,{cx:W/2,cy:H*.5,w:W*.86,fs:L.hookFs*.82,box:true,alpha:1-out})}
+
+/* مشهد كلام: قطعات بطيئة على صور الموقع ورا كابشن كبير — ولو founder بيظهر كارت المؤسس */
+const STATE_CUT=2.4;
+function drawStatement(x,L,t,s,TL){const {W,H,u}=L,lt=t-s.start,names=['hero_title','dest_cards','gallery','book_fields','reviews'],seg=Math.floor(lt/STATE_CUT),sl=lt%STATE_CUT;
+  blurredShot(x,L,names[(seg+(s.id==='founder'?0:2))%names.length],1.14-.08*E_OUT(clamp01(sl/STATE_CUT)),.38);x.fillStyle='rgba(10,22,40,.5)';x.fillRect(0,0,W,H);
+  const fin=E_OUT(clamp01(lt/.3));x.save();x.globalAlpha=fin;
+  if(s.id==='founder'){const [ini,name,role]=LC.founder,sp=spring(lt,.55,.6),av=190*u,cy=H*(L.f==='reel'?.33:.3),cw=640*u,ch=av+190*u;
+    x.save();x.translate(W/2,cy);x.scale(.8+.2*sp,.8+.2*sp);x.translate(-W/2,-cy);rr(x,W/2-cw/2,cy-ch/2,cw,ch,40*u);x.fillStyle='rgba(10,22,40,.78)';x.fill();
+    x.lineWidth=2*u;x.strokeStyle='rgba(217,176,122,.45)';x.stroke();const ay=cy-ch/2+40*u,g=x.createLinearGradient(W/2-av/2,ay,W/2+av/2,ay+av);g.addColorStop(0,COL.gold);g.addColorStop(1,COL.gold2);
+    x.fillStyle=g;x.beginPath();x.arc(W/2,ay+av/2,av/2,0,7);x.fill();x.font=font(700,av*.48);x.fillStyle=COL.navy;x.textAlign='center';x.textBaseline='middle';x.direction=RTL?'rtl':'ltr';x.fillText(ini,W/2,ay+av/2+4*u);
+    x.font=font(700,58*u);x.fillStyle='#fff';x.fillText(name,W/2,ay+av+52*u);x.font=font(500,34*u);x.fillStyle=COL.gold;x.fillText(role,W/2,ay+av+108*u);x.restore()}
+  x.restore();
+  drawWords(x,L,t,TL.phr,{cx:W/2,cy:H*(s.id==='founder'?(L.f==='reel'?.62:.68):.5),w:W*.86,fs:L.hookFs*.66,box:true,alpha:fin})}
+
+/* الكابشن: كلمة كلمة بتنط، والكلمة الحالية دهبي */
+function drawWords(x,L,t,phr,o){let cur=null;for(const p of phr)if(t>=p.wt[0]-.05)cur=p;if(!cur||(cur.end&&t>cur.end+.45))return;const u=L.u;
+  x.save();x.font=font(700,o.fs);x.textBaseline='middle';x.direction=RTL?'rtl':'ltr';x.textAlign='left';
+  const sp=x.measureText(' ').width,ws=cur.words.map(w=>x.measureText(w).width),lines=[[]];let lw=0;
+  cur.words.forEach((w,i)=>{if(lines[lines.length-1].length&&lw+ws[i]>o.w){lines.push([]);lw=0}lines[lines.length-1].push(i);lw+=ws[i]+sp});
+  const lh=o.fs*1.28,bh=lines.length*lh;let y=o.cy-bh/2+lh/2;
+  if(o.box){const bw=Math.min(o.w+60*u,Math.max(...lines.map(l=>l.reduce((a,i)=>a+ws[i]+sp,-sp)))+70*u);x.save();x.globalAlpha=.78*(o.alpha??1);rr(x,o.cx-bw/2,o.cy-bh/2-22*u,bw,bh+44*u,28*u);x.fillStyle='rgba(10,22,40,.82)';x.fill();x.restore()}
+  let active=0;cur.wt.forEach((wt,i)=>{if(t>=wt)active=i});
+  x.translate(o.cx,o.cy);x.scale(o.scale||1,o.scale||1);x.translate(-o.cx,-o.cy);
+  lines.forEach(line=>{const tot=line.reduce((a,i)=>a+ws[i]+sp,-sp);let xx=RTL?o.cx+tot/2:o.cx-tot/2-sp; /* عربي من اليمين، إنجليزي من الشمال */
+    line.forEach(i=>{const lt=t-cur.wt[i];if(RTL)xx-=ws[i];else xx+=sp;if(lt>-.05){const s2=spring(lt+.05,.38,.55),a=clamp01((lt+.05)*12)*(o.alpha??1),sc=.55+.45*s2,wx=xx+ws[i]/2;
+        x.save();x.globalAlpha=a;x.translate(wx,y);x.scale(sc,sc);x.shadowColor='rgba(0,0,0,.55)';x.shadowBlur=18*u;x.shadowOffsetY=4*u;
+        x.fillStyle=i===active?COL.gold:COL.ink;x.fillText(cur.words[i],-ws[i]/2,0);x.restore()}
+      if(RTL)xx-=sp;else xx+=ws[i]});y+=lh});
+  x.restore()}
+
+/* النهاية: لوجو + رابط بيتكتب + زر بيتضغط */
+function drawEnd(x,L,t,s,TL){const {W,H,u}=L,lt=t-s.start,cx=W/2,cy=L.f==='reel'?H*.44:H*.47,
+  endP=TL.phr.filter(q=>q.wt[0]>=s.start),go=endP.find(q=>q.words[0]===LC.goWord),book=endP[endP.length-1],btnAt=go?go.wt[0]-.2-s.start:2.6,tapAt=book?book.end-.15-s.start:3.6; /* الزر بيظهر مع «ادخل دلوقتي» وبيتضغط مع «واحجز معانا» */
+  const ls=230*u*(.6+.4*spring(lt,.55,.55)),la=clamp01(lt*4);x.save();x.globalAlpha=la;x.shadowColor='rgba(0,0,0,.4)';x.shadowBlur=40*u;x.shadowOffsetY=16*u;
+  rr(x,cx-ls/2,cy-330*u-ls/2,ls,ls,ls*.22);x.fillStyle='#fff';x.fill();x.shadowColor='transparent';if(AS.logo)x.drawImage(AS.logo,cx-ls*.36,cy-330*u-ls*.36,ls*.72,ls*.72);x.restore();
+  drawWords(x,L,t,TL.phr.filter(q=>q.wt[0]>=s.start),{cx,cy:cy-90*u,w:W*.86,fs:72*u,box:false});
+  const url='www.nooktoursegypt.com',ut=lt-.5,n=Math.max(0,Math.min(url.length,Math.floor(ut*22))),bw=760*u,bh=96*u,by=cy+40*u,ba=clamp01(ut*5);
+  if(ba>0){x.save();x.globalAlpha=ba;rr(x,cx-bw/2,by,bw,bh,bh/2);x.fillStyle='rgba(255,255,255,.12)';x.fill();x.lineWidth=2*u;x.strokeStyle='rgba(255,255,255,.25)';x.stroke();
+    x.font=font(500,38*u);x.direction='ltr';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';const full=x.measureText(url).width,sx=cx-full/2;
+    x.textAlign='left';x.fillText(url.slice(0,n),sx,by+bh/2);if(n<url.length||(t*1.2)%1<.55){const cw=x.measureText(url.slice(0,n)).width;x.fillStyle=COL.gold;x.fillRect(sx+cw+4*u,by+bh/2-22*u,4*u,44*u)}x.restore()}
+  const bt=lt-btnAt,tp=tapAt-btnAt;if(bt>0){const sp=spring(bt,.5,.55),pp=clamp01((bt-tp)/.3),sc=(.7+.3*sp)*(1-.05*Math.sin(Math.PI*pp)),btw=520*u,bth=110*u,btY=by+bh+60*u;
+    x.save();x.translate(cx,btY+bth/2);x.scale(sc,sc);x.translate(-cx,-(btY+bth/2));x.globalAlpha=clamp01(bt*5);x.shadowColor='rgba(217,176,122,.5)';x.shadowBlur=40*u;
+    const g=x.createLinearGradient(cx-btw/2,0,cx+btw/2,0);g.addColorStop(0,COL.gold);g.addColorStop(1,COL.gold2);rr(x,cx-btw/2,btY,btw,bth,bth/2);x.fillStyle=g;x.fill();x.shadowColor='transparent';
+    x.font=font(700,46*u);x.fillStyle=COL.navy;x.textAlign='center';x.textBaseline='middle';x.direction=RTL?'rtl':'ltr';x.fillText(LC.btn,cx,btY+bth/2);x.restore();
+    tapRipple(x,cx+60*u,btY+bth/2,(bt-tp)/.6,u);
+    const pa=clamp01((bt-.4)*3);x.save();x.globalAlpha=pa;x.font=font(500,36*u);x.fillStyle=COL.sub;x.textAlign='center';x.direction='ltr';x.fillText('WhatsApp · 01005377933',cx,btY+bth+70*u);x.restore()}}
+
+/* ============ الفريم ============ */
+const TRANS=.32; /* مدة انتقال الشاشة بين المشاهد */
+function drawFrame(x,t,TL,L){const s=sceneAt(TL,t),i=TL.scenes.indexOf(s),lt=t-s.start,p=clamp01(lt/(s.end-s.start)),{u}=L;
+  x.save();x.filter='none';x.globalAlpha=1;drawBg(x,L,t);
+  if(s.id==='hook'){drawHook(x,L,t,s,TL);drawProgress(x,L,t,TL);x.restore();return}
+  if(s.id==='problem'){drawProblem(x,L,t,s,TL);drawProgress(x,L,t,TL);x.restore();return}
+  if(s.id==='founder'||s.id==='statement'){drawStatement(x,L,t,s,TL);drawProgress(x,L,t,TL);x.restore();return}
+  if(s.id==='cta'){const ex=E_IN(clamp01(lt/.45));if(ex<1&&!['hook','problem','founder','statement'].includes(TL.scenes[i-1].id))phoneScene(x,L,TL.scenes[i-1],1,t,{dy:-L.H*.9*ex,rot:-.12*ex,blur:14*u*ex});drawEnd(x,L,t,s,TL);drawProgress(x,L,t,TL);x.restore();return}
+  const prev=TL.scenes[i-1],tin=clamp01(lt/TRANS),fromText=prev&&['hook','problem','founder','statement'].includes(prev.id);
+  let cam={};if(fromText){const sp=spring(lt,.6,.62);cam={dy:(1-sp)*L.H*.8,rot:(1-sp)*.18}} /* الموبايل بيطير من تحت */
+  if(prev&&!fromText&&tin<1){const e=E_OUT(tin);/* سوايب: الشاشة القديمة بتطلع والجديدة بتدخل بموشن بلير */
+    phoneScene(x,L,s,p,t,Object.assign(cam,{blur:(1-e)*10*u}),{slide:e,prev,prevP:1})}
+  else phoneScene(x,L,s,p,t,cam);
+  drawWords(x,L,t,TL.phr,{cx:L.cap.cx,cy:L.cap.cy,w:L.cap.w,fs:L.cap.fs,box:L.f==='reel'});
+  drawProgress(x,L,t,TL);x.restore()}
+/* فلاش أبيض خفيف على القطعات الحادة */
+const FLASH=.14,TEXT_SCENES=['hook','problem','founder','statement','cta'],GLARE_DUR=.9;
+function cutFlash(x,L,t,TL){const i=TL.scenes.indexOf(sceneAt(TL,t)),s=TL.scenes[i],prev=TL.scenes[i-1];if(!prev)return;
+  if(!(TEXT_SCENES.includes(s.id)||TEXT_SCENES.includes(prev.id)))return;const a=1-clamp01((t-s.start)/FLASH);if(a>0){x.save();x.fillStyle=`rgba(255,255,255,${(a*.55).toFixed(3)})`;x.fillRect(0,0,L.W,L.H);x.restore()}}
+function phoneScene(x,L,s,p,t,cam0,tr){const cam=Object.assign(camFor(s.id,p,L),cam0||{});cam.glare=(t-s.start)/GLARE_DUR;
+  drawPhone(x,L,cam,(x,R)=>{
+    const paint=(sc,pp,off)=>{x.save();x.translate(off,0);if(sc.id==='whatsapp')drawChat(x,R,pp,L.u);else{const sf=screenFor(sc.id,pp);if(sf)drawStrip(x,R,sf.names,sf.y)}x.restore()};
+    if(tr){paint(tr.prev,tr.prevP,R.w*tr.slide);paint(s,p,-R.w*(1-tr.slide))}else paint(s,p,0);
+    if(s.id==='book'){const r=shotRect('book_submit','#go');if(r){const k=R.w/SHOT_W;tapRipple(x,R.x+(r[0]+r[2]*.5)*k,R.y+(r[1]+r[3]/2)*k,(p-.86)/.12,L.u)}}})}
+function drawProgress(x,L,t,TL){cutFlash(x,L,t,TL);const {W,u}=L;x.fillStyle='rgba(255,255,255,.15)';x.fillRect(0,0,W,8*u);x.fillStyle=COL.gold;x.fillRect(W-W*t/TL.total,0,W*t/TL.total,8*u)}
+
+/* ============ الصوت: فويس ElevenLabs بس، متظبّط على -1dB peak ============ */
+const PEAK_TARGET=.8;
+async function renderAudio(TL){const ac=new OfflineAudioContext(2,Math.ceil(TL.total*SR),SR),v=AS.voice;let pk=0;
+  for(let c=0;c<v.numberOfChannels;c++){const d=v.getChannelData(c);for(let i=0;i<d.length;i++){const a=Math.abs(d[i]);if(a>pk)pk=a}}
+  const lim=ac.createDynamicsCompressor();lim.threshold.value=-4;lim.knee.value=0;lim.ratio.value=20;lim.attack.value=.001;lim.release.value=.1;lim.connect(ac.destination);
+  const src=ac.createBufferSource(),g=ac.createGain();src.buffer=v;g.gain.value=pk>0?PEAK_TARGET/pk:1;src.connect(g).connect(lim);src.start(0);
+  if(AS.music){const m=ac.createBufferSource(),mg=ac.createGain();m.buffer=AS.music;m.loop=AS.music.duration-MUSIC_OFFSET<TL.total;m.connect(mg).connect(lim);
+    /* داكينج: الموسيقى بتوطى تحت كل جملة وبتعلى في الفواصل، وبتختفي في الآخر */
+    mg.gain.setValueAtTime(MUS_UP,0);CAPS.forEach(([s,e])=>{mg.gain.setTargetAtTime(MUS_DUCK,Math.max(0,s-.12),.04);mg.gain.setTargetAtTime(MUS_UP,e+.05,.15)});
+    mg.gain.setTargetAtTime(0,TL.total-1,.3);m.start(0,MUSIC_OFFSET)}
+  return ac.startRendering()}
+const MUS_UP=.42,MUS_DUCK=.16,MUSIC_OFFSET=22.9; /* بنبدأ التراك من الضربة اللي بعد البريك عشان الهوك يبدأ قوي */
+
+/* ============ التصدير MP4 (WebCodecs) ============ */
+async function pickAudio(){for(const c of [{codec:'mp4a.40.2',mux:'aac'},{codec:'opus',mux:'opus'}]){const cfg={codec:c.codec,sampleRate:SR,numberOfChannels:2,bitrate:192000};
+    try{if((await AudioEncoder.isConfigSupported(cfg)).supported)return{cfg,mux:c.mux}}catch(e){console.error(e)}}return null}
+async function pickVideo(W,H){const bitrate=Math.round(Math.min(16e6,W*H*FPS*.1)); /* ~12Mbps للريل: جودة عالية وحجم معقول */for(const codec of ['avc1.640033','avc1.4d0033','avc1.420033']){const cfg={codec,width:W,height:H,bitrate,framerate:FPS,bitrateMode:'variable',latencyMode:'quality',avc:{format:'avc'}};
+    try{if((await VideoEncoder.isConfigSupported(cfg)).supported)return cfg}catch(e){console.error(e)}}return null}
+window.JOB={state:'idle'};
+async function exportMp4(f){const L=layout(f),TL=buildTL(),{W,H}=L;JOB.state='audio';log('جاري تجهيز الصوت…');
+  const abuf=await renderAudio(TL),ap=await pickAudio(),vcfg=await pickVideo(W,H);if(!vcfg)throw new Error('H.264 غير مدعوم');
+  const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H,frameRate:FPS},audio:ap?{codec:ap.mux,numberOfChannels:2,sampleRate:SR}:undefined,fastStart:'in-memory'});
+  let err=null;
+  if(ap){const ae=new AudioEncoder({output:(c,m)=>muxer.addAudioChunk(c,m),error:e=>{err=e}});ae.configure(ap.cfg);const N=abuf.length,CH=1024,L0=abuf.getChannelData(0),R0=abuf.getChannelData(1);
+    for(let i=0;i<N;i+=CH){const n=Math.min(CH,N-i),d=new Float32Array(n*2);d.set(L0.subarray(i,i+n),0);d.set(R0.subarray(i,i+n),n);
+      const ad=new AudioData({format:'f32-planar',sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(i/SR*1e6),data:d});ae.encode(ad);ad.close()}
+    await ae.flush();ae.close()}
+  const ve=new VideoEncoder({output:(c,m)=>muxer.addVideoChunk(c,m),error:e=>{err=e}});ve.configure(vcfg);
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d',{alpha:false});x.imageSmoothingQuality='high';
+  const NF=Math.round(TL.total*FPS);JOB.state='video';
+  for(let i=0;i<NF;i++){if(err)throw err;drawFrame(x,i/FPS,TL,L);const fr=new VideoFrame(cv,{timestamp:Math.round(i*1e6/FPS),duration:Math.round(1e6/FPS)});ve.encode(fr,{keyFrame:i%(FPS*2)===0});fr.close();
+    while(ve.encodeQueueSize>6)await new Promise(r=>setTimeout(r,3));if(i%15===0){JOB.progress=Math.round(i/NF*100);log(`جاري عمل الفيديو (${f})… ${JOB.progress}%`);await new Promise(r=>setTimeout(r,0))}}
+  await ve.flush();if(err)throw err;ve.close();muxer.finalize();
+  const blob=new Blob([muxer.target.buffer],{type:'video/mp4'});JOB.blob=blob;JOB.info={f,W,H,sec:TL.total,MB:(blob.size/1e6).toFixed(1),audio:ap?ap.mux:'none'};JOB.state='done';log(`✅ جاهز: ${f} · ${TL.total.toFixed(1)} ثانية · ${JOB.info.MB}MB`);return blob}
+function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},4000)}
+
+/* ============ معاينة ============ */
+let RAF=0;
+const PV_AUDIO=new Audio(BASE+VO_FILE);
+function preview(f){cancelAnimationFrame(RAF);const L=layout(f),TL=buildTL(),cv=$('cv');cv.width=L.W;cv.height=L.H;const x=cv.getContext('2d');
+  PV_AUDIO.currentTime=0;PV_AUDIO.play().catch(e=>{console.error(e);log('الصوت مش شغال في المعاينة — اضغط تاني')});
+  const tick=()=>{const t=PV_AUDIO.ended?TL.total:PV_AUDIO.currentTime;drawFrame(x,Math.min(t,TL.total-.01),TL,L);if(t<TL.total)RAF=requestAnimationFrame(tick)};RAF=requestAnimationFrame(tick);
+  log(`معاينة ${f} · ${TL.total.toFixed(1)} ثانية (بالصوت)`)}
+document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>preview(b.dataset.f));
+document.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{cancelAnimationFrame(RAF);try{download(await exportMp4(b.dataset.x),`nook-explainer-${b.dataset.x}.mp4`)}catch(e){console.error(e);log('فشل التصدير: '+e.message);JOB.state='error'}});
+loadAll().then(()=>{window.READY=true;log('جاهز — اختار معاينة أو تصدير')}).catch(e=>{console.error(e);log('فشل تحميل الملفات: '+e.message)});
+</script>
+</body>
+</html>
