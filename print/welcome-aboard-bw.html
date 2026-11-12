@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>أبيض وأسود — Welcome Aboard — Nook Tours</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{colors:{navy:'#0C2840',gold:'#8A5A1F',mist:'#F2F2F2'}}}}</script>
+<style>
+  /* نسخة مخصوصة للطباعة: خلفية بيضا، خطوط تقيلة وغامقة، من غير مساحات كحلي كبيرة (الطابعات بتطلّعها رمادي) */
+  body{font-family:'Cairo',sans-serif;background:#d9dde2;color:#0C2840;font-weight:600}
+  .en{font-family:'Montserrat',sans-serif;direction:ltr}
+  .page{width:210mm;height:296.5mm;margin:10mm auto;background:#fff;position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+  [contenteditable]:hover{outline:1px dashed #8A5A1F;outline-offset:2px}
+  [contenteditable]:focus{outline:2px solid #8A5A1F;outline-offset:2px}
+  .time{width:78px;text-align:center;flex-shrink:0;border:2.5px solid #0C2840;border-radius:10px;padding:4px 0;font-weight:800;font-size:16px;background:#fff;position:relative;z-index:1}
+  .time.last{background:#0C2840;color:#fff}
+  .card{border:2.5px solid #0C2840;border-radius:16px;padding:18px 20px;background:#fff}
+  @page{size:A4;margin:0}
+  @media print{html,body{background:#fff;height:296mm;overflow:hidden}.page{margin:0;box-shadow:none;height:296.5mm}.noprint{display:none!important}[contenteditable]{outline:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="noprint fixed top-4 left-4 z-50 flex gap-2"><a href="welcome-aboard.html" class="bg-white text-navy font-extrabold px-5 py-2 rounded-full shadow-lg border-2 border-navy">🎨 النسخة الملونة</a><button onclick="print()" class="bg-amber-600 text-white font-extrabold px-5 py-2 rounded-full shadow-lg">🖨️ اطبع</button><button id="pdfBtn" onclick="dlPdf('welcome-aboard')" class="bg-navy text-white font-extrabold px-5 py-2 rounded-full shadow-lg">⬇️ تحميل PDF</button></div>
+<div class="noprint text-center text-sm text-slate-600 pt-3">اضغط على أي نص عشان تعدّله قبل الطباعة (اسم الرحلة، المواعيد، رقم المرشد…)</div>
+
+<section class="page">
+  <div class="h-[7mm] bg-navy"></div>
+  <div class="h-[1.5mm] bg-gold"></div>
+
+  <div class="px-[15mm] pt-[8mm] pb-[6mm] border-b-[3px] border-navy">
+    <div class="flex items-center justify-between">
+      <div class="en text-[15px] font-extrabold tracking-[.3em]">NOOK TOURS EGYPT</div>
+      <div class="en text-[11.5px] font-bold tracking-[.2em] text-gold">DISCOVER MORE, CREATE MEMORIES</div>
+    </div>
+    <div class="mt-5 text-gold text-[19px] font-extrabold">أهلاً بيك على متن رحلتنا</div>
+    <h1 class="text-[50px] leading-[1.15] font-black mt-1" contenteditable>اسم الرحلة هنا</h1>
+    <div class="mt-3 flex gap-7 text-[16px] font-bold">
+      <div>📅 <span contenteditable>التاريخ</span></div>
+      <div>📍 <span contenteditable>الوجهة</span></div>
+      <div>🚌 <span contenteditable>رقم الأتوبيس</span></div>
+    </div>
+  </div>
+
+  <div class="px-[15mm] pt-[6mm]">
+    <p class="text-[16px] leading-8 font-semibold" contenteditable>أهلاً بيك معانا. جهّزنا لك يوم متظبّط من أول لحظة لحد ما ترجع. ده جدول الرحلة قدامك، وفريقنا معاك في كل خطوة. استمتع بالطريق وسيب الباقي علينا.</p>
+  </div>
+
+  <div class="px-[15mm] pt-[5mm]">
+    <div class="flex items-center gap-3 mb-3"><div class="w-12 h-[4px] bg-gold"></div><h2 class="text-[23px] font-black">جدول الرحلة</h2></div>
+    <div class="relative">
+      <div class="absolute top-3 bottom-3 right-[38px] w-[3px] bg-navy"></div>
+      <div class="space-y-3">
+        <div class="flex items-start gap-4"><div class="time en" contenteditable>00:00</div><div><div class="font-extrabold text-[18px]" contenteditable>التجمع والانطلاق</div><div class="text-[14.5px] font-semibold text-slate-700" contenteditable>مكان التجمع وتفاصيله</div></div></div>
+        <div class="flex items-start gap-4"><div class="time en" contenteditable>00:00</div><div><div class="font-extrabold text-[18px]" contenteditable>استراحة الطريق</div><div class="text-[14.5px] font-semibold text-slate-700" contenteditable>مدة الاستراحة</div></div></div>
+        <div class="flex items-start gap-4"><div class="time en" contenteditable>00:00</div><div><div class="font-extrabold text-[18px]" contenteditable>الوصول وتسجيل الدخول</div><div class="text-[14.5px] font-semibold text-slate-700" contenteditable>اسم المكان</div></div></div>
+        <div class="flex items-start gap-4"><div class="time en" contenteditable>00:00</div><div><div class="font-extrabold text-[18px]" contenteditable>أول نشاط</div><div class="text-[14.5px] font-semibold text-slate-700" contenteditable>وصف قصير</div></div></div>
+        <div class="flex items-start gap-4"><div class="time en" contenteditable>00:00</div><div><div class="font-extrabold text-[18px]" contenteditable>الغداء / وقت حر</div><div class="text-[14.5px] font-semibold text-slate-700" contenteditable>وصف قصير</div></div></div>
+        <div class="flex items-start gap-4"><div class="time en" contenteditable>00:00</div><div><div class="font-extrabold text-[18px]" contenteditable>النشاط الأخير</div><div class="text-[14.5px] font-semibold text-slate-700" contenteditable>وصف قصير</div></div></div>
+        <div class="flex items-start gap-4"><div class="time last en" contenteditable>00:00</div><div><div class="font-extrabold text-[18px]" contenteditable>العودة</div><div class="text-[14.5px] font-semibold text-slate-700" contenteditable>وقت الوصول المتوقع</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-[15mm] pt-[6mm] grid grid-cols-2 gap-5">
+    <div class="card"><h3 class="font-black text-[18px] mb-1.5">✨ أهم محطات الرحلة</h3><ul class="text-[15px] leading-7 font-semibold list-disc pr-5"><li contenteditable>المحطة الأولى</li><li contenteditable>المحطة التانية</li><li contenteditable>المحطة التالتة</li></ul></div>
+    <div class="card"><h3 class="font-black text-[18px] mb-1.5">🧳 للراحة والسلامة</h3><ul class="text-[15px] leading-7 font-semibold list-disc pr-5"><li contenteditable>خليك قريب من المجموعة وقت النزول</li><li contenteditable>خد مياه وواقي شمس</li><li contenteditable>بلّغ المرشد لو احتجت أي حاجة</li></ul></div>
+  </div>
+
+  <div class="absolute bottom-0 inset-x-0 border-t-[3px] border-navy px-[15mm] py-[5mm] flex items-center justify-between bg-white">
+    <div><div class="text-gold text-[13px] font-extrabold">مرشد الرحلة</div><div class="font-black text-[17px]" contenteditable>اسم المرشد — رقمه</div></div>
+    <div class="en text-left"><div class="font-black text-[18px]">01005377933</div><div class="text-[13px] font-bold">www.nooktoursegypt.com</div></div>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+async function dlPdf(name){const b=document.getElementById("pdfBtn"),old=b.textContent,pg=document.querySelector(".page");b.textContent="⏳ بجهّز الملف…";b.disabled=true;
+  const keep=pg.getAttribute("style")||"";pg.style.margin="0";pg.style.boxShadow="none";pg.style.height="296.5mm";
+  try{await document.fonts.ready;await html2pdf().set({margin:0,filename:"nook-tours-"+name+".pdf",image:{type:"jpeg",quality:.98},html2canvas:{scale:3,useCORS:true,scrollX:0,scrollY:0,windowWidth:pg.offsetWidth},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:[]}}).from(pg).save()}
+  catch(e){alert("تعذّر إنشاء الـ PDF: "+e.message+"\nاستخدم زرار اطبع واختار Save as PDF.")}
+  finally{pg.setAttribute("style",keep);b.textContent=old;b.disabled=false}}
+</script>
+</body>
+</html>
