@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Welcome Aboard — Nook Tours</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{colors:{navy:'#0C2840',blue:'#123859',gold:'#BF8C4E',mist:'#F2F2F2'}}}}</script>
+<style>
+  body{font-family:'Cairo',sans-serif;background:#d9dde2}
+  .en{font-family:'Montserrat',sans-serif;direction:ltr}
+  .page{width:210mm;height:297mm;margin:10mm auto;background:#fff;position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+  [contenteditable]:hover{outline:1px dashed #BF8C4E;outline-offset:2px}
+  [contenteditable]:focus{outline:2px solid #BF8C4E;outline-offset:2px}
+  @page{size:A4;margin:0}
+  @media print{body{background:#fff}.page{margin:0;box-shadow:none}.noprint{display:none!important}[contenteditable]{outline:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<button onclick="print()" class="noprint fixed top-4 left-4 z-50 bg-gold text-navy font-extrabold px-5 py-2 rounded-full shadow-lg">🖨️ اطبع</button>
+<div class="noprint text-center text-sm text-slate-600 pt-3">اضغط على أي نص عشان تعدّله قبل الطباعة (اسم الرحلة، المواعيد، رقم المرشد…)</div>
+
+<section class="page">
+  <!-- Header -->
+  <div class="bg-navy text-white px-[16mm] pt-[14mm] pb-[10mm] relative">
+    <div class="absolute inset-x-0 bottom-0 h-1 bg-gold"></div>
+    <div class="flex items-center justify-between">
+      <div class="en text-[13px] font-bold tracking-[.35em] text-gold">NOOK TOURS EGYPT</div>
+      <div class="en text-[11px] tracking-[.25em] text-white/70">DISCOVER MORE, CREATE MEMORIES</div>
+    </div>
+    <div class="mt-8">
+      <div class="text-gold text-lg font-bold tracking-wide">أهلاً بيك على متن رحلتنا</div>
+      <h1 class="text-[44px] leading-tight font-black mt-1" contenteditable>اسم الرحلة هنا</h1>
+      <div class="mt-3 flex gap-6 text-[15px] text-white/85">
+        <div>📅 <span contenteditable>التاريخ</span></div>
+        <div>📍 <span contenteditable>الوجهة</span></div>
+        <div>🚌 <span contenteditable>رقم الأتوبيس</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Welcome note -->
+  <div class="px-[16mm] pt-[8mm]">
+    <p class="text-[15px] leading-8 text-blue" contenteditable>أهلاً بيك معانا. جهّزنا لك يوم متظبّط من أول لحظة لحد ما ترجع. ده جدول الرحلة قدامك، وفريقنا معاك في كل خطوة. استمتع بالطريق وسيب الباقي علينا.</p>
+  </div>
+
+  <!-- Timeline -->
+  <div class="px-[16mm] pt-[6mm]">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-10 h-[3px] bg-gold"></div>
+      <h2 class="text-xl font-extrabold text-navy">جدول الرحلة</h2>
+    </div>
+    <div class="relative pr-1">
+      <div class="absolute top-2 bottom-2 right-[34px] w-[2px] bg-gold/40"></div>
+      <div class="space-y-3.5">
+        <div class="flex items-start gap-4"><div class="en w-[72px] text-center shrink-0 bg-navy text-gold font-extrabold text-[15px] rounded-lg py-1.5 relative z-10" contenteditable>00:00</div><div class="pt-1"><div class="font-extrabold text-navy text-[16px]" contenteditable>التجمع والانطلاق</div><div class="text-[13px] text-slate-600" contenteditable>مكان التجمع وتفاصيله</div></div></div>
+        <div class="flex items-start gap-4"><div class="en w-[72px] text-center shrink-0 bg-navy text-gold font-extrabold text-[15px] rounded-lg py-1.5 relative z-10" contenteditable>00:00</div><div class="pt-1"><div class="font-extrabold text-navy text-[16px]" contenteditable>استراحة الطريق</div><div class="text-[13px] text-slate-600" contenteditable>مدة الاستراحة</div></div></div>
+        <div class="flex items-start gap-4"><div class="en w-[72px] text-center shrink-0 bg-navy text-gold font-extrabold text-[15px] rounded-lg py-1.5 relative z-10" contenteditable>00:00</div><div class="pt-1"><div class="font-extrabold text-navy text-[16px]" contenteditable>الوصول وتسجيل الدخول</div><div class="text-[13px] text-slate-600" contenteditable>اسم المكان</div></div></div>
+        <div class="flex items-start gap-4"><div class="en w-[72px] text-center shrink-0 bg-navy text-gold font-extrabold text-[15px] rounded-lg py-1.5 relative z-10" contenteditable>00:00</div><div class="pt-1"><div class="font-extrabold text-navy text-[16px]" contenteditable>أول نشاط</div><div class="text-[13px] text-slate-600" contenteditable>وصف قصير</div></div></div>
+        <div class="flex items-start gap-4"><div class="en w-[72px] text-center shrink-0 bg-navy text-gold font-extrabold text-[15px] rounded-lg py-1.5 relative z-10" contenteditable>00:00</div><div class="pt-1"><div class="font-extrabold text-navy text-[16px]" contenteditable>الغداء / وقت حر</div><div class="text-[13px] text-slate-600" contenteditable>وصف قصير</div></div></div>
+        <div class="flex items-start gap-4"><div class="en w-[72px] text-center shrink-0 bg-navy text-gold font-extrabold text-[15px] rounded-lg py-1.5 relative z-10" contenteditable>00:00</div><div class="pt-1"><div class="font-extrabold text-navy text-[16px]" contenteditable>النشاط الأخير</div><div class="text-[13px] text-slate-600" contenteditable>وصف قصير</div></div></div>
+        <div class="flex items-start gap-4"><div class="en w-[72px] text-center shrink-0 bg-gold text-navy font-extrabold text-[15px] rounded-lg py-1.5 relative z-10" contenteditable>00:00</div><div class="pt-1"><div class="font-extrabold text-navy text-[16px]" contenteditable>العودة</div><div class="text-[13px] text-slate-600" contenteditable>وقت الوصول المتوقع</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Highlights + Notes -->
+  <div class="px-[16mm] pt-[8mm] grid grid-cols-2 gap-5">
+    <div class="bg-mist rounded-2xl p-5 border-t-4 border-gold">
+      <h3 class="font-extrabold text-navy mb-2">✨ أهم محطات الرحلة</h3>
+      <ul class="text-[13.5px] leading-7 text-blue list-disc pr-5"><li contenteditable>المحطة الأولى</li><li contenteditable>المحطة التانية</li><li contenteditable>المحطة التالتة</li></ul>
+    </div>
+    <div class="bg-mist rounded-2xl p-5 border-t-4 border-gold">
+      <h3 class="font-extrabold text-navy mb-2">🧳 للراحة والسلامة</h3>
+      <ul class="text-[13.5px] leading-7 text-blue list-disc pr-5"><li contenteditable>خليك قريب من المجموعة وقت النزول</li><li contenteditable>خد مياه وواقي شمس</li><li contenteditable>بلّغ المرشد لو احتجت أي حاجة</li></ul>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="absolute bottom-0 inset-x-0 bg-navy text-white px-[16mm] py-[7mm] flex items-center justify-between">
+    <div>
+      <div class="text-gold text-[12px] font-bold">مرشد الرحلة</div>
+      <div class="font-extrabold text-[15px]" contenteditable>اسم المرشد — رقمه</div>
+    </div>
+    <div class="text-left en">
+      <div class="text-gold font-extrabold text-[15px]">01005377933</div>
+      <div class="text-white/80 text-[12px]">www.nooktoursegypt.com</div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
