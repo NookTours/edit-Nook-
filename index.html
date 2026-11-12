@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Studio v15</title>
+<title>Nook Tours Studio v16</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -84,7 +84,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v15</span></h1>
+    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v16</span></h1>
 
     <div class="sec">1 · القالب</div>
     <div class="grid" id="tplG"></div>
@@ -151,6 +151,14 @@ input[type=range]{width:100%;accent-color:var(--gold)}
       <div><label>🌐 الموقع</label><input type="text" class="ltr" id="gWeb" value="www.nooktoursegypt.com"></div>
     </div>
     <div><label>📌 السلوجان (الشريط السفلي)</label><input type="text" class="ltr" id="gSlogan" value="DISCOVER MORE, CREATE MEMORIES"></div>
+
+    <div class="grid" style="margin-top:8px">
+      <div><label>🔠 حجم السلوجان <span id="sloV">22</span></label><input type="range" id="gSloSz" min="14" max="44" step="1" value="22"></div>
+      <div><label>🎨 شكل الشريط</label><select id="gSloSt"><option value="navy">كحلي</option><option value="glass">شفاف</option><option value="gold">دهبي</option></select></div>
+    </div>
+
+    <div class="sec">✍️ نصوص حرة (لكل القوالب)</div>
+    <div id="ftPanel"></div>
 
     <div class="sec">🖼️ لوجوهاتك (لكل القوالب)</div>
     <div id="lgPanel"></div>
@@ -339,15 +347,6 @@ hotels:{n:'أسعار فنادق',i:'🏨',f:['badge','title','c1','sub','rows',
       </div>
     </div>`}}},
 
-pricelist:{n:'قائمة أسعار',i:'📋',f:['badge','title','sub','rows','cur','cta'],
-  L:{sub:'💬 ملاحظة أسفل القائمة',rows:'📋 الاسم | السعر (سطر لكل بند)'},
-  d:{badge:'📋 أسعار الرحلات',title:'أسعار رحلات ديسمبر',sub:'الأسعار للفرد — شاملة المواصلات والإقامة',rows:'شرم الشيخ — 3 أيام | 2,499\nدهب — يومين | 1,899\nالأقصر وأسوان — 4 أيام | 3,299\nالإسكندرية — يوم واحد | 1,299\nسيوة — 4 أيام | 3,999',cur:'ج.م',cta:'احجز مكانك'},
-  r:(d,P)=>{const col=C(),max=P.tall?7:(P.sq||P.land)?4:6;
-    const rows=lines(d.rows).slice(0,max).map(x=>{const i=x.lastIndexOf('|'),a=i<0?x:x.slice(0,i).trim(),b=i<0?'':x.slice(i+1).trim();
-      return `<div style="display:flex;align-items:baseline;gap:14px;padding:13px 0;border-bottom:2px dashed rgba(191,140,78,.3)"><span style="color:#fff;font:700 ${SZ(34,'sub')}px ${AR}">${esc(a)}</span><span style="flex:1"></span><span style="color:${col.title};font:900 ${SZ(44,'title')}px ${AR}">${esc(b)}</span><span style="color:${col.badge};font:700 24px ${AR}">${esc(b?d.cur:'')}</span></div>`}).join('');
-    return{ov:`linear-gradient(rgba(6,12,22,.6),rgba(6,12,22,.35) 50%,rgba(6,12,22,.7))`,body:`<div style="${dock(P)};${glass};border-radius:44px;padding:${P.sq?30:42}px 48px">${badge(d,'margin-bottom:14px')}<div style="color:${col.title};font:900 ${SZ(ts(P)-14,'title')}px/1.25 ${AR}">${ml(d.title)}</div><div style="margin:10px 0 6px">${rows}</div>${d.sub?`<div style="color:${col.sub};font:500 ${SZ(26,'sub')}px/1.5 ${AR};margin:14px 0 18px">${ml(d.sub)}</div>`:''}
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:14px">${contact(d)}${cta(d.cta,'font-size:32px;padding:16px 38px')}</div></div>`}}},
-
 season:{n:'كفر موسمي',i:'❄️',f:['badge','title','sub','c1','cta'],
   L:{badge:'✨ السطر الصغير فوق',title:'📝 العنوان الكبير',sub:'📍 المكان',c1:'📞 رقم إضافي (اختياري)',cta:'🔵 نص الزر'},
   d:{badge:'THE SEASON HAS COME!',title:'HELLO!\nWINTER',sub:'SONDOS CAMP NUWEIBAA',c1:'',cta:'BOOK NOW'},
@@ -387,33 +386,6 @@ cover2:{n:'كفر وسط',i:'🌟',f:['badge','title','sub','cta'],
       <div style="width:70px;height:3px;background:${col.badge};margin:28px 0;border-radius:2px"></div>
       ${d.cta?`<div style="background:linear-gradient(135deg,${G2},${G});color:${col.cta};font:900 ${SZ(32,'cta')}px ${AR};padding:16px 44px;border-radius:40px">${esc(d.cta)}</div>`:''}
       <div style="margin-top:24px">${contactRow(d)}</div>
-    </div>`}}},
-
-cover3:{n:'كفر سفلي',i:'⬇️',f:['badge','title','sub','cta'],
-  L:{badge:'الشارة',title:'العنوان',sub:'التفاصيل',cta:'الزر'},
-  d:{badge:'رحلة جديدة',title:'سيوة في الانتظار',sub:'4 أيام بين الواحة والكثبان',cta:'احجز مقعدك'},
-  r:(d,P)=>{const col=C();
-    return{ov:`linear-gradient(to top,rgba(10,22,40,.95) 0%,rgba(10,22,40,.55) 45%,rgba(10,22,40,.15) 100%)`,
-    body:`<div style="position:absolute;left:0;right:0;bottom:${P.bot}px;padding:${P.sq?40:56}px ${P.pad}px 0;text-align:center">
-      ${d.badge?`<div style="display:inline-block;border:2px solid ${col.badge};color:${col.badge};font:800 ${SZ(26,'badge')}px ${AR};padding:8px 28px;border-radius:30px;margin-bottom:18px">${esc(d.badge)}</div>`:''}
-      <div style="color:${col.title};font:900 ${SZ(ts(P)+10,'title')}px/1.2 ${AR};text-shadow:0 6px 28px rgba(0,0,0,.5)">${ml(d.title)}</div>
-      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(30,'sub')}px/1.5 ${AR};margin:14px 0 22px">${ml(d.sub)}</div>`:''}
-      ${d.cta?`<div style="display:inline-block;background:linear-gradient(135deg,${G2},${G});color:${col.cta};font:900 ${SZ(32,'cta')}px ${AR};padding:16px 44px;border-radius:40px">${esc(d.cta)}</div>`:''}
-      <div style="margin-top:18px">${contactRow(d)}</div>
-    </div>`}}},
-
-cover4:{n:'كفر إطار',i:'▭',f:['badge','title','sub','cta'],
-  L:{badge:'الشارة',title:'العنوان',sub:'التفاصيل',cta:'الزر'},
-  d:{badge:'مغامرة',title:'دهب\nيوم واحد يكفي',sub:'سنوركل · بحر · جبال',cta:'احجز يومك'},
-  r:(d,P)=>{const col=C(),big=SZ(P.tall?110:P.land?82:94,'title');
-    return{ov:`linear-gradient(to bottom,rgba(10,22,40,.4),rgba(10,22,40,.15) 40%,rgba(10,22,40,.85))`,
-    body:`<div style="position:absolute;inset:28px;border:2px solid rgba(191,140,78,.45);border-radius:20px;pointer-events:none"></div>
-    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:${P.pad+20}px">
-      ${d.badge?`<div style="color:${col.badge};font:800 ${SZ(24,'badge')}px ${AR};letter-spacing:3px;margin-bottom:16px">— ${esc(d.badge)} —</div>`:''}
-      <div style="color:${col.title};font:900 ${big}px/1.15 ${AR};text-shadow:0 8px 36px rgba(0,0,0,.55)">${ml(d.title)}</div>
-      ${d.sub?`<div style="color:${col.sub};font:600 ${SZ(30,'sub')}px ${AR};margin-top:18px">${ml(d.sub)}</div>`:''}
-      <div style="margin-top:32px">${d.cta?`<div style="display:inline-block;background:linear-gradient(135deg,${G2},${G});color:${col.cta};font:900 ${SZ(30,'cta')}px ${AR};padding:14px 40px;border-radius:16px">${esc(d.cta)}</div>`:''}</div>
-      <div style="margin-top:20px">${contactRow(d)}</div>
     </div>`}}},
 
 cover5:{n:'كفر جريء',i:'⚡',f:['badge','title','sub','pfrom','price','cur','cta'],
@@ -503,64 +475,8 @@ urgency:{n:'عرض عاجل + واتساب',i:'⚡',f:['badge','title','c1','c2'
       <div style="color:${col.title};font:900 ${SZ(ts(P)-6,'title')}px/1.2 ${AR};margin-top:${20*k}px;text-shadow:0 4px 22px rgba(0,0,0,.5)">${ml(d.title)}</div>
       ${chat}${priceBox}<div>${sticker}</div></div></div>`}}},
 
-/* ===== مقارنة 3 باقات (اقتصادي / قياسي / VIP) والمميزة بإطار دهبي ===== */
-compare:{n:'مقارنة الباقات',i:'⚖️',f:['badge','title','sub','rows','c1','cur','cta'],
-  L:{badge:'🏷️ شارة الباقة المميزة',title:'📝 العنوان',sub:'💬 سطر تحت العنوان',rows:'📋 كل سطر باقة: الاسم | الفندق | السعر | ميزة، ميزة، ميزة',c1:'⭐ رقم الباقة المميزة (1-3)',cur:'العملة'},
-  d:{badge:'الأكثر طلباً',title:'اختار باقتك',sub:'الغردقة · 4 أيام 3 ليالي · الأسعار للفرد',rows:'اقتصادي | فندق 3 نجوم | 2,499 | إقامة 4 أيام، فطار يومي، انتقالات\nقياسي | فندق 4 نجوم | 3,999 | إقامة 4 أيام، فطار وعشا، انتقالات، رحلة بحرية\nVIP فاخر | فندق 5 نجوم | 6,499 | إقامة 4 أيام، كل الوجبات، انتقالات خاصة، مرشد سياحي',c1:'2',cur:'ج.م',cta:'احجز باقتك'},
-  r:(d,P)=>{const col=C(),best=Math.max(1,Math.min(3,parseInt(d.c1,10)||2))-1,k=P.land?.85:P.tall?1.05:P.sq?.8:.92;
-    const tiers=lines(d.rows).slice(0,3).map((x,i)=>{const p=x.split('|').map(s=>s.trim()),feats=(p[3]||'').split(/[،,]/).map(s=>s.trim()).filter(Boolean),hi=i===best;
-      return `<div style="flex:1;min-width:0;position:relative;background:${hi?'linear-gradient(180deg,rgba(191,140,78,.24),rgba(10,22,40,.9))':'linear-gradient(180deg,rgba(255,255,255,.09),rgba(10,22,40,.84))'};border:${hi?3:1.5}px solid ${hi?G:'rgba(255,255,255,.18)'};border-radius:${30*k}px;padding:${hi?46*k:32*k}px ${18*k}px ${26*k}px;text-align:center;${hi?'box-shadow:0 0 44px rgba(191,140,78,.45);transform:scale(1.04)':''}">
-        ${hi&&d.badge?`<div style="position:absolute;top:-${22*k}px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,${G2},${G});color:${NV};font:800 ${SZ(20*k,'badge')}px ${AR};padding:${8*k}px ${20*k}px;border-radius:30px;white-space:nowrap">⭐ ${esc(d.badge)}</div>`:''}
-        <div style="color:${hi?G2:col.badge};font:800 ${SZ(30*k,'title')}px ${AR}">${esc(p[0]||'')}</div>
-        <div style="color:${col.sub};font:500 ${SZ(22*k,'sub')}px ${AR};margin-top:${6*k}px">${esc(p[1]||'')}</div>
-        <div style="margin:${18*k}px 0 ${4*k}px;color:#fff;font:900 ${SZ(54*k,'title')}px/1 ${EN}">${esc(p[2]||'')}</div>
-        <div style="color:${col.sub};font:600 ${20*k}px ${AR};margin-bottom:${16*k}px">${esc(d.cur)}</div>
-        <div style="border-top:1px solid rgba(255,255,255,.15);padding-top:${14*k}px;text-align:right">${feats.map(f=>`<div style="color:#fff;font:500 ${SZ(21*k,'sub')}px/1.5 ${AR};margin:${6*k}px 0"><span style="color:${G}">✓</span> ${esc(f)}</div>`).join('')}</div></div>`}).join('');
-    return{ov:`linear-gradient(rgba(6,12,22,.72),rgba(6,12,22,.88))`,
-    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
-      <div style="color:${col.title};font:900 ${SZ(ts(P)-10,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
-      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(26,'sub')}px ${AR};margin-top:10px">${esc(d.sub)}</div>`:''}
-      <div style="display:flex;gap:${16*k}px;align-items:stretch;margin-top:${44*k}px">${tiers}</div>
-      <div style="margin-top:${34*k}px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">${d.cta?cta(d.cta,`font-size:${SZ(30,'cta')}px;padding:14px 38px`):''}${contactRow(d)}</div></div></div>`}}},
-
-/* ===== هوك فيروسي فوق الصورة/الفيديو: تغريدة أو شريط بحث أو إشعار iPhone ===== */
-hook:{n:'هوك فيروسي',i:'🔥',f:['title','who','c1'],
-  modes:[{key:'hookStyle',label:'شكل الهوك',opts:[['tweet','🐦 تغريدة'],['search','🔍 بحث'],['notify','🔔 إشعار']]},{key:'hookPos',label:'مكانه',opts:[['top','⬆️ فوق'],['mid','⏺ نص'],['bot','⬇️ تحت']]}],
-  L:{title:'🔥 نص الهوك',who:'👤 اسم الحساب',c1:'@ اليوزرنيم'},
-  d:{title:'لو معاك ويك إند فاضي، ده المكان اللي لازم تسافرله 👇',who:'Nook Tours Egypt',c1:'@nooktours',hookStyle:'tweet',hookPos:'mid'},
-  r:(d,P)=>{const k=P.land?.8:P.tall?1.1:P.sq?.85:1,w=Math.min(P.W-2*P.pad,(P.land?1100:960)*k),style=d.hookStyle||'tweet',pos=d.hookPos||'mid';let card;
-    if(style==='tweet')card=`<div style="width:${w}px;background:#fff;border-radius:${30*k}px;padding:${32*k}px ${36*k}px;box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:right">
-      <div style="display:flex;align-items:center;gap:${16*k}px;margin-bottom:${20*k}px"><div style="width:${76*k}px;height:${76*k}px;border-radius:50%;border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;background:#fff"><img src="${LOGO_URL}" alt="" style="width:78%;height:78%;object-fit:contain"></div>
-      <div style="min-width:0"><div style="color:#0f1419;font:800 ${SZ(30*k,'badge')}px ${AR}">${esc(d.who)} <span style="display:inline-block;width:${28*k}px;height:${28*k}px;border-radius:50%;background:#1d9bf0;color:#fff;font:900 ${18*k}px/${28*k}px ${EN};text-align:center;vertical-align:middle">✓</span></div><div style="color:#536471;font:500 ${24*k}px ${EN};direction:ltr;text-align:right">${esc(d.c1)}</div></div></div>
-      <div style="color:#0f1419;font:700 ${SZ(44*k,'title')}px/1.45 ${AR}">${ml(d.title)}</div>
-      <div style="color:#536471;font:500 ${22*k}px ${AR};margin-top:${20*k}px">10:24 م · Nook Tours</div></div>`;
-    else if(style==='search')card=`<div style="width:${w}px;text-align:center"><div style="display:flex;align-items:center;gap:${18*k}px;background:#fff;border-radius:${60*k}px;padding:${26*k}px ${34*k}px;box-shadow:0 24px 60px rgba(0,0,0,.35)"><span style="font-size:${38*k}px">🔍</span><span style="flex:1;color:#202124;font:600 ${SZ(38*k,'title')}px/1.35 ${AR};text-align:right">${ml(d.title)}<span style="display:inline-block;width:3px;height:${40*k}px;background:#1a73e8;vertical-align:middle;margin-right:6px"></span></span></div>
-      <div style="margin-top:${18*k}px;color:#fff;font:600 ${24*k}px ${AR};text-shadow:0 2px 10px rgba(0,0,0,.5)">${esc(d.who)}</div></div>`;
-    else card=`<div style="width:${w}px;background:rgba(245,245,247,.9);border-radius:${36*k}px;padding:${26*k}px ${30*k}px;box-shadow:0 24px 60px rgba(0,0,0,.3);text-align:right">
-      <div style="display:flex;align-items:center;gap:${14*k}px;margin-bottom:${12*k}px"><div style="width:${52*k}px;height:${52*k}px;border-radius:${12*k}px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none"><img src="${LOGO_URL}" alt="" style="width:82%;height:82%;object-fit:contain"></div><div style="flex:1;color:#6e6e73;font:600 ${22*k}px ${EN};letter-spacing:1px;direction:ltr;text-align:left">${esc(String(d.who||'').toUpperCase())}</div><div style="color:#6e6e73;font:500 ${22*k}px ${AR}">الآن</div></div>
-      <div style="color:#1d1d1f;font:700 ${SZ(36*k,'title')}px/1.4 ${AR}">${ml(d.title)}</div></div>`;
-    const v=pos==='top'?`top:${P.top+logoSpace(20)}px`:pos==='bot'?`bottom:${P.bot+20}px`:'top:50%;transform:translateY(-50%)';
-    return{ov:`linear-gradient(rgba(6,12,22,.15),rgba(6,12,22,.35))`,body:`<div style="position:absolute;left:0;right:0;${v};display:flex;justify-content:center">${card}</div>`}}},
-
-/* ===== نشرة الوجهات الأسبوعية: شبكة وجهات بالحرارة والجو ونصيحة ===== */
-weekly:{n:'وجهات الأسبوع',i:'☀️',f:['title','c1','rows','cta'],
-  L:{title:'📝 العنوان',c1:'📅 الفترة (اختياري)',rows:'📋 كل سطر وجهة: المدينة | الحرارة | أيقونة | نصيحة\n(عدّل درجات الحرارة كل أسبوع)'},
-  d:{title:'أجواء وجهاتنا الأسبوع ده ☀️🌊',c1:'',rows:'دهب | 27° | ☀️ | بحر هادي ومثالي للغطس\nشرم الشيخ | 28° | ☀️ | مناسب للسنوركل والرحلات البحرية\nالغردقة | 27° | 🌤️ | جو لطيف للأكوا بارك\nسيوة | 24° | 🌙 | ليالي صافية للسفاري والنجوم\nنويبع | 26° | 🌊 | هدوء وكامبات على البحر\nمرسى علم | 29° | ☀️ | شعاب مرجانية ودلافين',cta:'احجز رحلة الويك إند'},
-  r:(d,P)=>{const col=C(),cols=P.land||P.sq?3:2,k=P.land?.8:P.tall?1.08:P.sq?.76:.92;
-    const cards=lines(d.rows).slice(0,6).map(x=>{const p=x.split('|').map(s=>s.trim());return `<div style="background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(10,22,40,.8));border:1.5px solid rgba(191,140,78,.35);border-radius:${28*k}px;padding:${22*k}px ${18*k}px;text-align:center">
-      <div style="font-size:${54*k}px;line-height:1.15">${esc(p[2]||'')}</div>
-      <div style="color:#fff;font:800 ${SZ(32*k,'title')}px ${AR};margin-top:${8*k}px">${esc(p[0]||'')}</div>
-      <div style="color:${G2};font:800 ${SZ(48*k,'title')}px ${EN};margin:${4*k}px 0 ${8*k}px;direction:ltr">${esc(p[1]||'')}</div>
-      <div style="color:${col.sub};font:500 ${SZ(21*k,'sub')}px/1.45 ${AR}">${esc(p[3]||'')}</div></div>`}).join('');
-    return{ov:`linear-gradient(rgba(6,12,22,.62),rgba(6,12,22,.86))`,
-    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
-      <div style="color:${col.title};font:900 ${SZ(ts(P)-14,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
-      ${d.c1?`<div style="color:${col.sub};font:500 ${SZ(24,'sub')}px ${AR};margin-top:8px">${esc(d.c1)}</div>`:''}
-      <div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:${18*k}px;margin-top:${30*k}px">${cards}</div>
-      <div style="margin-top:${30*k}px;display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap">${d.cta?cta(d.cta,`font-size:${SZ(28,'cta')}px;padding:14px 36px`):''}${contactRow(d)}</div></div></div>`}}},
-
-/* ===== فاضي: الصورة/الفيديو كاملة من غير تعتيم ولا لوجو — شريط السلوجان تحت بس ===== */
-blank:{n:'فاضي (سلوجان بس)',i:'⬜',f:[],d:{},r:()=>({noLogo:true,ov:'transparent',body:''})},
+/* ===== حر: صورتك + لوجوهاتك + شريط السلوجان، وأنت بتكتب أي سطور تحبها من لوحة «نصوص حرة» ===== */
+free:{n:'حر (أنت اللي بتكتب)',i:'✍️',f:[],d:{},r:()=>({ov:'linear-gradient(to bottom,rgba(10,30,52,.3),rgba(10,30,52,0) 30%,rgba(10,30,52,0) 58%,rgba(10,30,52,.5))',body:''})},
 
 wlc1:{n:'ترحيب كلاسيك',i:'👋',f:['badge','title','sub','c1','c2','c3','yTitle','ySub','yDate','yPlace','yTag'],
   L:{badge:'🏷️ الجهة / الجروب',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ',c2:'📍 المكان',c3:'# الهاشتاج'},
@@ -577,40 +493,6 @@ wlc1:{n:'ترحيب كلاسيك',i:'👋',f:['badge','title','sub','c1','c2','c
       ${tag?`<div style="${mv(d.yTag)};color:#fff;font:700 ${26*k}px ${EN};letter-spacing:2px;margin-top:${46*k}px;opacity:.95">${tag}</div>`:''}
     </div></div>`}}},
 
-wlc2:{n:'ترحيب كارت زجاج',i:'🪟',f:['badge','title','sub','c1','c2','c3'],
-  L:{badge:'🏷️ الجهة / الجروب',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ',c2:'📍 المكان',c3:'# الهاشتاج'},
-  d:{badge:'مرحباً بكم',title:'أهلاً بيكم\nفي رحلتنا',sub:'سعداء جداً بوجودكم معنا في هذه الرحلة',c1:'الأربعاء 11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
-  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,tag=d.c3?`<bdi dir="ltr"># ${esc(String(d.c3).replace(/^#\s*/,''))}</bdi>`:'';
-    const cell=(ic,t)=>t?`<div style="flex:1;color:#fff;font:700 ${SZ(32*k,'sub')}px/1.3 ${AR}"><div style="font-size:${38*k}px;margin-bottom:6px">${ic}</div>${esc(t)}</div>`:'';
-    return{ov:`linear-gradient(rgba(6,14,26,.4),rgba(6,14,26,.62))`,
-    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(30)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center">
-    <div style="width:100%;max-width:${P.land?1100:900}px;${glass};border-radius:44px;border-top:6px solid ${G};padding:${48*k}px ${44*k}px;text-align:center">
-      ${d.badge?`<div style="display:inline-block;border:2px solid ${col.badge};color:${col.badge};font:800 ${SZ(26,'badge')}px ${AR};padding:8px 28px;border-radius:30px;margin-bottom:${22*k}px">${esc(d.badge)}</div>`:''}
-      <div style="color:${col.title};font:900 ${SZ(ts(P)-6,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
-      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(30*k,'sub')}px/1.5 ${AR};margin:${18*k}px 0 0">${ml(d.sub)}</div>`:''}
-      ${(d.c1||d.c2)?`<div style="display:flex;align-items:stretch;gap:${24*k}px;margin-top:${34*k}px;padding-top:${28*k}px;border-top:2px solid rgba(191,140,78,.45)">${cell('📅',d.c1)}${d.c1&&d.c2?`<div style="width:2px;background:rgba(191,140,78,.45)"></div>`:''}${cell('📍',d.c2)}</div>`:''}
-      ${tag?`<div style="color:${col.badge};font:800 ${26*k}px ${EN};letter-spacing:2px;margin-top:${34*k}px">${tag}</div>`:''}
-    </div></div>`}}},
-
-wlc3:{n:'ترحيب تذكرة',i:'🎟️',f:['badge','title','sub','c1','c2','c3'],
-  L:{badge:'🏷️ سطر فوق التاريخ',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ (الخانة الذهبية)',c2:'📍 المكان',c3:'# الهاشتاج'},
-  d:{badge:'رحلة جماعية',title:'Welcome\nأهلاً بيكم',sub:'يوم مليان حماس وذكريات',c1:'11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
-  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,tag=d.c3?`<bdi dir="ltr"># ${esc(String(d.c3).replace(/^#\s*/,''))}</bdi>`:'';
-    return{ov:`linear-gradient(rgba(6,14,26,.3),rgba(6,14,26,.55))`,
-    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(30)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center">
-    <div style="width:100%;max-width:${P.land?1000:860}px;border-radius:40px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);text-align:center">
-      <div style="background:linear-gradient(135deg,${G2},${G});padding:${34*k}px ${30*k}px">
-        ${d.badge?`<div style="color:${NV};font:800 ${SZ(26*k,'badge')}px ${AR};letter-spacing:3px;opacity:.8">${esc(d.badge)}</div>`:''}
-        ${d.c1?`<div style="color:${NV};font:900 ${SZ(92*k,'cta')}px/1.1 ${EN}">${esc(d.c1)}</div>`:''}
-      </div>
-      <div style="border-top:3px dashed rgba(191,140,78,.7);background:rgba(10,32,56,.93);padding:${40*k}px ${36*k}px">
-        <div style="color:${col.title};font:900 ${SZ(ts(P)-8,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
-        ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(30*k,'sub')}px/1.5 ${AR};margin-top:${16*k}px">${ml(d.sub)}</div>`:''}
-        ${d.c2?`<div style="color:#fff;font:800 ${SZ(34*k,'badge')}px ${AR};margin-top:${28*k}px">📍 ${esc(d.c2)}</div>`:''}
-        ${tag?`<div style="color:${col.badge};font:700 ${24*k}px ${EN};letter-spacing:2px;margin-top:${26*k}px">${tag}</div>`:''}
-      </div>
-    </div></div>`}}},
-
 wlc4:{n:'ترحيب سينمائي',i:'🎬',f:['badge','title','sub','c1','c2','c3'],
   L:{badge:'🏷️ الجهة / الجروب',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ',c2:'📍 المكان',c3:'# الهاشتاج'},
   d:{badge:'اسم الجامعة أو المدرسة',title:'Welcome\nأهلاً بيكم',sub:'يوم لا يتنسي مع الشلة',c1:'الأربعاء 11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
@@ -624,17 +506,6 @@ wlc4:{n:'ترحيب سينمائي',i:'🎬',f:['badge','title','sub','c1','c2',
         <div>${d.c1?`<div style="color:#fff;font:800 ${SZ(44*k,'cta')}px ${AR}">📅 ${esc(d.c1)}</div>`:''}${d.c2?`<div style="color:${col.badge};font:700 ${SZ(32*k,'badge')}px ${AR};margin-top:6px">📍 ${esc(d.c2)}</div>`:''}</div></div>`:''}
       ${tag?`<div style="color:#fff;opacity:.9;font:700 ${24*k}px ${EN};letter-spacing:2px;margin-top:${24*k}px">${tag}</div>`:''}
     </div>`}}},
-
-/* ===== نضيف: صورة نضيفة + لوجوهات فوق + شريط السلوجان تحت؛ سطرين اختياريين بس ===== */
-clean:{n:'نضيف (لوجو + سلوجان)',i:'✨',f:['title','sub','yTitle','ySub'],
-  L:{title:'📝 سطر كبير (اختياري)',sub:'💬 سطر صغير (اختياري)'},
-  d:{title:'',sub:'',yTitle:'0',ySub:'0'},
-  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,mv=v=>`position:relative;top:${(+v||0)*k}px`;
-    return{ov:`linear-gradient(to bottom,rgba(10,30,52,.36),rgba(10,30,52,0) 28%,rgba(10,30,52,0) 58%,rgba(10,30,52,.5))`,
-    body:(d.title||d.sub)?`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
-      ${d.title?`<div style="${mv(d.yTitle)};color:${col.title};font:300 ${SZ(ts(P)*.9,'title')}px/1.2 ${AR};text-shadow:0 4px 30px rgba(0,0,0,.5)">${ml(d.title)}</div>`:''}
-      ${d.sub?`<div style="${mv(d.ySub)};color:#fff;font:700 ${SZ(32*k,'sub')}px/1.5 ${AR};margin-top:${22*k}px;text-shadow:0 2px 14px rgba(0,0,0,.6)">${ml(d.sub)}</div>`:''}
-    </div></div>`:''}}},
 
 offer:{n:'كارت عرض',i:'🎫',f:['badge','title','sub','pfrom','price','cur','cta'],
   modes:[{key:'preset',label:'العرض (بيحمّل بياناته)',opts:[['dahab','🏝 رحلة دهب'],['portsaid','⚓ بورسعيد']],presets:OFFER_PRESETS}],
@@ -725,10 +596,11 @@ function logoHTML(P){const sz=Math.round($('lsz').value*2.1);
   else if(S.pos[1]==='r') h=`right:${P.pad-12}px`;
   else h=`left:${P.pad-12}px`;
   return `<div style="position:absolute;${v};${h};z-index:5;background:rgba(255,255,255,.96);border-radius:24px;padding:8px;box-shadow:0 6px 24px rgba(0,0,0,.35)"><img src="${LOGO_URL}" style="display:block;width:${sz}px;height:${sz}px" alt=""></div>`}
-function stripHTML(d,P){const s=d.slogan||'',ls=/[\u0600-\u06FF]/.test(s)?0:3;
-  return `<div data-fixed-font="1" style="position:absolute;left:0;right:0;bottom:${P.sb}px;height:${STRIP_H}px;${P.sb?'border-bottom:3px solid '+G+';':''}background:linear-gradient(90deg,rgba(8,16,28,.97),rgba(12,22,40,.97));border-top:3px solid ${G};display:flex;align-items:center;justify-content:center;gap:18px;z-index:6"><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(191,140,78,.6);display:inline-block"></span><span style="color:${G2};font:800 22px ${EN};letter-spacing:${ls}px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.4)">${esc(s)}</span><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(191,140,78,.6);display:inline-block"></span></div>`}
+function stripHTML(d,P){const s=d.slogan||'',ls=/[\u0600-\u06FF]/.test(s)?0:3,fz=+($('gSloSz')||{}).value||22,st=($('gSloSt')||{}).value||'navy',
+    bg=st==='gold'?`linear-gradient(90deg,${G},#d9ad74)`:st==='glass'?'rgba(8,16,28,.45)':'linear-gradient(90deg,rgba(8,16,28,.97),rgba(12,22,40,.97))',tc=st==='gold'?NV:G2;
+  return `<div data-fixed-font="1" style="position:absolute;left:0;right:0;bottom:${P.sb}px;height:${STRIP_H}px;${P.sb?'border-bottom:3px solid '+G+';':''}background:${bg};border-top:3px solid ${G};display:flex;align-items:center;justify-content:center;gap:18px;z-index:6"><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(191,140,78,.6);display:inline-block"></span><span style="color:${tc};font:800 ${fz}px ${EN};letter-spacing:${ls}px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.4)">${esc(s)}</span><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(191,140,78,.6);display:inline-block"></span></div>`}
 function buildUIRaw(d,P){const t=TPL[S.tpl].r(d,P),v=+$('dark').value,op=Math.min(1,v/66),ex=Math.max(0,(v-66)/100*.6);
-  const core=`<div style="position:absolute;inset:0;opacity:${op.toFixed(2)};background:${t.ov}"></div>${ex?`<div style="position:absolute;inset:0;background:rgba(0,0,0,${ex.toFixed(2)})"></div>`:''}${t.body}${!t.noLogo&&$('tLogo').checked&&!(lgOn()&&S.lg.hideStd)?logoHTML(P):''}${t.noLogo?'':userLogosHTML(P)}`;
+  const core=`<div style="position:absolute;inset:0;opacity:${op.toFixed(2)};background:${t.ov}"></div>${ex?`<div style="position:absolute;inset:0;background:rgba(0,0,0,${ex.toFixed(2)})"></div>`:''}${t.body}${!t.noLogo&&$('tLogo').checked&&!(lgOn()&&S.lg.hideStd)?logoHTML(P):''}${t.noLogo?'':userLogosHTML(P)}${freeTextHTML(P)}`;
   return {core, strip:P.strip?stripHTML(d,P):''}
 }
 function scaleText(h){const k=S.ts||1;if(k===1)return h;return h.replace(/(font(?:-size)?:\s*(?:[\w-]+\s+)*?)(\d+(?:\.\d+)?)px/g,(m,a,n)=>a+(Math.round(n*k*10)/10)+'px')}
@@ -777,6 +649,39 @@ function lgPanel(){const g=S.lg,R=(k,l,mn,mx,st)=>`<div><label>${l} <span data-l
     if(d.lgm){const [s,m]=d.lgm.split('|');lgMode(s,m)}else if(d.lgrm){S.lg[d.lgrm]=null;lgPanel();render()}else if(d.lgpos){S.lg.pos=d.lgpos;lgPanel();render()}
     else if(d.lgreset){const D={sz:130,y:0,gap:40,mvX:0,mvY:0};S.lg[d.lgreset]=D[d.lgreset];lgPanel();render()}});
   lgPanel()})();
+/* ---- نصوص حرة: 4 سطور تتحط في أي مكان فوق أي قالب (فولو، هاشتاج، تاريخ، أي كلام) ---- */
+S.ft=[0,1,2,3].map(i=>({t:'',sz:44,y:[40,50,60,70][i],x:0,c:'#ffffff',pill:false,b:true}));
+function ftSeed(){if(S.ft.some(l=>l.t))return;
+  Object.assign(S.ft[0],{t:'تابعنا على فيسبوك وإنستجرام',sz:46,y:42,pill:false});
+  Object.assign(S.ft[1],{t:'Nook Tours',sz:64,y:52,c:'#E8C56A',pill:false});
+  ftPanel()}
+function freeTextHTML(P){const k=P.land?.8:1,span=P.H-P.top-P.bot,rows=S.ft.filter(l=>l.t&&l.t.trim()).map(l=>{
+    const top=P.top+Math.max(0,Math.min(100,+l.y))/100*span,sz=Math.round(l.sz*k),isAr=/[؀-ۿ]/.test(l.t),
+      box=l.pill?`background:rgba(255,255,255,.88);color:${NV};padding:${Math.round(sz*.3)}px ${Math.round(sz*.9)}px;border-radius:999px;`:`color:${esc(l.c)};text-shadow:0 3px 18px rgba(0,0,0,.65);`;
+    return `<div data-fixed-font="1" style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${top}px;z-index:5;transform:translate(${Math.round(+l.x*k)}px,-50%);text-align:center;pointer-events:none"><span style="display:inline-block;max-width:100%;${box}font:${l.b?800:500} ${sz}px/1.3 ${isAr?AR:EN};${isAr?'':'direction:ltr;'}">${ml(l.t)}</span></div>`});
+  return rows.join('')}
+function ftPanel(){const p=$('ftPanel');if(!p)return;
+  const R=(i,k,l,mn,mx,st)=>`<div><label>${l} <span data-ftv="${i}|${k}">${S.ft[i][k]}</span></label><input type="range" data-ft="${i}|${k}" min="${mn}" max="${mx}" step="${st}" value="${S.ft[i][k]}"></div>`;
+  p.innerHTML=`<div class="hint" style="margin-bottom:6px">اكتب أي سطر وهيظهر فوق التصميم. المكان بيتحدد بالسلايدر جوه المساحة الآمنة.</div>
+  <div class="grid" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:8px"><button class="tb" type="button" data-ftadd="follow">➕ فولو</button><button class="tb" type="button" data-ftadd="tag">➕ هاشتاج</button><button class="tb" type="button" data-ftadd="date">➕ تاريخ</button></div>`+
+  S.ft.map((l,i)=>`<div style="border:1px solid rgba(191,140,78,.28);border-radius:10px;padding:8px;margin-bottom:8px"><label>سطر ${i+1}</label><input type="text" data-ftt="${i}" value="${esc(l.t)}" placeholder="اكتب هنا…">
+    <div class="grid">${R(i,'sz','🔠 الحجم',20,140,2)}${R(i,'y','↕️ المكان',0,100,1)}</div>
+    <div class="grid">${R(i,'x','↔️ يمين/شمال',-400,400,5)}<div><label>🎨 اللون</label><input type="color" data-ftc="${i}" value="${esc(l.c)}" style="width:100%;height:30px;padding:0"></div></div>
+    <div class="tog"><span>شكل كبسولة (خلفية بيضا)</span><input type="checkbox" data-ftp="${i}" ${l.pill?'checked':''}></div>
+    <div class="tog"><span>خط تقيل</span><input type="checkbox" data-ftb="${i}" ${l.b?'checked':''}></div>
+    <button class="tb" type="button" data-ftclr="${i}" style="width:100%;margin-top:4px">مسح السطر</button></div>`).join('')}
+(function(){const p=$('ftPanel');
+  p.addEventListener('input',e=>{const t=e.target,d=t.dataset;
+    if(d.ftt!==undefined)S.ft[+d.ftt].t=t.value;
+    else if(d.ft){const [i,k]=d.ft.split('|');S.ft[+i][k]=+t.value;const s=p.querySelector(`[data-ftv="${d.ft}"]`);if(s)s.textContent=t.value}
+    else if(d.ftc!==undefined)S.ft[+d.ftc].c=t.value;else return;render()});
+  p.addEventListener('change',e=>{const t=e.target,d=t.dataset;if(d.ftp!==undefined)S.ft[+d.ftp].pill=t.checked;else if(d.ftb!==undefined)S.ft[+d.ftb].b=t.checked;else return;render()});
+  p.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+    if(d.ftclr!==undefined){S.ft[+d.ftclr].t='';ftPanel();render()}
+    else if(d.ftadd){const L={follow:['تابعنا على فيسبوك وإنستجرام: Nook Tours',{pill:true,sz:40}],tag:['#NookTours',{sz:50}],date:['اكتب التاريخ هنا',{pill:true,sz:44}]}[d.ftadd],
+      i=S.ft.findIndex(l=>!l.t);if(i<0)return toast('كل السطور مستخدمة — امسح واحد');Object.assign(S.ft[i],{t:L[0],c:'#ffffff'},L[1]);ftPanel();render()}});
+  ftPanel();
+  ['gSloSz','gSloSt'].forEach(id=>$(id).addEventListener('input',()=>{const v=$('sloV');if(v)v.textContent=$('gSloSz').value;render()}))})();
 function autoFit(root,P){autoFit0(root,P);applyMove(root)}
 function autoFit0(root,P){
   const kids=[...root.children].filter(e=>e.tagName!=='IMG'),isFixed=e=>e.dataset.fixedFont,
@@ -820,7 +725,7 @@ function buildFields(){const T=TPL[S.tpl],st=S.store[S.tpl];
   $('fields').querySelectorAll('[data-review-mode]').forEach(b=>b.onclick=()=>{st.reviewMode=b.dataset.reviewMode;buildFields();render()});
   const rm=$('fields').querySelector('[data-remove-review-image]');if(rm)rm.onclick=()=>{st.reviewImage='';buildFields();render()};
 }
-function setTpl(t){S.tpl=t;if(!S.store[t])S.store[t]=Object.assign({},TPL[t].d);mark('[data-t]','t',t);buildFields();hint();render();syncVidUI();
+function setTpl(t){S.tpl=t;if(t==='free')ftSeed();if(!S.store[t])S.store[t]=Object.assign({},TPL[t].d);mark('[data-t]','t',t);buildFields();hint();render();syncVidUI();
   if(TPL[t].anim)loadFont(TPL[t].font||'Manrope').then(render).then(playAnim).catch(e=>{console.error(e);toast('تعذر تحميل خط الأنيميشن — اتأكد من النت')})}
 /* أزرار وإعدادات الفيديو تظهر مع خلفية فيديو أو مع قالب متحرك */
 function syncVidUI(){const anim=!!TPL[S.tpl].anim,show=S.media==='video'||anim;
