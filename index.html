@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Studio v13</title>
+<title>Nook Tours Studio v15</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -84,7 +84,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v13</span></h1>
+    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v15</span></h1>
 
     <div class="sec">1 · القالب</div>
     <div class="grid" id="tplG"></div>
@@ -152,6 +152,9 @@ input[type=range]{width:100%;accent-color:var(--gold)}
     </div>
     <div><label>📌 السلوجان (الشريط السفلي)</label><input type="text" class="ltr" id="gSlogan" value="DISCOVER MORE, CREATE MEMORIES"></div>
 
+    <div class="sec">🖼️ لوجوهاتك (لكل القوالب)</div>
+    <div id="lgPanel"></div>
+
     <div class="sec">5 · التصميم</div>
     <div class="grid" id="posG" style="grid-template-columns:1fr 1fr 1fr">
       <button class="tb" type="button" data-p="tl">↖ يسار</button>
@@ -217,6 +220,8 @@ const AR="'Cairo',sans-serif",EN="'Montserrat',sans-serif",SERIF="'Manrope','Rea
 const FMT={post:{w:1080,h:1350,n:'4:5 بوست'},reel:{w:1080,h:1920,n:'9:16 ريل/ستوري'},sq:{w:1080,h:1080,n:'1:1 مربع'},land:{w:1920,h:1080,n:'16:9 لاندسكيب'}};
 const S={tpl:'season',fmt:'post',media:'photo',pos:'tc',fx:.5,fy:.5,z:1,sound:false,store:{},ts:1,szTitle:1,szBadge:1,szSub:1,szCta:1,cTitle:'#D9B07A',cBadge:'#BF8C4E',cSub:'#c8e6f5',cCta:'#0C2840',fAr:'Cairo',fEn:'Montserrat'};
 const M={img:null,vurl:null};
+/* لوجوهات المستخدم + تحريك المحتوى: عامة لكل القوالب (A لوجوه، B لوجو الجامعة/الرحلة) */
+S.lg={A:null,B:null,sz:130,y:0,pos:'top',gap:40,line:true,hideStd:true,mvX:0,mvY:0};
 let LOGO_URL='',LOGO_DATA='',LOGO_IMG=null;
 
 function dataBlob(d){const [h,b]=d.split(','),m=h.match(/:(.*?);/)[1],bin=atob(b),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:m})}
@@ -241,10 +246,11 @@ const fade=(P,a,b)=>P.land
 const badgeCSS=`display:inline-block;background:linear-gradient(135deg,${G2},${G});color:${NV};font:800 27px ${AR};padding:10px 32px;border-radius:40px;white-space:nowrap;box-shadow:0 6px 22px rgba(191,140,78,.45)`;
 const badge=(d,s)=>d.badge?`<div style="${badgeCSS};${s||''}">${esc(d.badge)}</div>`:'';
 /* المسافة اللي اللوجو واخدها فوق (لو ظاهر ومتثبت فوق) */
-const logoSpace=min=>{const on=$('tLogo')&&$('tLogo').checked&&S.pos[0]==='t';return on?Math.max(min,Math.round((+$('lsz').value||56)*2.1)+36):min};
+const lgOn=()=>!!(S.lg.A||S.lg.B);
+const logoSpace=min=>{if(lgOn()&&S.lg.pos==='top')return Math.max(min,S.lg.sz+36);const on=$('tLogo')&&$('tLogo').checked&&!(lgOn()&&S.lg.hideStd)&&S.pos[0]==='t';return on?Math.max(min,Math.round((+$('lsz').value||56)*2.1)+36):min};
 const topBadge=(d,P)=>{
   let extra=0;
-  try{if(S.pos==='tc'&&$('tLogo')&&$('tLogo').checked) extra=Math.round((+$('lsz').value||56)*2.1)+36}catch(e){}
+  try{if(lgOn()&&S.lg.pos==='top')extra=S.lg.sz+36;else if(S.pos==='tc'&&$('tLogo')&&$('tLogo').checked&&!(lgOn()&&S.lg.hideStd)) extra=Math.round((+$('lsz').value||56)*2.1)+36}catch(e){}
   return badge(d,`position:absolute;top:${P.top+extra}px;left:50%;transform:translateX(-50%)`);
 };
 const ttl=(d,P,c,x)=>`<div style="color:${c||'#fff'};font:900 ${ts(P)+(x||0)}px/1.25 ${AR};${c?'':'text-shadow:0 4px 22px rgba(0,0,0,.5)'}">${ml(d.title)}</div>`;
@@ -556,18 +562,19 @@ weekly:{n:'وجهات الأسبوع',i:'☀️',f:['title','c1','rows','cta'],
 /* ===== فاضي: الصورة/الفيديو كاملة من غير تعتيم ولا لوجو — شريط السلوجان تحت بس ===== */
 blank:{n:'فاضي (سلوجان بس)',i:'⬜',f:[],d:{},r:()=>({noLogo:true,ov:'transparent',body:''})},
 
-wlc1:{n:'ترحيب كلاسيك',i:'👋',f:['badge','title','sub','c1','c2','c3'],
+wlc1:{n:'ترحيب كلاسيك',i:'👋',f:['badge','title','sub','c1','c2','c3','yTitle','ySub','yDate','yPlace','yTag'],
   L:{badge:'🏷️ الجهة / الجروب',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ',c2:'📍 المكان',c3:'# الهاشتاج'},
-  d:{badge:'اسم الجامعة أو المدرسة',title:'Welcome to\nاسم الجروب',sub:'WE’RE SO EXCITED TO HAVE YOU JOIN US FOR THIS AMAZING GETAWAY!',c1:'WEDNESDAY 11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
+  d:{badge:'اسم الجامعة أو المدرسة',title:'Welcome to\nاسم الجروب',sub:'WE’RE SO EXCITED TO HAVE YOU JOIN US FOR THIS AMAZING GETAWAY!',c1:'WEDNESDAY 11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM',yTitle:'0',ySub:'0',yDate:'0',yPlace:'0',yTag:'0'},
   r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,tag=d.c3?`<bdi dir="ltr"># ${esc(String(d.c3).replace(/^#\s*/,''))}</bdi>`:'';
+    const mv=v=>`position:relative;top:${(+v||0)*k}px`;
     return{ov:`linear-gradient(to bottom,rgba(10,30,52,.5),rgba(10,30,52,.2) 40%,rgba(10,30,52,.72))`,
     body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
       ${d.badge?`<div style="color:#fff;font:700 ${SZ(26,'badge')}px ${AR};letter-spacing:3px;opacity:.92;margin-bottom:${22*k}px">${esc(d.badge)}</div>`:''}
-      <div style="color:${col.title};font:300 ${SZ(ts(P),'title')}px/1.15 ${AR};text-shadow:0 4px 30px rgba(0,0,0,.5)">${ml(d.title)}</div>
-      ${d.sub?`<div style="color:#fff;direction:ltr;font:800 ${SZ(34*k,'sub')}px/1.4 ${EN};margin:${40*k}px auto 0;max-width:86%;text-shadow:0 2px 14px rgba(0,0,0,.6)">${ml(d.sub)}</div>`:''}
-      ${d.c1?`<div style="display:inline-block;margin-top:${44*k}px;background:rgba(255,255,255,.8);color:${NV};font:700 ${SZ(46*k,'cta')}px ${EN};padding:${16*k}px ${60*k}px;border-radius:60px">${esc(d.c1)}</div>`:''}
-      ${d.c2?`<div style="color:${col.badge};font:800 ${SZ(32*k,'badge')}px ${AR};letter-spacing:2px;margin-top:${38*k}px;text-shadow:0 2px 12px rgba(0,0,0,.6)">${esc(d.c2)}</div>`:''}
-      ${tag?`<div style="color:#fff;font:700 ${26*k}px ${EN};letter-spacing:2px;margin-top:${46*k}px;opacity:.95">${tag}</div>`:''}
+      <div style="${mv(d.yTitle)};color:${col.title};font:300 ${SZ(ts(P),'title')}px/1.15 ${AR};text-shadow:0 4px 30px rgba(0,0,0,.5)">${ml(d.title)}</div>
+      ${d.sub?`<div style="${mv(d.ySub)};color:#fff;direction:ltr;font:800 ${SZ(34*k,'sub')}px/1.4 ${EN};margin:${40*k}px auto 0;max-width:86%;text-shadow:0 2px 14px rgba(0,0,0,.6)">${ml(d.sub)}</div>`:''}
+      ${d.c1?`<div style="${mv(d.yDate)};display:inline-block;margin-top:${44*k}px;background:rgba(255,255,255,.8);color:${NV};font:700 ${SZ(46*k,'cta')}px ${EN};padding:${16*k}px ${60*k}px;border-radius:60px">${esc(d.c1)}</div>`:''}
+      ${d.c2?`<div style="${mv(d.yPlace)};color:${col.badge};font:800 ${SZ(32*k,'badge')}px ${AR};letter-spacing:2px;margin-top:${38*k}px;text-shadow:0 2px 12px rgba(0,0,0,.6)">${esc(d.c2)}</div>`:''}
+      ${tag?`<div style="${mv(d.yTag)};color:#fff;font:700 ${26*k}px ${EN};letter-spacing:2px;margin-top:${46*k}px;opacity:.95">${tag}</div>`:''}
     </div></div>`}}},
 
 wlc2:{n:'ترحيب كارت زجاج',i:'🪟',f:['badge','title','sub','c1','c2','c3'],
@@ -618,6 +625,17 @@ wlc4:{n:'ترحيب سينمائي',i:'🎬',f:['badge','title','sub','c1','c2',
       ${tag?`<div style="color:#fff;opacity:.9;font:700 ${24*k}px ${EN};letter-spacing:2px;margin-top:${24*k}px">${tag}</div>`:''}
     </div>`}}},
 
+/* ===== نضيف: صورة نضيفة + لوجوهات فوق + شريط السلوجان تحت؛ سطرين اختياريين بس ===== */
+clean:{n:'نضيف (لوجو + سلوجان)',i:'✨',f:['title','sub','yTitle','ySub'],
+  L:{title:'📝 سطر كبير (اختياري)',sub:'💬 سطر صغير (اختياري)'},
+  d:{title:'',sub:'',yTitle:'0',ySub:'0'},
+  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,mv=v=>`position:relative;top:${(+v||0)*k}px`;
+    return{ov:`linear-gradient(to bottom,rgba(10,30,52,.36),rgba(10,30,52,0) 28%,rgba(10,30,52,0) 58%,rgba(10,30,52,.5))`,
+    body:(d.title||d.sub)?`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
+      ${d.title?`<div style="${mv(d.yTitle)};color:${col.title};font:300 ${SZ(ts(P)*.9,'title')}px/1.2 ${AR};text-shadow:0 4px 30px rgba(0,0,0,.5)">${ml(d.title)}</div>`:''}
+      ${d.sub?`<div style="${mv(d.ySub)};color:#fff;font:700 ${SZ(32*k,'sub')}px/1.5 ${AR};margin-top:${22*k}px;text-shadow:0 2px 14px rgba(0,0,0,.6)">${ml(d.sub)}</div>`:''}
+    </div></div>`:''}}},
+
 offer:{n:'كارت عرض',i:'🎫',f:['badge','title','sub','pfrom','price','cur','cta'],
   modes:[{key:'preset',label:'العرض (بيحمّل بياناته)',opts:[['dahab','🏝 رحلة دهب'],['portsaid','⚓ بورسعيد']],presets:OFFER_PRESETS}],
   L:{pfrom:'💬 نص صغير فوق السعر',cur:'🏷 العملة / الوحدة'},
@@ -662,7 +680,10 @@ after:{n:'صور بعد الرحلة',i:'📸',f:['badge','title','sub','who','c
     </div>`}}}
 };
 
-const FL={stats:['📊 الأرقام (افصل بينها بـ ·)','t'],badge:['🏷️ الشارة','t'],title:['📝 العنوان','a'],sub:['💬 التفاصيل','a'],c1:['📌 سطر مميز 1','t'],c2:['📌 سطر مميز 2','t'],c3:['📌 سطر مميز 3','t'],inc:['✅ المميزات (سطر لكل ميزة)','a'],rows:['📋 الأسعار','a'],pfrom:['نص قبل السعر','t'],price:['💰 السعر','t'],cur:['العملة / الوحدة','t'],old:['السعر القديم (اختياري)','t'],disc:['نسبة الخصم (اختياري)','t'],who:['👤 اسم العميل','t'],stars:['⭐ التقييم','s'],cta:['🔵 نص الزر','t']};
+const FL={stats:['📊 الأرقام (افصل بينها بـ ·)','t'],badge:['🏷️ الشارة','t'],title:['📝 العنوان','a'],sub:['💬 التفاصيل','a'],c1:['📌 سطر مميز 1','t'],c2:['📌 سطر مميز 2','t'],c3:['📌 سطر مميز 3','t'],inc:['✅ المميزات (سطر لكل ميزة)','a'],rows:['📋 الأسعار','a'],pfrom:['نص قبل السعر','t'],price:['💰 السعر','t'],cur:['العملة / الوحدة','t'],old:['السعر القديم (اختياري)','t'],disc:['نسبة الخصم (اختياري)','t'],who:['👤 اسم العميل','t'],stars:['⭐ التقييم','s'],cta:['🔵 نص الزر','t'],
+ /* تحكم بالسلايدر ('r': الحد الأدنى، الأقصى، الخطوة، الافتراضي) وتحميل لوجو ('g') */
+ yTitle:['↕️ تحريك العنوان / الجريتينج','r',-400,400,5,0],ySub:['↕️ تحريك جملة الحماس','r',-400,400,5,0],yDate:['↕️ تحريك التاريخ','r',-400,400,5,0],yPlace:['↕️ تحريك المكان','r',-400,400,5,0],yTag:['↕️ تحريك الهاشتاج','r',-400,400,5,0],
+ lgA:['🖼️ لوجو بتاعي (ارفع صورة)','g'],lgB:['🎓 لوجو الجامعة / الرحلة (ارفع صورة)','g'],lgSz:['📏 حجم اللوجوهات','r',50,300,5,130],lgY:['↕️ تحريك اللوجوهات','r',-400,400,5,0]};
 const HALF=['pfrom','price','cur','old','disc','stars'];
 const C=()=>({title:S.cTitle||'#D9B07A',badge:S.cBadge||'#BF8C4E',sub:S.cSub||'#c8e6f5',cta:S.cCta||'#0C2840'});
 const SZ=(base,kind)=>{const m={title:S.szTitle,badge:S.szBadge,sub:S.szSub,cta:S.szCta}[kind]||1;return Math.round(base*m)};
@@ -707,13 +728,57 @@ function logoHTML(P){const sz=Math.round($('lsz').value*2.1);
 function stripHTML(d,P){const s=d.slogan||'',ls=/[\u0600-\u06FF]/.test(s)?0:3;
   return `<div data-fixed-font="1" style="position:absolute;left:0;right:0;bottom:${P.sb}px;height:${STRIP_H}px;${P.sb?'border-bottom:3px solid '+G+';':''}background:linear-gradient(90deg,rgba(8,16,28,.97),rgba(12,22,40,.97));border-top:3px solid ${G};display:flex;align-items:center;justify-content:center;gap:18px;z-index:6"><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(191,140,78,.6);display:inline-block"></span><span style="color:${G2};font:800 22px ${EN};letter-spacing:${ls}px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.4)">${esc(s)}</span><span style="width:10px;height:10px;border-radius:50%;background:${G};box-shadow:0 0 12px rgba(191,140,78,.6);display:inline-block"></span></div>`}
 function buildUIRaw(d,P){const t=TPL[S.tpl].r(d,P),v=+$('dark').value,op=Math.min(1,v/66),ex=Math.max(0,(v-66)/100*.6);
-  const core=`<div style="position:absolute;inset:0;opacity:${op.toFixed(2)};background:${t.ov}"></div>${ex?`<div style="position:absolute;inset:0;background:rgba(0,0,0,${ex.toFixed(2)})"></div>`:''}${t.body}${!t.noLogo&&$('tLogo').checked?logoHTML(P):''}`;
+  const core=`<div style="position:absolute;inset:0;opacity:${op.toFixed(2)};background:${t.ov}"></div>${ex?`<div style="position:absolute;inset:0;background:rgba(0,0,0,${ex.toFixed(2)})"></div>`:''}${t.body}${!t.noLogo&&$('tLogo').checked&&!(lgOn()&&S.lg.hideStd)?logoHTML(P):''}${t.noLogo?'':userLogosHTML(P)}`;
   return {core, strip:P.strip?stripHTML(d,P):''}
 }
 function scaleText(h){const k=S.ts||1;if(k===1)return h;return h.replace(/(font(?:-size)?:\s*(?:[\w-]+\s+)*?)(\d+(?:\.\d+)?)px/g,(m,a,n)=>a+(Math.round(n*k*10)/10)+'px')}
 function buildUI(d,P){const u=buildUIRaw(d,P);return scaleText(applyFonts(u.core))+u.strip}
 /* لو بلوك النصوص (المثبّت من تحت) طلع فوق اللوجو/الشارة أو برّه الإطار — يتصغّر لحد ما يدخل */
-function autoFit(root,P){
+/* لوجوهات المستخدم فوق القالب (من غير خلفية لو اتشالت) */
+function userLogosHTML(P){if(!lgOn())return '';const g=S.lg,k=P.land?.8:1,h=Math.round(g.sz*k),ims=[g.A,g.B].filter(Boolean).map(l=>`<img src="${l.src}" alt="" style="display:block;height:${h}px;width:auto;max-width:${Math.round(P.W*.4)}px;object-fit:contain">`);
+  const line=g.line&&ims.length===2?`<div style="width:3px;align-self:stretch;background:rgba(255,255,255,.85);border-radius:2px"></div>`:'';
+  const pos=g.pos==='bottom'?`bottom:${P.bot+(-g.y)}px`:`top:${P.top+(+g.y)}px`;
+  return `<div data-lg="1" style="position:absolute;${pos};left:0;right:0;z-index:5;direction:ltr;display:flex;justify-content:center;align-items:center;gap:${Math.round(g.gap*k)}px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.45))">${ims.join(line)}</div>`}
+/* تحريك محتوى القالب كله (يمين/شمال + فوق/تحت) بتعديل top/bottom/left/right للكتل */
+function applyMove(root){const x=+S.lg.mvX||0,y=+S.lg.mvY||0;if(!x&&!y)return;[...root.children].forEach(e=>{const st=e.getAttribute('style')||'';
+  if(e.tagName==='IMG'||e.dataset.fixedFont||e.dataset.lg||/z-index:\s*[56]/.test(st)||(!e.children.length&&/inset:\s*0/.test(st)))return;
+  const sh=(p,dv)=>{const v=e.style[p];if(v&&/px$/.test(v))e.style[p]=(parseFloat(v)+dv)+'px'};sh('top',y);sh('bottom',-y);sh('left',x);sh('right',-x)})}
+/* ---- معالجة اللوجو: شيل الخلفية السودا/البيضا + قص الحواف ---- */
+const lgImg=src=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('الصورة دي مش مدعومة'));im.src=src});
+async function lgProcess(orig,mode){const im=await lgImg(orig),sc=Math.min(1,800/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(1,Math.round(im.naturalWidth*sc)),h=Math.max(1,Math.round(im.naturalHeight*sc)),c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0,w,h);const id=x.getImageData(0,0,w,h),d=id.data,cl=v=>v<0?0:v>1?1:v;
+  if(mode==='black'){for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]),a=cl((m-18)/90)*(d[i+3]/255);if(m>0){d[i]=Math.min(255,d[i]*255/m);d[i+1]=Math.min(255,d[i+1]*255/m);d[i+2]=Math.min(255,d[i+2]*255/m)}d[i+3]=Math.round(a*255)}}
+  else if(mode==='white'){for(let i=0;i<d.length;i+=4){const mn=Math.min(d[i],d[i+1],d[i+2]),a=cl((255-mn-18)/90)*(d[i+3]/255);if(a>.01){for(let j=0;j<3;j++)d[i+j]=Math.max(0,Math.min(255,(d[i+j]-255*(1-a))/a))}d[i+3]=Math.round(a*255)}}
+  x.putImageData(id,0,0);let x0=w,y0=h,x1=0,y1=0;for(let yy=0;yy<h;yy++)for(let xx=0;xx<w;xx++)if(d[(yy*w+xx)*4+3]>12){if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(yy<y0)y0=yy;if(yy>y1)y1=yy}
+  if(x1<=x0||y1<=y0||mode==='none'&&x0===0&&y0===0&&x1===w-1&&y1===h-1)return c.toDataURL('image/png');
+  const p=4,cx=Math.max(0,x0-p),cy=Math.max(0,y0-p),cw=Math.min(w,x1+p+1)-cx,ch=Math.min(h,y1+p+1)-cy,o=document.createElement('canvas');o.width=cw;o.height=ch;o.getContext('2d').drawImage(c,cx,cy,cw,ch,0,0,cw,ch);return o.toDataURL('image/png')}
+async function lgDetect(orig){const im=await lgImg(orig),c=document.createElement('canvas'),n=20;c.width=c.height=n;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0,n,n);const d=x.getImageData(0,0,n,n).data;let s=0,cnt=0,al=0;
+  for(const [px,py] of [[0,0],[n-1,0],[0,n-1],[n-1,n-1]]){const i=(py*n+px)*4;s+=(d[i]+d[i+1]+d[i+2])/3;al+=d[i+3];cnt++}
+  if(al/cnt<200)return 'none';s/=cnt;return s<70?'black':s>200?'white':'none'}
+async function lgUpload(slot,f){if(!f)return;if(!f.type.startsWith('image/'))return toast('اختار ملف صورة');
+  const orig=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result));r.onerror=()=>rej(new Error('تعذر قراءة الصورة'));r.readAsDataURL(f)});
+  if(!/^data:image\/(png|jpe?g|webp|gif);base64,/.test(orig))return toast('الملف ده مش صورة');
+  try{const mode=await lgDetect(orig);S.lg[slot]={orig,mode,src:await lgProcess(orig,mode)};lgPanel();render()}catch(e){toast(e.message)}}
+async function lgMode(slot,mode){const l=S.lg[slot];if(!l)return;try{l.mode=mode;l.src=await lgProcess(l.orig,mode);lgPanel();render()}catch(e){toast(e.message)}}
+function lgPanel(){const g=S.lg,R=(k,l,mn,mx,st)=>`<div><label>${l} <span data-lgv="${k}">${g[k]}</span></label><div style="display:flex;gap:8px;align-items:center"><input type="range" data-lgr="${k}" min="${mn}" max="${mx}" step="${st}" value="${g[k]}" style="flex:1"><button class="tb" type="button" data-lgreset="${k}" style="padding:4px 9px;width:auto">↺</button></div></div>`,
+  slot=(s,l)=>`<div class="full"><label>${l}</label><div class="up"><input type="file" data-lgf="${s}" accept="image/*"><p>اضغط لاختيار <span>صورة اللوجو</span></p></div>${g[s]?`<div style="background:repeating-conic-gradient(#555 0 25%,#777 0 50%) 0 0/16px 16px;border-radius:8px;padding:6px;text-align:center;margin-top:6px"><img src="${g[s].src}" alt="" style="height:60px;max-width:100%;object-fit:contain"></div>
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:6px">${[['none','الأصل'],['black','شيل الأسود'],['white','شيل الأبيض']].map(([m,t])=>`<button class="tb ${g[s].mode===m?'on':''}" type="button" data-lgm="${s}|${m}">${t}</button>`).join('')}</div>
+    <button class="tb" type="button" data-lgrm="${s}" style="margin-top:6px;width:100%">إزالة اللوجو</button>`:''}</div>`;
+  $('lgPanel').innerHTML=slot('A','🖼️ لوجو بتاعي')+slot('B','🎓 لوجو الجامعة / الرحلة')+`<div class="hint">الصورة بتتقص من الحواف، والخلفية السودا أو البيضا بتتشال لوحدها لو اتعرفت. غيّرها بالأزرار لو مش مظبوطة.</div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:8px"><button class="tb ${g.pos==='top'?'on':''}" type="button" data-lgpos="top">⬆️ فوق</button><button class="tb ${g.pos==='bottom'?'on':''}" type="button" data-lgpos="bottom">⬇️ تحت</button></div>
+    ${R('sz','📏 حجم اللوجوهات',50,300,5)}${R('y','↕️ تحريك اللوجوهات',-400,400,5)}${R('gap','↔️ المسافة بينهم',0,160,5)}
+    <div class="tog"><span>خط فاصل بين اللوجوهين</span><input type="checkbox" data-lgc="line" ${g.line?'checked':''}></div>
+    <div class="tog"><span>إخفاء لوجو Nook الأصلي</span><input type="checkbox" data-lgc="hideStd" ${g.hideStd?'checked':''}></div>
+    <div class="sec" style="margin-top:10px">↔️↕️ تحريك محتوى القالب كله</div>${R('mvY','↕️ فوق / تحت',-500,500,5)}${R('mvX','↔️ يمين / شمال',-400,400,5)}`}
+(function(){const p=$('lgPanel');
+  p.addEventListener('input',e=>{const k=e.target.dataset.lgr;if(!k)return;S.lg[k]=+e.target.value;const s=p.querySelector(`[data-lgv="${k}"]`);if(s)s.textContent=e.target.value;render()});
+  p.addEventListener('change',e=>{const t=e.target;if(t.dataset.lgf)lgUpload(t.dataset.lgf,t.files[0]);else if(t.dataset.lgc){S.lg[t.dataset.lgc]=t.checked;render()}});
+  p.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+    if(d.lgm){const [s,m]=d.lgm.split('|');lgMode(s,m)}else if(d.lgrm){S.lg[d.lgrm]=null;lgPanel();render()}else if(d.lgpos){S.lg.pos=d.lgpos;lgPanel();render()}
+    else if(d.lgreset){const D={sz:130,y:0,gap:40,mvX:0,mvY:0};S.lg[d.lgreset]=D[d.lgreset];lgPanel();render()}});
+  lgPanel()})();
+function autoFit(root,P){autoFit0(root,P);applyMove(root)}
+function autoFit0(root,P){
   const kids=[...root.children].filter(e=>e.tagName!=='IMG'),isFixed=e=>e.dataset.fixedFont,
     topAnch=e=>e.style.top&&!e.style.bottom&&!isFixed(e),botAnch=e=>e.style.bottom&&!e.style.top&&!isFixed(e);
   const minTop=Math.max(P.top,...kids.filter(topAnch).map(e=>e.offsetTop+e.offsetHeight))+FIT_GAP;
@@ -743,8 +808,13 @@ function buildFields(){const T=TPL[S.tpl],st=S.store[S.tpl];
   $('fields').innerHTML=optsUI+modeUI+T.f.filter(k=>!(S.tpl==='review'&&st.reviewMode==='image'&&k==='sub')).map(k=>{const [l,t]=FL[k],lab=(T.L&&T.L[k])||l,full=HALF.indexOf(k)<0;let inp;
     if(t==='a')inp=`<textarea data-k="${k}" rows="${k==='inc'||k==='rows'?5:2}">${esc(st[k])}</textarea>`;
     else if(t==='s')inp=`<select data-k="${k}"><option${st[k]==='⭐⭐⭐⭐⭐'?' selected':''}>⭐⭐⭐⭐⭐</option><option${st[k]==='⭐⭐⭐⭐'?' selected':''}>⭐⭐⭐⭐</option></select>`;
+    else if(t==='r'){const F=FL[k],v=st[k]===undefined||st[k]===''?F[5]:st[k];inp=`<div style="display:flex;align-items:center;gap:10px"><input type="range" data-k="${k}" min="${F[2]}" max="${F[3]}" step="${F[4]}" value="${esc(v)}" style="flex:1" oninput="this.nextElementSibling.textContent=this.value"><span style="min-width:38px;text-align:center;font:700 12px Montserrat,sans-serif;color:#D9B07A">${esc(v)}</span><button class="tb" type="button" data-reset-k="${k}" data-def="${F[5]}" style="padding:4px 9px;width:auto">↺</button></div>`}
+    else if(t==='g')inp=`<div class="up"><input type="file" data-logo-k="${k}" accept="image/*"><p>اضغط لاختيار <span>صورة</span></p>${st[k]?`<img src="${st[k]}" alt="" style="display:block;width:auto;max-width:100%;height:70px;object-fit:contain">`:''}</div>${st[k]?`<button class="tb" type="button" data-remove-logo="${k}" style="margin-top:6px;width:100%">إزالة</button>`:''}`;
     else inp=`<input type="text" data-k="${k}" value="${esc(st[k])}">`;
     return `<div class="${full?'full':''}"><label>${lab}</label>${inp}</div>`}).join('');
+  $('fields').querySelectorAll('[data-logo-k]').forEach(i=>i.onchange=e=>{const f=e.target.files[0],k=i.dataset.logoK;if(!f)return;if(!f.type.startsWith('image/'))return toast('اختار ملف صورة');const rd=new FileReader();rd.onload=()=>{if(!/^data:image\/(png|jpe?g|webp|gif);base64,/.test(String(rd.result)))return toast('الملف ده مش صورة');st[k]=rd.result;buildFields();render()};rd.onerror=()=>toast('تعذر قراءة الصورة');rd.readAsDataURL(f)});
+  $('fields').querySelectorAll('[data-remove-logo]').forEach(b=>b.onclick=()=>{st[b.dataset.removeLogo]='';buildFields();render()});
+  $('fields').querySelectorAll('[data-reset-k]').forEach(b=>b.onclick=()=>{st[b.dataset.resetK]=b.dataset.def;buildFields();render()});
   $('fields').querySelectorAll('[data-mode-key]').forEach(b=>b.onclick=()=>{const k=b.dataset.modeKey,v=b.dataset.modeVal,md=(T.modes||[]).find(m=>m.key===k);st[k]=v;if(md&&md.presets&&md.presets[v])Object.assign(st,md.presets[v],{[k]:v});buildFields();render()});
   const mf=$('reviewImageFile');if(mf)mf.onchange=e=>{const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('image/'))return toast('اختار ملف صورة');const reader=new FileReader();reader.onload=()=>{if(!/^data:image\/(png|jpe?g|webp|gif);base64,/.test(String(reader.result)))return toast('الملف ده مش صورة'); /* بنقبل صور بس قبل ما تتحط في الصفحة */st.reviewImage=reader.result;buildFields();render()};reader.onerror=()=>toast('تعذر قراءة الصورة');reader.readAsDataURL(f)};
   $('fields').querySelectorAll('[data-review-mode]').forEach(b=>b.onclick=()=>{st.reviewMode=b.dataset.reviewMode;buildFields();render()});
