@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Studio v11</title>
+<title>Nook Tours Studio v13</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -84,7 +84,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v11</span></h1>
+    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v13</span></h1>
 
     <div class="sec">1 · القالب</div>
     <div class="grid" id="tplG"></div>
@@ -263,7 +263,13 @@ const NL=String.fromCharCode(10);
 /* بيانات الوجهات الجاهزة لقالب الفنادق (بتاعة صاحب الشركة؛ عدّلها من الـ Studio) */
 const HOTEL_PRESETS={
  sharm:{badge:'',title:'عروض شرم الشيخ في 2026',c1:'',sub:'الأسعار للفرد تشمل الإقامة 4 أيام 3 ليالي والانتقالات',cur:'السعر',rows:['عايدة شرم أكوا بارك | الهضبة | فطار + عشاء | 3950','فيفا شرم | الهضبة | فطار + عشاء | 4300','رويال نعمة أكوا بارك | خليج نعمة | فطار + عشاء | 4700','شاركس باي أوسيز | سوهو سكوير | فطار + عشاء | 5000','شارمينج إن أكوا بارك | الهضبة | فطار + عشاء | 5300','باتوراما نعمة أكوا بارك | خليج نعمة | فطار + غداء + عشاء | 6500','هوليوود بالم أكوا بارك | خليج نعمة | فطار + غداء + عشاء | 7500','شرم بلازا أكوا بارك | خليج الباشا | فطار + غداء + عشاء | 8750','باروتيل أكوا بارك | خليج نبق | فطار + غداء + عشاء | 8750','باروتيل لاجون أكوا بارك | خليج نبق | فطار + غداء + عشاء | 9500','أمواج عيون ريزورت بول فيو | خليج نبق | فطار + غداء + عشاء | 10000','دريمز فاكيشن أكوا بول فيو | الهضبة | فطار + غداء + عشاء | 11250','سيتي شرم | الهضبة | فطار + غداء + عشاء | 12500','كونتيننتال بلازا أكوا | خليج الباشا | فطار + غداء + عشاء | 12900','تروبيتال نعمة باي | خليج نعمة | فطار + غداء + عشاء | 14300','باروتيل بيتش | خليج نبق | فطار + غداء + عشاء | 14400'].join(NL)},
- sokhna:{badge:'',title:'عروض العين السخنة',c1:'من 1 نوفمبر إلى 20 ديسمبر 2026',sub:'السعر للفرد في الليلة · شامل الفطار والعشاء',cur:'السعر للفرد في الليلة',rows:['Elfanar de Luna | 1,600','La Cabana Blue Blue | 1,800','Miral | 1,800','Domarina Hotel | 2,100','Blumar El Dome | 2,200','Dayra Camp | 2,300','Retail View (Deluxe) | 2,300','Tolip Galala Hights | 2,400','Coral Sea Beach | 2,750','Stella Club | 2,800','Tolip Galala Hills | 2,900','Tolip Galala Magestic | 3,200','Stella Grand | 4,200'].join(NL)}
+ sokhna:{badge:'',title:'عروض العين السخنة',c1:'من 1 نوفمبر إلى 20 ديسمبر 2026',sub:'السعر للفرد في الليلة · شامل الفطار والعشاء',cur:'السعر للفرد في الليلة',rows:['Elfanar de Luna | 1,600','La Cabana Blue Blue | 1,800','Miral | 1,800','Domarina Hotel | 2,100','Blumar El Dome | 2,200','Dayra Camp | 2,300','Retail View (Deluxe) | 2,300','Tolip Galala Hights | 2,400','Coral Sea Beach | 2,750','Stella Club | 2,800','Tolip Galala Hills | 2,900','Tolip Galala Magestic | 3,200','Stella Grand | 4,200'].join(NL)},
+ hurghada:{badge:'عروض الغردقة',title:'عروض الغردقة في 2026',c1:'',sub:'الأسعار تشمل الإقامة 4 أيام 3 ليالي والانتقالات للفرد',cur:'السعر',rows:['مون بيتش أكوا بارك | فطار + غداء + عشاء | 4950','امبير هوتيل أكوا بارك | فطار + غداء + عشاء | 5750','امبير بيتش أكوا بارك | فطار + غداء + عشاء | 6200','صن آند سي الغردقة | فطار + غداء + عشاء | 6550','ميراج باي أكوا بارك | فطار + غداء + عشاء | 7400','مورينو هورايزون | فطار + غداء + عشاء | 9950','رويال لاجونز | فطار + غداء + عشاء | 10000','الكريما بيتش | فطار + غداء + عشاء | 11200'].join(NL)}
+};
+/* كروت العروض الجاهزة (قالب offer): بيانات من البوستات القديمة، كلها قابلة للتعديل من الـ Studio */
+const OFFER_PRESETS={
+ dahab:{badge:'رحلة دهب',title:'اكتشف سحر دهب واستمتع بأجمل الأوقات',sub:'4 ليالي و3 أيام من المغامرة والاسترخاء بين أجمل شواطئ دهب وطبيعتها الساحرة',pfrom:'حصري ب',price:'2,299',cur:'EGP',cta:'احجز رحلتك'},
+ portsaid:{badge:'',title:'اكتشف بورسعيد واستمتع بيوم مختلف',sub:'يوم مميز بين شوارع بورسعيد الساحرة وأجوائها البحرية ومعالمها المميزة. عروض خاصة للمجموعات!',pfrom:'ابتداء من',price:'425',cur:'EGP / Per person',cta:'احجز يومك'}
 };
 const TPL={
 trip:{n:'رحلة جروب',i:'🚌',f:['badge','title','sub','c1','c2','c3','inc','pfrom','price','cur','cta'],
@@ -285,7 +291,7 @@ price:{n:'عرض سعر',i:'🔥',f:['badge','title','sub','c1','pfrom','price',
       ${cta(d.cta,'display:block;text-align:center;font-size:40px;padding:22px 20px')}<div style="margin-top:14px">${contactRow(d)}</div></div>`}}},
 
 hotels:{n:'أسعار فنادق',i:'🏨',f:['badge','title','c1','sub','rows','cur','cta'],
-  modes:[{key:'preset',label:'الوجهة (بتحمّل بياناتها)',opts:[['sharm','🏖 شرم الشيخ'],['sokhna','🌊 العين السخنة']],presets:HOTEL_PRESETS},{key:'page',label:'الصفحات (لو الفنادق كتير)',opts:[['all','📄 الكل'],['1','① النص الأول'],['2','② النص التاني']]},{key:'bgMode',label:'الخلفية',opts:[['auto','🖼️ الصورة لو فيه'],['solid','⬛ كحلي سادة']]}],
+  modes:[{key:'preset',label:'الوجهة (بتحمّل بياناتها)',opts:[['sharm','🏖 شرم الشيخ'],['sokhna','🌊 العين السخنة'],['hurghada','🐠 الغردقة']],presets:HOTEL_PRESETS},{key:'page',label:'الصفحات (لو الفنادق كتير)',opts:[['all','📄 الكل'],['1','① النص الأول'],['2','② النص التاني']]},{key:'bgMode',label:'الخلفية',opts:[['auto','🖼️ الصورة لو فيه'],['solid','⬛ كحلي سادة']]}],
   L:{title:'📝 العنوان',c1:'📅 الفترة (اختياري)',sub:'💬 سطر تحت العنوان (شامل إيه)',cur:'🏷 عنوان عمود السعر',rows:'📋 كل سطر: الفندق | الموقع | الإقامة | السعر (أو الفندق | الإقامة | السعر، أو الفندق | السعر بس)'},
   d:Object.assign({},HOTEL_PRESETS.sharm,{preset:'sharm',cta:'احجز الآن',page:'all',bgMode:'auto'}),
   r:(d,P)=>{const col=C();
@@ -549,6 +555,82 @@ weekly:{n:'وجهات الأسبوع',i:'☀️',f:['title','c1','rows','cta'],
 
 /* ===== فاضي: الصورة/الفيديو كاملة من غير تعتيم ولا لوجو — شريط السلوجان تحت بس ===== */
 blank:{n:'فاضي (سلوجان بس)',i:'⬜',f:[],d:{},r:()=>({noLogo:true,ov:'transparent',body:''})},
+
+wlc1:{n:'ترحيب كلاسيك',i:'👋',f:['badge','title','sub','c1','c2','c3'],
+  L:{badge:'🏷️ الجهة / الجروب',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ',c2:'📍 المكان',c3:'# الهاشتاج'},
+  d:{badge:'اسم الجامعة أو المدرسة',title:'Welcome to\nاسم الجروب',sub:'WE’RE SO EXCITED TO HAVE YOU JOIN US FOR THIS AMAZING GETAWAY!',c1:'WEDNESDAY 11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
+  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,tag=d.c3?`<bdi dir="ltr"># ${esc(String(d.c3).replace(/^#\s*/,''))}</bdi>`:'';
+    return{ov:`linear-gradient(to bottom,rgba(10,30,52,.5),rgba(10,30,52,.2) 40%,rgba(10,30,52,.72))`,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;text-align:center">
+      ${d.badge?`<div style="color:#fff;font:700 ${SZ(26,'badge')}px ${AR};letter-spacing:3px;opacity:.92;margin-bottom:${22*k}px">${esc(d.badge)}</div>`:''}
+      <div style="color:${col.title};font:300 ${SZ(ts(P),'title')}px/1.15 ${AR};text-shadow:0 4px 30px rgba(0,0,0,.5)">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:#fff;direction:ltr;font:800 ${SZ(34*k,'sub')}px/1.4 ${EN};margin:${40*k}px auto 0;max-width:86%;text-shadow:0 2px 14px rgba(0,0,0,.6)">${ml(d.sub)}</div>`:''}
+      ${d.c1?`<div style="display:inline-block;margin-top:${44*k}px;background:rgba(255,255,255,.8);color:${NV};font:700 ${SZ(46*k,'cta')}px ${EN};padding:${16*k}px ${60*k}px;border-radius:60px">${esc(d.c1)}</div>`:''}
+      ${d.c2?`<div style="color:${col.badge};font:800 ${SZ(32*k,'badge')}px ${AR};letter-spacing:2px;margin-top:${38*k}px;text-shadow:0 2px 12px rgba(0,0,0,.6)">${esc(d.c2)}</div>`:''}
+      ${tag?`<div style="color:#fff;font:700 ${26*k}px ${EN};letter-spacing:2px;margin-top:${46*k}px;opacity:.95">${tag}</div>`:''}
+    </div></div>`}}},
+
+wlc2:{n:'ترحيب كارت زجاج',i:'🪟',f:['badge','title','sub','c1','c2','c3'],
+  L:{badge:'🏷️ الجهة / الجروب',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ',c2:'📍 المكان',c3:'# الهاشتاج'},
+  d:{badge:'مرحباً بكم',title:'أهلاً بيكم\nفي رحلتنا',sub:'سعداء جداً بوجودكم معنا في هذه الرحلة',c1:'الأربعاء 11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
+  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,tag=d.c3?`<bdi dir="ltr"># ${esc(String(d.c3).replace(/^#\s*/,''))}</bdi>`:'';
+    const cell=(ic,t)=>t?`<div style="flex:1;color:#fff;font:700 ${SZ(32*k,'sub')}px/1.3 ${AR}"><div style="font-size:${38*k}px;margin-bottom:6px">${ic}</div>${esc(t)}</div>`:'';
+    return{ov:`linear-gradient(rgba(6,14,26,.4),rgba(6,14,26,.62))`,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(30)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center">
+    <div style="width:100%;max-width:${P.land?1100:900}px;${glass};border-radius:44px;border-top:6px solid ${G};padding:${48*k}px ${44*k}px;text-align:center">
+      ${d.badge?`<div style="display:inline-block;border:2px solid ${col.badge};color:${col.badge};font:800 ${SZ(26,'badge')}px ${AR};padding:8px 28px;border-radius:30px;margin-bottom:${22*k}px">${esc(d.badge)}</div>`:''}
+      <div style="color:${col.title};font:900 ${SZ(ts(P)-6,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(30*k,'sub')}px/1.5 ${AR};margin:${18*k}px 0 0">${ml(d.sub)}</div>`:''}
+      ${(d.c1||d.c2)?`<div style="display:flex;align-items:stretch;gap:${24*k}px;margin-top:${34*k}px;padding-top:${28*k}px;border-top:2px solid rgba(191,140,78,.45)">${cell('📅',d.c1)}${d.c1&&d.c2?`<div style="width:2px;background:rgba(191,140,78,.45)"></div>`:''}${cell('📍',d.c2)}</div>`:''}
+      ${tag?`<div style="color:${col.badge};font:800 ${26*k}px ${EN};letter-spacing:2px;margin-top:${34*k}px">${tag}</div>`:''}
+    </div></div>`}}},
+
+wlc3:{n:'ترحيب تذكرة',i:'🎟️',f:['badge','title','sub','c1','c2','c3'],
+  L:{badge:'🏷️ سطر فوق التاريخ',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ (الخانة الذهبية)',c2:'📍 المكان',c3:'# الهاشتاج'},
+  d:{badge:'رحلة جماعية',title:'Welcome\nأهلاً بيكم',sub:'يوم مليان حماس وذكريات',c1:'11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
+  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,tag=d.c3?`<bdi dir="ltr"># ${esc(String(d.c3).replace(/^#\s*/,''))}</bdi>`:'';
+    return{ov:`linear-gradient(rgba(6,14,26,.3),rgba(6,14,26,.55))`,
+    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(30)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center">
+    <div style="width:100%;max-width:${P.land?1000:860}px;border-radius:40px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);text-align:center">
+      <div style="background:linear-gradient(135deg,${G2},${G});padding:${34*k}px ${30*k}px">
+        ${d.badge?`<div style="color:${NV};font:800 ${SZ(26*k,'badge')}px ${AR};letter-spacing:3px;opacity:.8">${esc(d.badge)}</div>`:''}
+        ${d.c1?`<div style="color:${NV};font:900 ${SZ(92*k,'cta')}px/1.1 ${EN}">${esc(d.c1)}</div>`:''}
+      </div>
+      <div style="border-top:3px dashed rgba(191,140,78,.7);background:rgba(10,32,56,.93);padding:${40*k}px ${36*k}px">
+        <div style="color:${col.title};font:900 ${SZ(ts(P)-8,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
+        ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(30*k,'sub')}px/1.5 ${AR};margin-top:${16*k}px">${ml(d.sub)}</div>`:''}
+        ${d.c2?`<div style="color:#fff;font:800 ${SZ(34*k,'badge')}px ${AR};margin-top:${28*k}px">📍 ${esc(d.c2)}</div>`:''}
+        ${tag?`<div style="color:${col.badge};font:700 ${24*k}px ${EN};letter-spacing:2px;margin-top:${26*k}px">${tag}</div>`:''}
+      </div>
+    </div></div>`}}},
+
+wlc4:{n:'ترحيب سينمائي',i:'🎬',f:['badge','title','sub','c1','c2','c3'],
+  L:{badge:'🏷️ الجهة / الجروب',title:'📝 عنوان الترحيب',sub:'💬 جملة الحماس',c1:'📅 التاريخ',c2:'📍 المكان',c3:'# الهاشتاج'},
+  d:{badge:'اسم الجامعة أو المدرسة',title:'Welcome\nأهلاً بيكم',sub:'يوم لا يتنسي مع الشلة',c1:'الأربعاء 11 - 11',c2:'مكان الرحلة',c3:'NOOK TOURS TEAM'},
+  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.82:1,tag=d.c3?`<bdi dir="ltr"># ${esc(String(d.c3).replace(/^#\s*/,''))}</bdi>`:'';
+    return{ov:`linear-gradient(to top,rgba(6,14,26,.96) 0%,rgba(6,14,26,.62) 42%,rgba(6,14,26,.08) 75%)`,
+    body:`<div style="position:absolute;left:0;right:0;bottom:${P.bot}px;padding:${P.sq?36:48}px ${P.pad}px 0">
+      ${d.badge?`<div style="color:${col.badge};font:800 ${SZ(26,'badge')}px ${AR};letter-spacing:4px;margin-bottom:${14*k}px">${esc(d.badge)}</div>`:''}
+      <div style="color:${col.title};font:900 ${SZ(ts(P)+16,'title')}px/1.08 ${AR};text-shadow:0 6px 30px rgba(0,0,0,.55)">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(30*k,'sub')}px/1.5 ${AR};margin-top:${14*k}px">${ml(d.sub)}</div>`:''}
+      ${(d.c1||d.c2)?`<div style="display:flex;align-items:center;gap:${22*k}px;margin-top:${26*k}px"><div style="width:6px;align-self:stretch;background:${G};border-radius:3px"></div>
+        <div>${d.c1?`<div style="color:#fff;font:800 ${SZ(44*k,'cta')}px ${AR}">📅 ${esc(d.c1)}</div>`:''}${d.c2?`<div style="color:${col.badge};font:700 ${SZ(32*k,'badge')}px ${AR};margin-top:6px">📍 ${esc(d.c2)}</div>`:''}</div></div>`:''}
+      ${tag?`<div style="color:#fff;opacity:.9;font:700 ${24*k}px ${EN};letter-spacing:2px;margin-top:${24*k}px">${tag}</div>`:''}
+    </div>`}}},
+
+offer:{n:'كارت عرض',i:'🎫',f:['badge','title','sub','pfrom','price','cur','cta'],
+  modes:[{key:'preset',label:'العرض (بيحمّل بياناته)',opts:[['dahab','🏝 رحلة دهب'],['portsaid','⚓ بورسعيد']],presets:OFFER_PRESETS}],
+  L:{pfrom:'💬 نص صغير فوق السعر',cur:'🏷 العملة / الوحدة'},
+  d:Object.assign({},OFFER_PRESETS.dahab,{preset:'dahab'}),
+  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.1:P.sq?.84:1,tsz=SZ(ts(P)*.86*k,'title');
+    return{ov:fade(P,.92,.2),body:`<div style="${dock(P)};${glass};border-radius:${34*k}px;padding:${34*k}px ${34*k}px ${28*k}px">
+      ${d.badge?`<div style="display:flex;align-items:center;gap:14px;color:${G2};font:700 ${SZ(26*k,'badge')}px ${AR};margin-bottom:${14*k}px"><span style="width:${38*k}px;height:2px;background:${G}"></span>${esc(d.badge)}</div>`:''}
+      <div style="color:${col.title};font:900 ${tsz}px/1.25 ${AR}">${ml(d.title)}</div>
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(28*k,'sub')}px/1.6 ${AR};margin:${12*k}px 0 ${20*k}px;opacity:.9">${ml(d.sub)}</div>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:${20*k}px;flex-wrap:wrap">
+        ${d.price?`<div style="border:2px solid rgba(191,140,78,.55);background:rgba(255,255,255,.06);border-radius:${22*k}px;padding:${12*k}px ${26*k}px;text-align:center">${d.pfrom?`<div style="color:${G2};font:700 ${SZ(24*k,'badge')}px ${AR}">${esc(d.pfrom)}</div>`:''}<div style="color:#fff;font:900 ${SZ(76*k,'title')}px/1.05 ${EN};direction:ltr">${esc(d.price)}</div>${d.cur?`<div style="color:${G2};font:700 ${SZ(22*k,'badge')}px ${EN};direction:ltr">${esc(d.cur)}</div>`:''}</div>`:''}
+        <div style="text-align:center;flex:1;min-width:${P.land?200:300}px">${d.cta?cta(d.cta,`font-size:${SZ(36*k,'cta')}px;padding:${16*k}px ${40*k}px`):''}<div style="margin-top:${12*k}px">${contact(d,'center')}</div></div>
+      </div></div>`}}},
 
 review:{n:'رأي عميل',i:'⭐',f:['badge','stars','sub','who','c1','cta'],
   L:{sub:'💬 نص الرأي',c1:'✈️ الرحلة اللي سافرها'},
