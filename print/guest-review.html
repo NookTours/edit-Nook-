@@ -4,80 +4,89 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Guest Review — Nook Tours</title>
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
-<script>tailwind.config={theme:{extend:{colors:{navy:'#0C2840',blue:'#123859',gold:'#BF8C4E',mist:'#F2F2F2'}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=El+Messiri:wght@500;600;700&family=Montserrat:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 <style>
-  body{font-family:'Cairo',sans-serif;background:#d9dde2;font-weight:600}.text-white\/80,.text-white\/85,.text-white\/70{color:#fff!important}.text-slate-500,.text-slate-600{color:#334155!important}
-  .en{font-family:'Montserrat',sans-serif;direction:ltr}
-  .page{width:210mm;height:297mm;margin:10mm auto;background:#fff;position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.2)}
-  .dot{width:9mm;height:9mm;border:1.6px solid #BF8C4E;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:700 11px Montserrat,sans-serif;color:#0C2840}
-  .line{border-bottom:1.4px solid #c9ced4;height:8mm}
-  .fill{border-bottom:1.4px solid #BF8C4E;height:8mm}
-  @page{size:A4;margin:0}
-  @media print{html,body{background:#fff;height:296mm;overflow:hidden}.page{margin:0;box-shadow:none;height:296.5mm}.noprint{display:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+:root{--ink:#0C2840;--gold:#BF8C4E;--gt:#BF8C4E;--band:#0C2840;--bt:#fff;--soft:#F2F2F2;--sub:#475569}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#d9dde2;color:var(--ink);font-weight:600}
+.en{font-family:'Montserrat',sans-serif;direction:ltr;text-align:left}
+.serif{font-family:'Playfair Display',serif}
+.ar{direction:rtl;text-align:right;font-family:'Cairo',sans-serif}
+.disp{font-family:'El Messiri','Cairo',sans-serif}
+.page{width:210mm;height:296.5mm;margin:10mm auto;background:#fff;position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.frame{position:absolute;inset:5mm;border:.55mm solid var(--gold);z-index:3;pointer-events:none}
+.frame:after{content:"";position:absolute;inset:1.3mm;border:.2mm solid var(--gold)}
+.band{background:var(--band);color:var(--bt);padding:10mm 14mm 4mm;position:relative}
+.row2{display:grid;grid-template-columns:1fr 1fr;column-gap:10mm;direction:ltr}
+.orn{display:flex;align-items:center;gap:3mm;color:var(--gt);margin:2.2mm 0}
+.orn:before,.orn:after{content:"";flex:1;height:.3mm;background:var(--gold)}
+.orn i{width:2.2mm;height:2.2mm;background:var(--gold);transform:rotate(45deg)}
+.body{padding:0 14mm}
+.h2{font-weight:800;color:var(--ink);font-size:15px;letter-spacing:.02em}
+.gt{color:var(--gt)}
+[contenteditable]:hover{outline:1px dashed var(--gold);outline-offset:2px}
+[contenteditable]:focus{outline:2px solid var(--gold);outline-offset:2px}
+.time{width:19mm;text-align:center;border:.6mm solid var(--ink);border-radius:2.5mm;padding:1mm 0;font:800 15px Montserrat,sans-serif;background:#fff;direction:ltr}
+.time.last{background:var(--ink);color:#fff}
+.tl{display:grid;grid-template-columns:1fr 19mm 1fr;column-gap:5mm;direction:ltr;align-items:start;position:relative}
+.tl .t1{font-weight:800;font-size:14.5px} .tl .t2{font-size:11.5px;color:var(--sub);font-weight:600;margin-top:.5mm}
+.card{border:.6mm solid var(--ink);border-radius:3mm;padding:4mm 5mm;background:var(--soft)}
+.card h3{font-weight:800;font-size:15px;margin-bottom:1mm}
+.card ul{padding-inline-start:5mm;font-size:13.5px;line-height:1.75;font-weight:600}
+.foot{position:absolute;left:5mm;right:5mm;bottom:5mm;padding:4mm 9mm;border-top:.6mm solid var(--ink);background:#fff;z-index:2}
+.dot{width:7.6mm;height:7.6mm;border:.6mm solid var(--ink);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:800 10px Montserrat,sans-serif}
+.fill{border-bottom:.55mm solid var(--ink);height:7mm;margin-top:1mm}
+.line{border-bottom:.4mm solid #6b7280;height:7.4mm}
+.lab{display:flex;justify-content:space-between;align-items:baseline;font-weight:800;font-size:13.5px}
+.lab .en{font-size:11.5px;letter-spacing:.04em}
+@page{size:A4;margin:0}
+@media print{html,body{background:#fff;height:296mm;overflow:hidden}.page{margin:0;box-shadow:none;height:296.5mm}.noprint{display:none!important}[contenteditable]{outline:none!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.tb{position:fixed;top:12px;left:12px;z-index:50;display:flex;gap:8px;direction:rtl}
+.tb a,.tb button{font:800 14px Cairo,sans-serif;padding:8px 18px;border-radius:999px;border:2px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;text-decoration:none}
+.tb button.p{background:#BF8C4E;border-color:#BF8C4E;color:#fff} .tb button.d{background:#0C2840;color:#fff}
 </style>
 </head>
 <body>
-<div class="noprint fixed top-4 left-4 z-50 flex gap-2"><a href="guest-review-bw.html" class="bg-white text-navy font-extrabold px-5 py-2 rounded-full shadow-lg border-2 border-navy">⚫ نسخة أبيض وأسود</a><button onclick="print()" class="bg-gold text-navy font-extrabold px-5 py-2 rounded-full shadow-lg">🖨️ اطبع</button><button id="pdfBtn" onclick="dlPdf('guest-review')" class="bg-navy text-white font-extrabold px-5 py-2 rounded-full shadow-lg">⬇️ تحميل PDF</button></div>
-
-<section class="page">
-  <div class="bg-navy text-white px-[16mm] pt-[12mm] pb-[8mm] relative">
-    <div class="absolute inset-x-0 bottom-0 h-1 bg-gold"></div>
-    <div class="flex justify-between items-center">
-      <div class="en text-[13px] font-bold tracking-[.35em] text-gold">NOOK TOURS EGYPT</div>
-      <div class="en text-[11px] tracking-[.25em] text-white/70">GUEST FEEDBACK</div>
-    </div>
-    <h1 class="text-[34px] font-black mt-5">رأيك يهمنا</h1>
-    <p class="text-white/80 text-[14px] mt-1">دقيقتين من وقتك بيساعدونا نخلي رحلتك الجاية أحسن.</p>
+<div class="tb noprint"><a href="guest-review-bw.html">⚫ أبيض وأسود / B&W</a><button class="p" onclick="print()">🖨️ اطبع / Print</button><button class="d" id="pdfBtn" onclick="dlPdf('guest-review')">⬇️ PDF</button></div>
+<section class="page"><div class="frame"></div>
+<div class="band">
+  <div class="row2"><div class="en gt" style="font-weight:800;letter-spacing:.32em;font-size:13px">NOOK TOURS EGYPT</div><div class="ar disp" style="font-weight:700;font-size:15px">نوك تورز</div></div>
+  <div class="orn"><i></i></div>
+  <div class="row2" style="align-items:end">
+    <div class="en serif" style="font-size:36px;font-weight:700;line-height:1.05">Your Opinion<br><span style="font-style:italic;font-weight:600;color:var(--gt)">Matters</span></div>
+    <div class="ar disp" style="font-size:36px;font-weight:700;line-height:1.2">رأيك <span class="gt">يهمنا</span></div>
   </div>
-
-  <div class="px-[16mm] pt-[8mm]">
-    <div class="grid grid-cols-2 gap-x-8 gap-y-5 text-[14px] font-bold text-navy">
-      <div>الاسم<div class="fill"></div></div>
-      <div>الوجهة<div class="fill"></div></div>
-      <div>تاريخ الرحلة<div class="fill"></div></div>
-      <div>رقم التليفون (اختياري)<div class="fill"></div></div>
-    </div>
-
-    <div class="flex items-center gap-3 mt-5 mb-3"><div class="w-10 h-[3px] bg-gold"></div><h2 class="text-lg font-extrabold text-navy">قيّم تجربتك</h2><span class="text-[12px] text-slate-500">(1 ضعيف … 5 ممتاز)</span></div>
-    <div class="border border-gold/50 rounded-2xl overflow-hidden">
-      <div class="flex items-center justify-between px-5 py-2 bg-mist font-extrabold text-navy text-[14px]"><span>البند</span><span class="en flex gap-[3mm] text-[11px] pl-[2mm]"><span class="w-[9mm] text-center">1</span><span class="w-[9mm] text-center">2</span><span class="w-[9mm] text-center">3</span><span class="w-[9mm] text-center">4</span><span class="w-[9mm] text-center">5</span></span></div>
-      <div class="flex items-center justify-between px-5 py-2 border-t border-gold/30"><span class="font-bold text-blue">🚌 المواصلات</span><span class="en flex gap-[3mm]"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></span></div>
-      <div class="flex items-center justify-between px-5 py-2 border-t border-gold/30"><span class="font-bold text-blue">🧭 المرشد</span><span class="en flex gap-[3mm]"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></span></div>
-      <div class="flex items-center justify-between px-5 py-2 border-t border-gold/30"><span class="font-bold text-blue">🏨 الإقامة</span><span class="en flex gap-[3mm]"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></span></div>
-      <div class="flex items-center justify-between px-5 py-2 border-t border-gold/30"><span class="font-bold text-blue">🗓️ برنامج الرحلة</span><span class="en flex gap-[3mm]"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></span></div>
-    </div>
-
-    <div class="flex items-center gap-3 mt-5 mb-1"><div class="w-10 h-[3px] bg-gold"></div><h2 class="text-lg font-extrabold text-navy">عايز تقولنا إيه؟</h2></div>
-    <div class="text-[12.5px] text-slate-500 mb-1">إيه اللي عجبك؟ وإيه اللي ممكن نعمله أحسن؟</div>
-    <div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div>
-
-    <div class="mt-4 flex items-center gap-6 text-[14px] font-bold text-navy">
-      <span>هتسافر معانا تاني؟</span>
-      <span class="flex items-center gap-2"><i class="dot"></i> أكيد</span>
-      <span class="flex items-center gap-2"><i class="dot"></i> ممكن</span>
-      <span class="flex items-center gap-2"><i class="dot"></i> لأ</span>
-    </div>
-    <div class="mt-3 flex items-center gap-3 text-[13px] text-blue"><i class="dot" style="width:6mm;height:6mm;border-radius:2mm"></i> موافق إن رأيي يتنشر باسمي الأول بس</div>
-
-    <div class="grid grid-cols-2 gap-x-10 mt-5 text-[14px] font-bold text-navy">
-      <div>التوقيع<div class="fill" style="height:10mm"></div></div>
-      <div>التاريخ<div class="fill" style="height:10mm"></div></div>
-    </div>
+  <div class="row2" style="margin-top:3mm;font-size:13px;font-weight:600"><div class="en">Two minutes of your time help us make your next trip even better.</div><div class="ar">دقيقتين من وقتك بيساعدونا نخلي رحلتك الجاية أحسن.</div></div>
+</div>
+<div class="body" style="padding-top:5mm">
+  <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:10mm;row-gap:3mm"><div><div class="lab" style="direction:ltr"><span class="en">Name</span><span class="ar" style="direction:rtl">الاسم</span></div><div class="fill"></div></div><div><div class="lab" style="direction:ltr"><span class="en">Destination</span><span class="ar" style="direction:rtl">الوجهة</span></div><div class="fill"></div></div><div><div class="lab" style="direction:ltr"><span class="en">Trip Date</span><span class="ar" style="direction:rtl">تاريخ الرحلة</span></div><div class="fill"></div></div><div><div class="lab" style="direction:ltr"><span class="en">Phone (optional)</span><span class="ar" style="direction:rtl">التليفون (اختياري)</span></div><div class="fill"></div></div></div>
+  <div class="row2" style="margin:5mm 0 2mm"><div class="en h2 serif" style="font-size:17px">Rate Your Experience <span style="font-size:11px;font-weight:600;color:var(--sub)">(1 poor – 5 excellent)</span></div><div class="ar h2 disp" style="font-size:19px">قيّم تجربتك <span style="font-size:11px;font-weight:600;color:var(--sub)">(1 ضعيف – 5 ممتاز)</span></div></div>
+  <div style="border:.6mm solid var(--ink);border-radius:3mm;overflow:hidden">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;column-gap:5mm;padding:1.8mm 5mm;border-bottom:.6mm solid var(--ink);direction:ltr;background:var(--soft)"><span class="en" style="font-weight:800;font-size:12px">ITEM</span><span class="en" style="display:flex;gap:2.4mm;font-weight:800;font-size:11px"><span style="width:7.6mm;text-align:center">1</span><span style="width:7.6mm;text-align:center">2</span><span style="width:7.6mm;text-align:center">3</span><span style="width:7.6mm;text-align:center">4</span><span style="width:7.6mm;text-align:center">5</span></span><span class="ar" style="font-weight:800;font-size:13px">البند</span></div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:5mm;padding:2mm 5mm;border-bottom:.25mm solid #94a3b8;direction:ltr"><div class="en" style="font-weight:800;font-size:13.5px">🚌 Transportation</div><div style="display:flex;gap:2.4mm;direction:ltr"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div><div class="ar" style="font-weight:800;font-size:14.5px">المواصلات</div></div><div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:5mm;padding:2mm 5mm;border-bottom:.25mm solid #94a3b8;direction:ltr"><div class="en" style="font-weight:800;font-size:13.5px">🧭 Guide</div><div style="display:flex;gap:2.4mm;direction:ltr"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div><div class="ar" style="font-weight:800;font-size:14.5px">المرشد</div></div><div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:5mm;padding:2mm 5mm;border-bottom:.25mm solid #94a3b8;direction:ltr"><div class="en" style="font-weight:800;font-size:13.5px">🏨 Accommodation</div><div style="display:flex;gap:2.4mm;direction:ltr"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div><div class="ar" style="font-weight:800;font-size:14.5px">الإقامة</div></div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;column-gap:5mm;padding:2mm 5mm;direction:ltr"><div class="en" style="font-weight:800;font-size:13.5px">🗓️ Itinerary</div><div style="display:flex;gap:2.4mm"><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div><div class="ar" style="font-weight:800;font-size:14.5px">برنامج الرحلة</div></div>
   </div>
-
-  <div class="absolute bottom-0 inset-x-0 bg-navy text-white px-[16mm] py-[6mm] flex items-center justify-between">
-    <div class="font-extrabold text-[15px]">شكراً إنك اخترت Nook Tours 💛</div>
-    <div class="en text-left"><div class="text-gold font-extrabold text-[14px]">01005377933</div><div class="text-white/80 text-[11px]">www.nooktoursegypt.com</div></div>
+  <div class="row2" style="margin:5mm 0 1mm"><div class="en h2 serif" style="font-size:16px">Tell us more</div><div class="ar h2 disp" style="font-size:18px">عايز تقولنا إيه؟</div></div>
+  <div class="row2" style="font-size:12px;font-weight:600;color:var(--sub)"><div class="en">What did you enjoy? What can we do better?</div><div class="ar">إيه اللي عجبك؟ وإيه اللي ممكن نعمله أحسن؟</div></div>
+  <div class="line"></div><div class="line"></div><div class="line"></div>
+  <div class="row2" style="margin-top:4mm;align-items:center;font-weight:800;font-size:13.5px">
+    <div class="en" style="display:flex;align-items:center;gap:3mm;flex-wrap:wrap">Travel with us again? <span style="display:flex;align-items:center;gap:1.5mm"><i class="dot" style="width:6mm;height:6mm"></i>Sure</span><span style="display:flex;align-items:center;gap:1.5mm"><i class="dot" style="width:6mm;height:6mm"></i>Maybe</span><span style="display:flex;align-items:center;gap:1.5mm"><i class="dot" style="width:6mm;height:6mm"></i>No</span></div>
+    <div class="ar" style="display:flex;align-items:center;gap:3mm;flex-wrap:wrap">هتسافر معانا تاني؟ <span style="display:flex;align-items:center;gap:1.5mm"><i class="dot" style="width:6mm;height:6mm"></i>أكيد</span><span style="display:flex;align-items:center;gap:1.5mm"><i class="dot" style="width:6mm;height:6mm"></i>ممكن</span><span style="display:flex;align-items:center;gap:1.5mm"><i class="dot" style="width:6mm;height:6mm"></i>لأ</span></div>
   </div>
+  <div class="row2" style="margin-top:3mm;font-size:12.5px;font-weight:700"><div class="en" style="display:flex;gap:2.5mm;align-items:center"><i class="dot" style="width:5mm;height:5mm;border-radius:1.2mm"></i>I agree my review may be published with my first name only</div><div class="ar" style="display:flex;gap:2.5mm;align-items:center"><i class="dot" style="width:5mm;height:5mm;border-radius:1.2mm"></i>موافق إن رأيي يتنشر باسمي الأول بس</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:10mm;margin-top:4mm"><div><div class="lab" style="direction:ltr"><span class="en">Signature</span><span class="ar" style="direction:rtl">التوقيع</span></div><div class="fill" style="height:9mm"></div></div><div><div class="lab" style="direction:ltr"><span class="en">Date</span><span class="ar" style="direction:rtl">التاريخ</span></div><div class="fill" style="height:9mm"></div></div></div>
+</div>
+<div class="foot"><div class="row2" style="align-items:center">
+  <div class="en serif" style="font-weight:700;font-size:15px">Thank you for choosing Nook Tours</div>
+  <div class="ar" style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:800;font-size:15px">شكراً إنك اخترت نوك تورز</div><div class="en" style="text-align:right"><div style="font-weight:800;font-size:14px">01005377933</div><div style="font-size:11px;font-weight:700">www.nooktoursegypt.com</div></div></div>
+</div></div>
 </section>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-async function dlPdf(name){const b=document.getElementById("pdfBtn"),old=b.textContent,pg=document.querySelector(".page");b.textContent="⏳ بجهّز الملف…";b.disabled=true;
+async function dlPdf(name){const b=document.getElementById("pdfBtn"),old=b.textContent,pg=document.querySelector(".page");b.textContent="⏳";b.disabled=true;
   const keep=pg.getAttribute("style")||"";pg.style.margin="0";pg.style.boxShadow="none";pg.style.height="296.5mm";
-  try{await document.fonts.ready;await html2pdf().set({margin:0,filename:"nook-tours-"+name+".pdf",image:{type:"jpeg",quality:.98},html2canvas:{scale:2,useCORS:true,scrollX:0,scrollY:0,windowWidth:pg.offsetWidth},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:[]}}).from(pg).save()}
-  catch(e){alert("تعذّر إنشاء الـ PDF: "+e.message+"\nاستخدم زرار اطبع واختار Save as PDF.")}
+  try{await document.fonts.ready;await html2pdf().set({margin:0,filename:"nook-tours-"+name+".pdf",image:{type:"jpeg",quality:.98},html2canvas:{scale:3,useCORS:true,scrollX:0,scrollY:0,windowWidth:pg.offsetWidth},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:[]}}).from(pg).save()}
+  catch(e){alert("PDF error: "+e.message+"\nاستخدم Print واختار Save as PDF.")}
   finally{pg.setAttribute("style",keep);b.textContent=old;b.disabled=false}}
 </script>
 </body>
