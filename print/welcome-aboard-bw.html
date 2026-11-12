@@ -24,6 +24,11 @@ body{font-family:'Cairo',sans-serif;background:#d9dde2;color:var(--ink);font-wei
 .body{padding:0 14mm}
 .h2{font-weight:800;color:var(--ink);font-size:15px;letter-spacing:.02em}
 .gt{color:var(--gt)}
+.fld{flex:1;min-width:0}
+.fl{font-size:10.5px;font-weight:800;color:var(--gt);letter-spacing:.06em}
+.fv{font-size:15px;font-weight:800;border-bottom:.3mm dotted currentColor;min-height:6.5mm;min-width:0;line-height:1.4}
+[data-ph]:empty:before{content:attr(data-ph);opacity:.5;font-weight:600}
+@media print{[data-ph]:empty:before{content:""}}
 [contenteditable]:hover{outline:1px dashed var(--gold);outline-offset:2px}
 [contenteditable]:focus{outline:2px solid var(--gold);outline-offset:2px}
 .time{width:19mm;text-align:center;border:.6mm solid var(--ink);border-radius:2.5mm;padding:1mm 0;font:800 15px Calibri,Carlito,sans-serif;background:#fff;direction:ltr}
@@ -63,11 +68,12 @@ body{font-family:'Cairo',sans-serif;background:#d9dde2;color:var(--ink);font-wei
     <div class="ar disp" style="font-size:27px;font-weight:700;line-height:1.25">أهلاً بيك<br><span class="gt">في رحلتنا</span></div>
   </div>
   <div class="row2" style="margin-top:3mm">
-    <div class="en " contenteditable>Trip Name</div><div class="ar " contenteditable>اسم الرحلة هنا</div>
+    <div class="en"><div class="fl" contenteditable>TRIP</div><div class="fv" style="font-size:21px;font-weight:800" contenteditable data-ph="Type the trip name"></div></div>
+    <div class="ar"><div class="fl" contenteditable>الرحلة</div><div class="fv" style="font-size:21px;font-weight:800" contenteditable data-ph="اكتب اسم الرحلة"></div></div>
   </div>
-  <div class="row2" style="margin-top:2.5mm;font-size:13.5px;font-weight:700">
-    <div class="en" style="display:flex;gap:6mm;flex-wrap:wrap"><span><span contenteditable>Date</span></span><span><span contenteditable>Destination</span></span><span><span contenteditable>Bus No.</span></span></div>
-    <div class="ar" style="display:flex;gap:6mm;flex-wrap:wrap"><span><span contenteditable>التاريخ</span></span><span><span contenteditable>الوجهة</span></span><span><span contenteditable>رقم الأتوبيس</span></span></div>
+  <div class="row2" style="margin-top:3mm">
+    <div class="en" style="display:flex;gap:3mm"><div class="fld"><div class="fl" contenteditable>DATE</div><div class="fv" contenteditable data-ph="Type date"></div></div><div class="fld"><div class="fl" contenteditable>DESTINATION</div><div class="fv" contenteditable data-ph="Type place"></div></div><div class="fld"><div class="fl" contenteditable>BUS NO.</div><div class="fv" contenteditable data-ph="Type number"></div></div></div>
+    <div class="ar" style="display:flex;gap:3mm"><div class="fld"><div class="fl" contenteditable>التاريخ</div><div class="fv" contenteditable data-ph="اكتب التاريخ"></div></div><div class="fld"><div class="fl" contenteditable>الوجهة</div><div class="fv" contenteditable data-ph="اكتب المكان"></div></div><div class="fld"><div class="fl" contenteditable>رقم الأتوبيس</div><div class="fv" contenteditable data-ph="اكتب الرقم"></div></div></div>
   </div>
 </div>
 <div class="body" style="padding-top:3mm">
@@ -88,8 +94,8 @@ body{font-family:'Cairo',sans-serif;background:#d9dde2;color:var(--ink);font-wei
   </div>
 </div>
 <div class="foot"><div class="row2" style="align-items:center">
-  <div class="en"><div class="gt" style="font-weight:800;font-size:11px;letter-spacing:.15em">TRIP GUIDE</div><div style="font-weight:800;font-size:15px" contenteditable>Guide name — phone</div></div>
-  <div class="ar" style="display:flex;justify-content:space-between;align-items:center"><div><div class="gt" style="font-weight:800;font-size:12px">مرشد الرحلة</div><div style="font-weight:800;font-size:15px" contenteditable>اسم المرشد — رقمه</div></div><div class="en" style="text-align:right;direction:ltr"><div style="font-weight:800;font-size:15px">01005377933</div><div style="font-size:11.5px;font-weight:700">www.nooktoursegypt.com</div></div></div>
+  <div class="en"><div class="gt" style="font-weight:800;font-size:11px;letter-spacing:.15em">TRIP GUIDE</div><div class="fv" style="font-weight:800;font-size:15px" contenteditable data-ph="Guide name and phone"></div></div>
+  <div class="ar" style="display:flex;justify-content:space-between;align-items:center"><div><div class="gt" style="font-weight:800;font-size:12px">مرشد الرحلة</div><div class="fv" style="font-weight:800;font-size:15px" contenteditable data-ph="اسم المرشد ورقمه"></div></div><div class="en" style="text-align:right;direction:ltr"><div style="font-weight:800;font-size:15px">01005377933</div><div style="font-size:11.5px;font-weight:700">www.nooktoursegypt.com</div></div></div>
 </div></div>
 </section>
 <script>

@@ -24,6 +24,11 @@ body{font-family:'Cairo',sans-serif;background:#d9dde2;color:var(--ink);font-wei
 .body{padding:0 14mm}
 .h2{font-weight:800;color:var(--ink);font-size:15px;letter-spacing:.02em}
 .gt{color:var(--gt)}
+.fld{flex:1;min-width:0}
+.fl{font-size:10.5px;font-weight:800;color:var(--gt);letter-spacing:.06em}
+.fv{font-size:15px;font-weight:800;border-bottom:.3mm dotted currentColor;min-height:6.5mm;min-width:0;line-height:1.4}
+[data-ph]:empty:before{content:attr(data-ph);opacity:.5;font-weight:600}
+@media print{[data-ph]:empty:before{content:""}}
 [contenteditable]:hover{outline:1px dashed var(--gold);outline-offset:2px}
 [contenteditable]:focus{outline:2px solid var(--gold);outline-offset:2px}
 .time{width:19mm;text-align:center;border:.6mm solid var(--ink);border-radius:2.5mm;padding:1mm 0;font:800 15px Calibri,Carlito,sans-serif;background:#fff;direction:ltr}
