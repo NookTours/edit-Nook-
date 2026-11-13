@@ -88,6 +88,9 @@ td[contenteditable]{min-height:8mm}
 .tb .bx{background:#fff;border:2px solid #0C2840;border-radius:12px;padding:8px;font:700 12px Cairo,sans-serif;color:#0C2840}
 .tb .bx small{display:block;color:#64748b;font-weight:600;margin:2px 0 6px;min-height:15px}
 .tb input[type=color]{width:34px;height:28px;border:1.5px solid #0C2840;border-radius:8px;padding:0}
+.page[data-mode=du] .ov{display:none}.page:not([data-mode=du]) .du{display:none}
+@media print{tr.empty{display:none!important}}
+.pdfing tr.empty{display:none!important}
 @media screen{body{padding-left:225px}}
 @page{size:A4;margin:0}
 @media print{html,body{background:#fff;height:296mm;overflow:hidden}.page{margin:0;box-shadow:none;height:296.5mm}.noprint,.x,.add{display:none!important}[contenteditable]{outline:none!important}[data-ph]:empty:before{content:""}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
@@ -186,10 +189,10 @@ $('#tp').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
  else if(a==='hide'){cur.style.visibility='hidden';cur.dataset.vh=1}
  else if(a==='reset'){cur.setAttribute('style',cur.dataset.o||'');delete cur.dataset.vh}});
 $('#tpc').addEventListener('input',e=>{if(cur)cur.style.color=e.target.value})})();
-async function dlPdf(){const b=$('#pdfBtn'),old=b.textContent;b.textContent='...';b.disabled=true;const keep=page.getAttribute('style')||'';page.style.margin='0';page.style.boxShadow='none';page.style.height='296.5mm';
+async function dlPdf(){const b=$('#pdfBtn'),old=b.textContent;b.textContent='...';b.disabled=true;document.body.classList.add('pdfing');const keep=page.getAttribute('style')||'';page.style.margin='0';page.style.boxShadow='none';page.style.height='296.5mm';
  try{await document.fonts.ready;await html2pdf().set({margin:0,filename:'nook-tours-'+DOC+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:3,useCORS:true,scrollX:0,scrollY:0,windowWidth:page.offsetWidth},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:[]}}).from(page).save()}
  catch(e){alert('تعذّر إنشاء الـ PDF: '+e.message+'\nاستخدم اطبع واختار Save as PDF.')}
- finally{page.setAttribute('style',keep);b.textContent=old;b.disabled=false}}
+ finally{document.body.classList.remove('pdfing');page.setAttribute('style',keep);b.textContent=old;b.disabled=false}}
 
 
 const ROW=`<tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr>`,PROW=`<tr><td class="n"></td><td contenteditable data-ph="00 / 00 / 0000"></td><td contenteditable data-ph="كاش / تحويل"></td><td class="num pa" contenteditable data-ph="0"></td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr>`;
@@ -213,7 +216,7 @@ function msgText(l){const tot=num($('#vTot').textContent),paid=num($('#vPaid').t
  if(TYPE==='fin')return T(l,'استلمنا كامل المبلغ '+A(tot)+'. لا توجد أي مبالغ مستحقة.','We have received the full amount of '+A(tot)+'. No balance is due.');
  return T(l,'تفاصيل الحجز'+tripS+' بإجمالي '+A(tot)+'.'+(bal>0?' المتبقي '+A(bal)+(due?' يُسدد قبل '+due:'')+'.':''),
    'Booking charges'+tripS+', total '+A(tot)+'.'+(bal>0?' Balance due '+A(bal)+(due?' by '+due:'')+'.':''))}
-function calc(){let sub=0,paid=0;
+function calc(){let sub=0,paid=0;$$('#rows tr,#prows tr').forEach(tr=>tr.classList.toggle('empty',![...tr.querySelectorAll('td[contenteditable]')].some(td=>td.textContent.trim())));
  $$('#rows tr').forEach((tr,i)=>{tr.querySelector('.n').textContent=i+1;const c=tr.children,q=c[2].textContent.trim(),tt=(q===''?1:num(q))*num(c[3].textContent);
   tr.querySelector('.t').textContent=fmt(tt);sub+=tt});
  $$('#prows tr').forEach((tr,i)=>{tr.querySelector('.n').textContent=i+1;paid+=num(tr.querySelector('.pa').textContent)});

@@ -78,14 +78,19 @@ td[contenteditable]{min-height:8mm}
 .page[data-th=bw] .tr.bal{background:#fff;color:var(--ink);border:.7mm solid var(--ink)}
 .stamp{display:inline-block;border:.7mm solid var(--acc);color:var(--accd);border-radius:2mm;padding:1mm 4mm;font:900 15px Calibri,Cairo,sans-serif;letter-spacing:.1em;transform:rotate(-4deg);cursor:pointer}
 .stamp[data-s=""]{visibility:hidden}
+.msg{margin:4mm 0 1mm;padding:2.5mm 4mm;border-inline-start:1.2mm solid var(--acc);background:var(--soft);font-size:15.5px;line-height:1.6;font-weight:700;border-radius:1mm;min-height:11mm}
+.pt th,.pt td{font-size:13px;padding:1.8mm 2mm}
 .add{margin-top:2mm;font:700 12.5px Cairo,sans-serif;color:var(--accd);cursor:pointer;border:1px dashed var(--acc);border-radius:2mm;padding:1.5mm 4mm;display:inline-block;background:#fff}
-.tb{position:fixed;top:10px;left:10px;z-index:60;display:flex;flex-direction:column;gap:6px;direction:rtl;width:200px}
+.tb{max-height:calc(100vh - 20px);overflow:auto;position:fixed;top:10px;left:10px;z-index:60;display:flex;flex-direction:column;gap:6px;direction:rtl;width:200px}
 .tb .g{display:flex;gap:4px;flex-wrap:wrap}
 .tb button,.tb a{flex:1;font:800 12.5px Cairo,sans-serif;padding:7px 6px;border-radius:9px;border:2px solid #0C2840;background:#fff;color:#0C2840;cursor:pointer;text-decoration:none;text-align:center}
 .tb button.on{background:#0C2840;color:#fff}.tb button.p{background:#BF8C4E;border-color:#BF8C4E;color:#fff}
 .tb .bx{background:#fff;border:2px solid #0C2840;border-radius:12px;padding:8px;font:700 12px Cairo,sans-serif;color:#0C2840}
 .tb .bx small{display:block;color:#64748b;font-weight:600;margin:2px 0 6px;min-height:15px}
 .tb input[type=color]{width:34px;height:28px;border:1.5px solid #0C2840;border-radius:8px;padding:0}
+.page[data-mode=du] .ov{display:none}.page:not([data-mode=du]) .du{display:none}
+@media print{tr.empty{display:none!important}}
+.pdfing tr.empty{display:none!important}
 @media screen{body{padding-left:225px}}
 @page{size:A4;margin:0}
 @media print{html,body{background:#fff;height:296mm;overflow:hidden}.page{margin:0;box-shadow:none;height:296.5mm}.noprint,.x,.add{display:none!important}[contenteditable]{outline:none!important}[data-ph]:empty:before{content:""}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
@@ -95,6 +100,7 @@ td[contenteditable]{min-height:8mm}
 <div class="tb noprint" id="tb">
 <div class="g"><button data-lang="ar" class="on">عربي</button><button data-lang="en">English</button><button data-lang="both">الاتنين</button></div>
 <div class="g"><button data-th="gen" class="on">عام</button><button data-th="dahab">دهب</button><button data-th="sokhna">السخنة</button><button data-th="bw">أبيض وأسود</button></div>
+<div class="g"><button data-mode="ov" class="on">إقامة</button><button data-mode="du">Day use</button></div>
 <div class="g"><button class="p" onclick="print()">اطبع</button><button id="pdfBtn" onclick="dlPdf()">PDF</button></div>
 <div class="g"><a href="invoice.html">الفاتورة</a></div>
 <div class="bx" id="tp"><b>تحكم في النص</b><small id="tpn">اضغط على أي نص الأول</small>
@@ -111,9 +117,9 @@ td[contenteditable]{min-height:8mm}
 </div>
 <div class="body">
   <div class="hero"><div class="t" data-k="thanks"></div><div class="s" data-k="glad"></div></div>
-  <div class="guest"><div class="cell"><div class="lb" data-k="guest"></div><div class="vl" contenteditable data-ph="اكتب اسم الضيف · Guest name"></div></div><div class="cell"><div class="lb" data-k="dest"></div><div class="vl" contenteditable data-ph="الوجهة · Destination"></div></div></div>
+  <div class="guest" style="grid-template-columns:1fr 1fr"><div class="cell"><div class="lb" data-k="guest"></div><div class="vl" contenteditable data-ph="اكتب اسم الضيف · Guest name"></div></div><div class="cell"><div class="lb" data-k="leader"></div><div class="vl" contenteditable data-ph="اسم صاحب المجموعة · Group leader"></div></div><div class="cell" style="grid-column:1/-1"><div class="lb" data-k="dest"></div><div class="vl" contenteditable data-ph="الوجهة · Destination"></div></div></div>
   <div class="sec" data-k="sec1"></div>
-  <div class="grid2"><div class="cell"><div class="lb" data-k="hotel"></div><div class="vl" contenteditable data-ph="اكتب اسم الفندق · Hotel name"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="room"></div><div class="vl" contenteditable data-ph="Double"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="cin"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="cout"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="nights"></div><div class="vl" contenteditable data-ph="0"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="rooms"></div><div class="vl" contenteditable data-ph="1"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="adults"></div><div class="vl" contenteditable data-ph="2"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="kids"></div><div class="vl" contenteditable data-ph="0"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="tr_time"></div><div class="vl" contenteditable data-ph="00:00"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="dep"></div><div class="vl" contenteditable data-ph="00:00"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell" style="grid-column:1/-1"><div class="lb" data-k="meet"></div><div class="vl" contenteditable data-ph="اكتب المكان · Place"></div><b class="x noprint" title="إخفاء">×</b></div></div>
+  <div class="grid2"><div class="cell"><div class="lb" data-k="hotel"></div><div class="vl" contenteditable data-ph="اكتب اسم الفندق · Hotel name"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="room"></div><div class="vl" contenteditable data-ph="Double"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell ov"><div class="lb" data-k="cin"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell ov"><div class="lb" data-k="cout"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell ov"><div class="lb" data-k="nights"></div><div class="vl" contenteditable data-ph="0"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell du"><div class="lb" data-k="vdate"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell du"><div class="lb" data-k="dentry"></div><div class="vl" contenteditable data-ph="00:00"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell du"><div class="lb" data-k="dexit"></div><div class="vl" contenteditable data-ph="00:00"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="rooms"></div><div class="vl" contenteditable data-ph="1"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="adults"></div><div class="vl" contenteditable data-ph="2"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="kids"></div><div class="vl" contenteditable data-ph="0"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="tr_time"></div><div class="vl" contenteditable data-ph="00:00"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell"><div class="lb" data-k="dep"></div><div class="vl" contenteditable data-ph="00:00"></div><b class="x noprint" title="إخفاء">×</b></div><div class="cell" style="grid-column:1/-1"><div class="lb" data-k="meet"></div><div class="vl" contenteditable data-ph="اكتب المكان · Place"></div><b class="x noprint" title="إخفاء">×</b></div></div>
   <div class="sec" data-k="sec2"></div>
   <div class="cks" id="cks">
     <div class="ck" data-s="1"><i></i><span data-k="c_trans"></span><b></b></div>
@@ -143,6 +149,7 @@ const D={
  tr_time:['موعد الانتقالات','Transfer time'],dep:['موعد التحرك','Departure time'],meet:['مكان التجمع','Meeting point'],bookno:['رقم الحجز','Booking No.'],
  c_trans:['الانتقالات','Transfers'],c_bf:['الفطار','Breakfast'],c_dn:['العشاء','Dinner'],c_ln:['الغداء','Lunch'],
  thx:['نتمنى لك رحلة سعيدة','Wishing you a wonderful trip'],
+ leader:['صاحب المجموعة','Group leader'],vdate:['تاريخ الزيارة','Visit date'],dentry:['وقت الدخول','Entry time'],dexit:['وقت الخروج','Exit time'],
 };
 function afterLang(){}
 
@@ -175,13 +182,15 @@ $('#tp').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)r
  else if(a==='hide'){cur.style.visibility='hidden';cur.dataset.vh=1}
  else if(a==='reset'){cur.setAttribute('style',cur.dataset.o||'');delete cur.dataset.vh}});
 $('#tpc').addEventListener('input',e=>{if(cur)cur.style.color=e.target.value})})();
-async function dlPdf(){const b=$('#pdfBtn'),old=b.textContent;b.textContent='...';b.disabled=true;const keep=page.getAttribute('style')||'';page.style.margin='0';page.style.boxShadow='none';page.style.height='296.5mm';
+async function dlPdf(){const b=$('#pdfBtn'),old=b.textContent;b.textContent='...';b.disabled=true;document.body.classList.add('pdfing');const keep=page.getAttribute('style')||'';page.style.margin='0';page.style.boxShadow='none';page.style.height='296.5mm';
  try{await document.fonts.ready;await html2pdf().set({margin:0,filename:'nook-tours-'+DOC+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:3,useCORS:true,scrollX:0,scrollY:0,windowWidth:page.offsetWidth},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:[]}}).from(page).save()}
  catch(e){alert('تعذّر إنشاء الـ PDF: '+e.message+'\nاستخدم اطبع واختار Save as PDF.')}
- finally{page.setAttribute('style',keep);b.textContent=old;b.disabled=false}}
+ finally{document.body.classList.remove('pdfing');page.setAttribute('style',keep);b.textContent=old;b.disabled=false}}
 
 
 function addCk(){const d=document.createElement('div');d.className='ck';d.dataset.s='1';d.innerHTML='<i></i><span contenteditable>خدمة جديدة</span>';$('#cks').appendChild(d);renderChecks()}
+$$('[data-mode]').forEach(b=>b.onclick=()=>{page.dataset.mode=b.dataset.mode;$$('[data-mode]').forEach(x=>x.classList.toggle('on',x===b))});
+if(/dayuse/.test(location.hash)){page.dataset.mode='du';$$('[data-mode]').forEach(x=>x.classList.toggle('on',x.dataset.mode==='du'))}
 
 (location.hash||'').slice(1).split(',').forEach(x=>{if(['ar','en','both'].includes(x))LANG=x;if(['gen','dahab','sokhna','bw'].includes(x))page.dataset.th=x});
 applyLang();
