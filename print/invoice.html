@@ -78,8 +78,10 @@ td[contenteditable]{min-height:8mm}
 .page[data-th=bw] .tr.bal{background:#fff;color:var(--ink);border:.7mm solid var(--ink)}
 .stamp{display:inline-block;border:.7mm solid var(--acc);color:var(--accd);border-radius:2mm;padding:1mm 4mm;font:900 15px Calibri,Cairo,sans-serif;letter-spacing:.1em;transform:rotate(-4deg);cursor:pointer}
 .stamp[data-s=""]{visibility:hidden}
+.msg{margin:4mm 0 1mm;padding:2.5mm 4mm;border-inline-start:1.2mm solid var(--acc);background:var(--soft);font-size:15.5px;line-height:1.6;font-weight:700;border-radius:1mm;min-height:11mm}
+.pt th,.pt td{font-size:13px;padding:1.8mm 2mm}
 .add{margin-top:2mm;font:700 12.5px Cairo,sans-serif;color:var(--accd);cursor:pointer;border:1px dashed var(--acc);border-radius:2mm;padding:1.5mm 4mm;display:inline-block;background:#fff}
-.tb{position:fixed;top:10px;left:10px;z-index:60;display:flex;flex-direction:column;gap:6px;direction:rtl;width:200px}
+.tb{max-height:calc(100vh - 20px);overflow:auto;position:fixed;top:10px;left:10px;z-index:60;display:flex;flex-direction:column;gap:6px;direction:rtl;width:200px}
 .tb .g{display:flex;gap:4px;flex-wrap:wrap}
 .tb button,.tb a{flex:1;font:800 12.5px Cairo,sans-serif;padding:7px 6px;border-radius:9px;border:2px solid #0C2840;background:#fff;color:#0C2840;cursor:pointer;text-decoration:none;text-align:center}
 .tb button.on{background:#0C2840;color:#fff}.tb button.p{background:#BF8C4E;border-color:#BF8C4E;color:#fff}
@@ -95,6 +97,9 @@ td[contenteditable]{min-height:8mm}
 <div class="tb noprint" id="tb">
 <div class="g"><button data-lang="ar" class="on">عربي</button><button data-lang="en">English</button><button data-lang="both">الاتنين</button></div>
 <div class="g"><button data-th="gen" class="on">عام</button><button data-th="dahab">دهب</button><button data-th="sokhna">السخنة</button><button data-th="bw">أبيض وأسود</button></div>
+<div class="bx"><b>نوع المستند</b><div class="g" id="dtypes" style="margin-top:4px"><button data-dt="inv" class="on">فاتورة</button><button data-dt="dep">عربون</button><button data-dt="rec">دفعة</button><button data-dt="fin">سداد نهائي</button></div></div>
+<div class="bx"><b>حاسبة العربون</b><small>اكتب النسبة من الإجمالي</small><div class="g" style="align-items:center"><input id="pct" type="number" min="1" max="100" placeholder="%" style="width:60px;font:700 13px Cairo;padding:5px;border:2px solid #0C2840;border-radius:8px"><button onclick="addDeposit()">ضيف دفعة</button></div></div>
+<div class="bx"><b>رسالة رد للعميل</b><small>تتكتب لوحدها من البيانات</small><textarea id="wa" rows="7" style="width:100%;font:600 12px Cairo,sans-serif;direction:rtl;border:1.5px solid #0C2840;border-radius:8px;padding:5px"></textarea><div class="g" style="margin-top:4px"><button onclick="genWA()">حدّث</button><button onclick="copyWA()" id="cpb">انسخ</button></div></div>
 <div class="g"><button class="p" onclick="print()">اطبع</button><button id="pdfBtn" onclick="dlPdf()">PDF</button></div>
 <div class="g"><a href="confirmation.html">تأكيد الحجز</a></div>
 <div class="bx" id="tp"><b>تحكم في النص</b><small id="tpn">اضغط على أي نص الأول</small>
@@ -106,28 +111,35 @@ td[contenteditable]{min-height:8mm}
 <section class="page" data-th="gen">
 <div class="hd">
   <div class="brand"><div class="wm">NOOK TOURS EGYPT<small>DISCOVER MORE, CREATE MEMORIES</small></div><div class="dtitle" data-k="title"></div></div>
-  <div class="meta"><div class="mf"><div class="lb" data-k="inv_no"></div><div class="vl" contenteditable data-ph="INV-0000"></div></div><div class="mf"><div class="lb" data-k="inv_date"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div></div><div class="mf"><div class="lb" data-k="due"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div></div></div>
+  <div class="meta"><div class="mf"><div class="lb" data-k="inv_no"></div><div class="vl" contenteditable data-ph="INV-0000" id="fNo"></div></div><div class="mf"><div class="lb" data-k="inv_date"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000" id="fDate"></div></div><div class="mf"><div class="lb" data-k="due"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000" id="fDue"></div></div></div>
   <svg class="wave" viewBox="0 0 800 40" preserveAspectRatio="none"><path d="M0 22 C100 4 200 40 300 22 S500 4 600 22 S760 36 800 18 L800 40 L0 40Z" fill="#fff"/><path d="M0 22 C100 4 200 40 300 22 S500 4 600 22 S760 36 800 18" fill="none" stroke="#BF8C4E" stroke-width="2.5"/></svg>
 </div>
-<div class="body" style="padding-top:5mm">
+<div class="body" style="padding-top:4mm">
   <div class="grid2" style="grid-template-columns:1fr 1fr;gap:6mm">
-    <div class="guest" style="display:block"><div class="lb" data-k="billto"></div><div class="vl" contenteditable data-ph="اسم العميل · Client name" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="phone"></div><div class="vl" contenteditable data-ph="01XXXXXXXXX"></div></div>
-    <div class="guest" style="display:block"><div class="lb" data-k="trip"></div><div class="vl" contenteditable data-ph="الوجهة · Destination" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="dest"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000 → 00 / 00 / 0000"></div></div>
+    <div class="guest" style="display:block"><div class="lb" data-k="billto"></div><div class="vl" id="fName" contenteditable data-ph="اسم العميل · Client name" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="phone"></div><div class="vl" contenteditable data-ph="01XXXXXXXXX"></div></div>
+    <div class="guest" style="display:block"><div class="lb" data-k="trip"></div><div class="vl" id="fTrip" contenteditable data-ph="الوجهة · Destination" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="dest"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000 → 00 / 00 / 0000"></div></div>
   </div>
-  <div class="sec" data-k="items"></div>
+  <div class="msg" id="msg" contenteditable data-ph="..."></div>
+  <div class="sec" data-k="items" style="margin-top:3mm"></div>
   <table id="tbl"><thead><tr><th style="width:8mm">#</th><th data-k="desc"></th><th class="num" style="width:20mm" data-k="qty"></th><th class="num" style="width:30mm" data-k="price"></th><th class="num" style="width:32mm" data-k="amt"></th></tr></thead>
-  <tbody id="rows"><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr></tbody></table>
-  <span class="add noprint" onclick="addRow()">+ بند جديد</span>
-  <div class="tot">
-    <div class="tr"><span data-k="sub"></span><span class="v" id="vSub">0</span></div>
-    <div class="tr"><span data-k="disc"></span><span class="v" contenteditable id="vDisc" data-ph="0"></span></div>
-    <div class="tr g"><span data-k="total"></span><span class="v"><span id="vTot">0</span> <span contenteditable id="cur" style="font-size:.7em">EGP</span></span></div>
-    <div class="tr"><span data-k="paid"></span><span class="v" contenteditable id="vPaid" data-ph="0"></span></div>
-    <div class="tr bal"><span data-k="bal"></span><span class="v" id="vBal">0</span></div>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8mm;margin-top:6mm">
-    <div style="flex:1"><div class="lb" data-k="pay"></div><div class="vl" contenteditable data-ph="كاش / تحويل / فودافون كاش · Cash / Transfer"></div><div class="lb" style="margin-top:3mm" data-k="notes"></div><div class="vl" contenteditable data-ph="..." style="min-height:14mm"></div></div>
-    <div><span class="stamp" id="stamp" data-s="1" onclick="cycleStamp()">PAID</span></div>
+  <tbody id="rows"><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr></tbody></table>
+  <span class="add noprint" onclick="addRow('rows',ROW)">+ بند جديد</span>
+  <div style="display:flex;gap:7mm;align-items:flex-start;margin-top:2mm">
+    <div style="flex:1;min-width:0">
+      <div class="sec" data-k="pays" style="margin-top:2mm"></div>
+      <table id="ptbl" class="pt"><thead><tr><th style="width:7mm">#</th><th data-k="pdate"></th><th data-k="pmeth"></th><th class="num" style="width:25mm" data-k="pamt"></th></tr></thead>
+      <tbody id="prows"><tr><td class="n"></td><td contenteditable data-ph="00 / 00 / 0000"></td><td contenteditable data-ph="كاش / تحويل"></td><td class="num pa" contenteditable data-ph="0"></td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr></tbody></table>
+      <span class="add noprint" onclick="addRow('prows',PROW)">+ دفعة جديدة</span>
+      <div class="lb" style="margin-top:3mm" data-k="notes"></div><div class="vl" contenteditable data-ph="..." style="min-height:12mm"></div>
+    </div>
+    <div class="tot" style="margin:0;flex:none;width:80mm">
+      <div class="tr"><span data-k="sub"></span><span class="v" id="vSub">0</span></div>
+      <div class="tr"><span data-k="disc"></span><span class="v" contenteditable id="vDisc" data-ph="0"></span></div>
+      <div class="tr g"><span data-k="total"></span><span class="v"><span id="vTot">0</span> <span contenteditable id="cur" style="font-size:.7em">EGP</span></span></div>
+      <div class="tr"><span data-k="paid"></span><span class="v" id="vPaid">0</span></div>
+      <div class="tr bal"><span data-k="bal"></span><span class="v" id="vBal">0</span></div>
+      <div style="text-align:center;margin-top:5mm"><span class="stamp" id="stamp" data-s="" onclick="cycleStamp()"></span></div>
+    </div>
   </div>
 </div>
 <div class="ft"><div class="thx" data-k="thx"></div><div class="ct">01005377933<br>www.nooktoursegypt.com</div></div>
@@ -137,12 +149,13 @@ td[contenteditable]{min-height:8mm}
 const DOC='invoice';
 const D={
  title:['فاتورة','Invoice'],inv_no:['رقم الفاتورة','Invoice No.'],inv_date:['التاريخ','Date'],due:['تاريخ الاستحقاق','Due date'],
- billto:['العميل','Billed to'],trip:['الرحلة','Trip'],name:['الاسم','Name'],phone:['التليفون','Phone'],dest:['الوجهة والتواريخ','Destination & dates'],
+ billto:['العميل','Billed to'],trip:['الرحلة','Trip'],phone:['التليفون','Phone'],dest:['الوجهة والتواريخ','Destination & dates'],
  items:['البنود','Items'],desc:['البيان','Description'],qty:['العدد','Qty'],price:['سعر الوحدة','Unit price'],amt:['الإجمالي','Amount'],
  sub:['المجموع','Subtotal'],disc:['الخصم','Discount'],total:['الإجمالي الكلي','Total'],paid:['المدفوع','Paid'],bal:['المتبقي','Balance due'],
- pay:['طريقة الدفع','Payment method'],notes:['ملاحظات','Notes'],thx:['شكراً لاختيارك نوك تورز','Thank you for choosing Nook Tours'],
+ pays:['الدفعات','Payments'],pdate:['التاريخ','Date'],pmeth:['الطريقة','Method'],pamt:['المبلغ','Amount'],
+ notes:['ملاحظات','Notes'],thx:['شكراً لاختيارك نوك تورز','Thank you for choosing Nook Tours'],
 };
-function afterLang(){}
+function afterLang(){if(window.calc)calc()}
 
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const page=$('.page');let LANG='ar';
@@ -179,17 +192,55 @@ async function dlPdf(){const b=$('#pdfBtn'),old=b.textContent;b.textContent='...
  finally{page.setAttribute('style',keep);b.textContent=old;b.disabled=false}}
 
 
-const ROW=`<tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr>`;
+const ROW=`<tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr>`,PROW=`<tr><td class="n"></td><td contenteditable data-ph="00 / 00 / 0000"></td><td contenteditable data-ph="كاش / تحويل"></td><td class="num pa" contenteditable data-ph="0"></td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr>`;
+const DT={
+ inv:{t:['فاتورة','Invoice'],no:'INV-0000',due:['تاريخ الاستحقاق','Due date']},
+ dep:{t:['إيصال استلام عربون','Deposit Receipt'],no:'DEP-0000',due:['سداد المتبقي قبل','Balance due by']},
+ rec:{t:['إيصال استلام دفعة','Payment Receipt'],no:'RCT-0000',due:['سداد المتبقي قبل','Balance due by']},
+ fin:{t:['إيصال سداد نهائي','Final Payment Receipt'],no:'RCT-0000',due:['تاريخ السداد','Paid on']}
+};
+let TYPE='inv',stMode=-1;
+const SL={PAID:['مدفوع','PAID'],DEP:['استلام عربون','DEPOSIT RECEIVED'],PART:['دفع جزئي','PARTIAL'],UNPAID:['غير مدفوع','UNPAID']},SK=['PAID','DEP','PART','UNPAID',''];
 function num(s){return parseFloat(String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,\s٫]/g,''))||0}
-const fmt=n=>n.toLocaleString('en-US',{maximumFractionDigits:2});
-function calc(){let sub=0;$$('#rows tr').forEach((tr,i)=>{tr.querySelector('.n').textContent=i+1;const c=tr.children,t=num(c[2].textContent||1)*num(c[3].textContent);const q=c[2].textContent.trim();
-  const tt=(q===''?1:num(q))*num(c[3].textContent);tr.querySelector('.t').textContent=fmt(tt);sub+=tt});
- const disc=num($('#vDisc').textContent),tot=sub-disc,paid=num($('#vPaid').textContent);$('#vSub').textContent=fmt(sub);$('#vTot').textContent=fmt(tot);$('#vBal').textContent=fmt(tot-paid)}
-function addRow(){const tb=$('#rows');tb.insertAdjacentHTML('beforeend',ROW);calc();if(page.scrollHeight>page.clientHeight+2||$('.ft').getBoundingClientRect().top<$('.add').getBoundingClientRect().bottom+160){tb.lastElementChild.remove();calc();alert('الصفحة اتملت: مفيش مكان لبند زيادة في الصفحة دي')}}
-document.addEventListener('input',e=>{if(e.target.closest('#tbl')||e.target.closest('.tot'))calc()});
+const fmt=n=>n.toLocaleString('en-US',{maximumFractionDigits:2}),txt=s=>($(s).textContent||'').trim();
+const T=(l,a,e)=>l==='ar'?a:e;
+function msgText(l){const tot=num($('#vTot').textContent),paid=num($('#vPaid').textContent),bal=tot-paid,cur=txt('#cur')||'EGP',due=txt('#fDue'),trip=txt('#fTrip');
+ const A=n=>n>0?fmt(n)+' '+cur:'____ '+cur,dueS=due?T(l,' قبل '+due,' by '+due):'',tripS=trip?T(l,' لرحلة '+trip,' for '+trip):'';
+ if(TYPE==='dep')return T(l,'استلمنا منكم مبلغ '+A(paid)+' كعربون لتأكيد الحجز'+tripS+'.'+(bal>0?' المتبقي '+A(bal)+' يُسدد'+dueS+'.':''),
+   'We have received '+A(paid)+' as a deposit to confirm your booking'+tripS+'.'+(bal>0?' The remaining '+A(bal)+' is due'+dueS+'.':''));
+ if(TYPE==='rec')return T(l,'استلمنا منكم دفعة. إجمالي المدفوع '+A(paid)+(bal>0?' والمتبقي '+A(bal)+(due?' يُسدد قبل '+due:''):'')+'.',
+   'Payment received. Total paid so far '+A(paid)+(bal>0?', remaining '+A(bal)+(due?' due by '+due:''):'')+'.');
+ if(TYPE==='fin')return T(l,'استلمنا كامل المبلغ '+A(tot)+'. لا توجد أي مبالغ مستحقة.','We have received the full amount of '+A(tot)+'. No balance is due.');
+ return T(l,'تفاصيل الحجز'+tripS+' بإجمالي '+A(tot)+'.'+(bal>0?' المتبقي '+A(bal)+(due?' يُسدد قبل '+due:'')+'.':''),
+   'Booking charges'+tripS+', total '+A(tot)+'.'+(bal>0?' Balance due '+A(bal)+(due?' by '+due:'')+'.':''))}
+function calc(){let sub=0,paid=0;
+ $$('#rows tr').forEach((tr,i)=>{tr.querySelector('.n').textContent=i+1;const c=tr.children,q=c[2].textContent.trim(),tt=(q===''?1:num(q))*num(c[3].textContent);
+  tr.querySelector('.t').textContent=fmt(tt);sub+=tt});
+ $$('#prows tr').forEach((tr,i)=>{tr.querySelector('.n').textContent=i+1;paid+=num(tr.querySelector('.pa').textContent)});
+ const disc=num($('#vDisc').textContent),tot=sub-disc;$('#vSub').textContent=fmt(sub);$('#vTot').textContent=fmt(tot);$('#vPaid').textContent=fmt(paid);$('#vBal').textContent=fmt(tot-paid);
+ const m=$('#msg');if(!m.dataset.ed&&document.activeElement!==m){m.innerHTML=LANG==='both'?'<span class="la">'+msgText('ar')+'</span><span class="le">'+msgText('en')+'</span>':msgText(LANG==='en'?'en':'ar')}
+ let k=stMode;if(k<0)k=tot<=0?4:(tot-paid<=0?0:paid>0?(TYPE==='dep'?1:2):3);
+ const s=$('#stamp'),key=SK[k];s.dataset.s=key?'1':'';s.textContent=key?(LANG==='both'?SL[key][0]+' / '+SL[key][1]:SL[key][LANG==='en'?1:0]):''}
+function addRow(id,tpl){const tb=$('#'+id);tb.insertAdjacentHTML('beforeend',tpl);calc();const f=$('.ft').getBoundingClientRect().top;
+ const last=$('.tot').getBoundingClientRect().bottom,bd=$('.body').lastElementChild.getBoundingClientRect().bottom;
+ if(Math.max(last,bd)>f-8){tb.lastElementChild.remove();calc();alert('الصفحة اتملت: مفيش مكان لسطر زيادة في الصفحة دي')}}
+document.addEventListener('input',e=>{if(e.target.id==='msg'){e.target.dataset.ed=1;return}calc()});
 document.addEventListener('click',e=>{const x=e.target.closest('.x');if(x&&x.closest('tr')){x.closest('tr').remove();calc()}});
-const ST=[['PAID','1'],['PARTIAL',''],['UNPAID',''],['','']];let si=0;
-function cycleStamp(){const L=['PAID','PARTIAL','UNPAID',''];si=(si+1)%4;const s=$('#stamp');s.textContent=L[si]||'PAID';s.dataset.s=L[si]?'1':''}
+function cycleStamp(){const cur=stMode<0?-1:stMode;stMode=cur>=4?-1:cur+1;calc()}
+function setType(t,noLang){TYPE=t;const d=DT[t];D.title=d.t;D.due=d.due;$('#fNo').dataset.ph=d.no;D.inv_no=[t==='inv'?'رقم الفاتورة':'رقم الإيصال',t==='inv'?'Invoice No.':'Receipt No.'];
+ delete $('#msg').dataset.ed;stMode=-1;$$('[data-dt]').forEach(b=>b.classList.toggle('on',b.dataset.dt===t));if(!noLang)applyLang()}
+$$('[data-dt]').forEach(b=>b.onclick=()=>setType(b.dataset.dt));
+const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return p(d.getDate())+' / '+p(d.getMonth()+1)+' / '+d.getFullYear()};
+function addDeposit(){const p=num($('#pct').value),tot=num($('#vTot').textContent);if(!p||!tot){alert('اكتب النسبة الأول وتأكد إن فيه بنود بأسعار');return}
+ const tb=$('#prows'),empty=[...tb.children].find(r=>!r.querySelector('.pa').textContent.trim());
+ if(!empty){tb.insertAdjacentHTML('beforeend',PROW)}const r=empty||tb.lastElementChild;r.children[1].textContent=today();r.querySelector('.pa').textContent=fmt(Math.round(tot*p/100));
+ if(TYPE==='inv')setType('dep');else{delete $('#msg').dataset.ed;calc()}}
+function genWA(){const l=LANG==='en'?'en':'ar',nm=txt('#fName'),no=txt('#fNo');
+ const ar='أهلاً '+(nm||'يا فندم')+'،\n'+msgText('ar')+(no?'\nرقم المستند: '+no:'')+'\nأي استفسار تواصل معنا: 01005377933\nنوك تورز',
+  en='Hello '+(nm||'')+',\n'+msgText('en')+(no?'\nDocument No.: '+no:'')+'\nAny questions? 01005377933\nNook Tours';
+ $('#wa').value=LANG==='both'?ar+'\n\n'+en:l==='en'?en:ar}
+function copyWA(){const t=$('#wa');if(!t.value)genWA();t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}const b=$('#cpb');b.textContent='اتنسخت';setTimeout(()=>b.textContent='انسخ',1500)}
+(location.hash||'').slice(1).split(',').forEach(x=>{if(DT[x])setType(x,true)});
 calc();
 
 (location.hash||'').slice(1).split(',').forEach(x=>{if(['ar','en','both'].includes(x))LANG=x;if(['gen','dahab','sokhna','bw'].includes(x))page.dataset.th=x});
