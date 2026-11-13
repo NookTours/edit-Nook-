@@ -237,5 +237,41 @@ const ROW=`<tr class="r"><td class="n"></td><td contenteditable data-ph="اكت�
 (location.hash||'').slice(1).split(',').forEach(x=>{if(['ar','en','both'].includes(x))LANG=x;if(['gen','dahab','sokhna','bw'].includes(x))page.dataset.th=x});
 applyLang();
 </script>
+<style>.pe-hide{display:none!important}</style><script>
+(function(){
+ var LEAF=['.cell','.mf','.fld','.tr','li','tr','.note','.msg'];
+ function isHid(e){return e.classList.contains('pe-hide')||e.classList.contains('empty')||e.classList.contains('noprint')||e.style.display==='none'}
+ function leafOf(el){for(var i=0;i<LEAF.length;i++){var a=el.closest(LEAF[i]);if(a&&!a.closest('.tb'))return a}return null}
+ function sweep(pg){
+   pg.querySelectorAll('div,ul,table').forEach(function(el){
+     if(el.closest('.tb')||el.classList.contains('body')||el.classList.contains('hd')||el.classList.contains('ft')||el.classList.contains('pe-hide'))return;
+     if(el.tagName==='TABLE'){var rows=[].slice.call(el.querySelectorAll('tbody tr'));if(rows.length&&rows.every(isHid))el.classList.add('pe-hide');return}
+     var kids=[].slice.call(el.children);
+     if(kids.length&&kids.every(isHid))el.classList.add('pe-hide');
+   });
+   pg.querySelectorAll('.sec').forEach(function(sec){
+     var n=sec.nextElementSibling;
+     while(n&&n.classList.contains('noprint'))n=n.nextElementSibling;
+     if(!n||isHid(n))sec.classList.add('pe-hide');
+   });
+ }
+ function setHide(on){
+   document.querySelectorAll('.pe-hide').forEach(function(e){e.classList.remove('pe-hide')});
+   if(!on)return;
+   var pages=[].slice.call(document.querySelectorAll('.page'));
+   pages.forEach(function(pg){
+     pg.querySelectorAll('[contenteditable]').forEach(function(ce){
+       if(ce.closest('.tb')||ce.textContent.trim())return;
+       var a=leafOf(ce);if(a)a.classList.add('pe-hide');
+     });
+     pg.querySelectorAll('.tot .tr .v').forEach(function(v){if(v.textContent.trim()==='—'&&v.parentElement)v.parentElement.classList.add('pe-hide')});
+   });
+   for(var k=0;k<3;k++)pages.forEach(sweep);
+ }
+ window.addEventListener('beforeprint',function(){setHide(true)});
+ window.addEventListener('afterprint',function(){setHide(false)});
+ if(typeof dlPdf==='function'){var _dl=dlPdf;dlPdf=async function(){setHide(true);try{return await _dl.apply(this,arguments)}finally{setHide(false)}}}
+})();
+</script>
 </body>
 </html>
