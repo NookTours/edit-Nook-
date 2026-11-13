@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice — Nook Tours</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=El+Messiri:wght@600;700&family=Carlito:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Calibri,Carlito,Cairo,sans-serif;background:#d9dde2;color:#0C2840;font-weight:600;font-size:15px}
+.page{--ink:#0C2840;--acc:#BF8C4E;--accd:#8A5A1F;--hbg:#0C2840;--htx:#fff;--soft:#F2F2F2;--line:#cfd5dc;
+  width:210mm;height:296.5mm;margin:10mm auto;background:#fff;position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.page[data-th=dahab]{--hbg:#F2F2F2;--htx:#0C2840;--soft:#FBF6EE}
+.page[data-th=sokhna]{--hbg:#123859;--acc:#BF8450}
+.page[data-th=bw]{--hbg:#fff;--htx:#0C2840;--soft:#fff;--line:#6b7280}
+.hd{background:var(--hbg);color:var(--htx);padding:11mm 15mm 7mm;position:relative}
+.page[data-th=bw] .hd{border-bottom:1mm solid var(--ink)}
+.page[data-th=sokhna] .hd{border-bottom:2.2mm solid var(--acc)}
+.page[data-th=gen] .hd{border-bottom:1.4mm solid var(--acc)}
+.page[data-th=dahab] .hd{border-bottom:none;padding-bottom:12mm}
+.wave{display:none;position:absolute;left:0;bottom:-1px;width:100%;height:8mm}
+.page[data-th=dahab] .wave{display:block}
+.brand{display:flex;justify-content:space-between;align-items:flex-start;gap:8mm}
+.wm{font:800 15px Calibri,Carlito,sans-serif;letter-spacing:.32em;direction:ltr}
+.wm small{display:block;font-weight:700;font-size:10.5px;letter-spacing:.2em;color:var(--acc);margin-top:1mm}
+.dtitle{text-align:end;line-height:1.15;font:800 30px 'El Messiri',Cairo,sans-serif}[dir=ltr] .dtitle{font:700 25px Calibri,Carlito,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.dtitle .la{font:800 28px 'El Messiri',Cairo,sans-serif}.dtitle .le{font:700 17px Calibri,Carlito,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--acc)}
+.dtitle .la:only-child,.dtitle .le:only-child{}
+.meta{display:flex;gap:6mm;margin-top:6mm}
+.mf{flex:1;border-top:.4mm solid var(--acc);padding-top:1.5mm}
+.lb{font-size:11.5px;font-weight:800;color:var(--accd);letter-spacing:.03em;line-height:1.25}
+.page[data-th=sokhna] .hd .lb,.page[data-th=gen] .hd .lb{color:#E3C08C}
+.vl{font-size:16px;font-weight:800;min-height:6.5mm;border-bottom:.3mm dotted var(--line);line-height:1.4}
+.hd .vl{border-bottom-color:rgba(255,255,255,.4)}.page[data-th=dahab] .hd .vl,.page[data-th=bw] .hd .vl{border-bottom-color:#9aa5b1}
+[data-ph]:empty:before{content:attr(data-ph);opacity:.45;font-weight:600}
+.la{display:block}.le{display:block;font-size:.84em;font-weight:600;opacity:.88;direction:ltr;text-align:start}
+[dir=rtl] .le{text-align:right}
+.lb .la,.lb .le,.ck .la,.ck .le,th .la,th .le{display:inline}.lb .le:before,th .le:before{content:" / ";margin-inline-start:1mm}.lb .le,th .le{opacity:.8}.ck .le{margin-inline-start:2mm;font-size:.78em}
+.body{padding:0 15mm}
+.hero{padding:6mm 0 3mm}
+.hero .t{font:800 25px 'El Messiri',Cairo,Calibri,sans-serif;line-height:1.3}
+.hero .s{font-size:15px;color:#475569;margin-top:1mm}
+.page[data-th=bw] .hero .s{color:#334155}
+.sec{display:flex;align-items:center;gap:3mm;margin:5mm 0 2.5mm;font:800 15px 'El Messiri',Cairo,Calibri,sans-serif}
+.sec:before{content:"";width:9mm;height:.9mm;background:var(--acc)}
+.sec .le{display:inline;margin-inline-start:2mm;font-size:.8em}.sec .la{display:inline}
+.guest{background:var(--soft);border:.5mm solid var(--ink);border-radius:3mm;padding:4mm 5mm;display:grid;grid-template-columns:1.5fr 1fr;gap:5mm}
+.guest .vl{font-size:21px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:2.6mm 9mm}
+.cell{position:relative}
+.x{position:absolute;top:0;inset-inline-end:0;cursor:pointer;font:800 13px Calibri,sans-serif;color:#b91c1c;background:#fff;border:1px solid #b91c1c;border-radius:50%;width:5mm;height:5mm;display:none;align-items:center;justify-content:center;line-height:1}
+.cell:hover .x,tr:hover .x{display:flex}
+.cks{display:flex;flex-wrap:wrap;gap:3mm 9mm}
+.ck{display:flex;align-items:center;gap:3mm;cursor:pointer;font-weight:800;font-size:15.5px;user-select:none}
+.ck i{flex:none;width:7.5mm;height:7.5mm;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:900 14px Calibri,sans-serif;font-style:normal;border:.5mm solid var(--ink)}
+.ck[data-s="1"] i{background:var(--ink);color:#fff}
+.ck[data-s="0"] i{color:#6b7280;border-color:#6b7280}
+.ck[data-s="0"] span{text-decoration:line-through;text-decoration-thickness:.3mm;color:#475569}
+.ck[data-s=""]{display:none}
+.ck b{font-weight:700;font-size:.9em;color:#334155;margin-inline-start:1.5mm}
+.note{border:.4mm solid var(--line);border-radius:3mm;min-height:15mm;padding:3mm 4mm;font-size:14.5px;line-height:1.6}
+.ft{position:absolute;left:0;right:0;bottom:0;padding:4mm 15mm 5mm;border-top:.7mm solid var(--ink);background:#fff;display:flex;justify-content:space-between;align-items:center;gap:6mm}
+.ft .thx{font:800 16px 'El Messiri',Cairo,Calibri,sans-serif}
+.ft .ct{font-weight:800;font-size:14px;direction:ltr;text-align:end;line-height:1.4}
+[contenteditable]:hover{outline:1px dashed var(--acc);outline-offset:2px}[contenteditable]:focus{outline:2px solid var(--acc);outline-offset:2px}
+table{width:100%;border-collapse:collapse}
+th{background:var(--ink);color:#fff;font-size:12.5px;font-weight:800;padding:2.2mm 2.5mm;text-align:start;line-height:1.25}
+.page[data-th=bw] th{background:#fff;color:var(--ink);border-top:.6mm solid var(--ink);border-bottom:.6mm solid var(--ink)}
+th .le{font-size:.9em}
+td{border-bottom:.3mm solid var(--line);padding:2mm 2.5mm;vertical-align:top;font-size:14.5px;position:relative}
+td.num,th.num{text-align:end;white-space:nowrap}td.n{width:8mm;color:#6b7280}
+td[contenteditable]{min-height:8mm}
+.tot{margin-inline-start:auto;width:88mm;margin-top:4mm}
+.tr{display:flex;justify-content:space-between;gap:4mm;padding:1.6mm 0;border-bottom:.3mm solid var(--line);font-weight:700}
+.tr.g{font-size:18px;font-weight:900;border-top:.7mm solid var(--ink);border-bottom:.7mm solid var(--ink);padding:2.4mm 0;margin-top:1mm}
+.tr .v{direction:ltr;font-weight:800;min-width:24mm;text-align:end}
+.tr.bal{background:var(--ink);color:#fff;padding:2.6mm 3mm;font-size:17px;font-weight:900;border:none}
+.page[data-th=bw] .tr.bal{background:#fff;color:var(--ink);border:.7mm solid var(--ink)}
+.stamp{display:inline-block;border:.7mm solid var(--acc);color:var(--accd);border-radius:2mm;padding:1mm 4mm;font:900 15px Calibri,Cairo,sans-serif;letter-spacing:.1em;transform:rotate(-4deg);cursor:pointer}
+.stamp[data-s=""]{visibility:hidden}
+.add{margin-top:2mm;font:700 12.5px Cairo,sans-serif;color:var(--accd);cursor:pointer;border:1px dashed var(--acc);border-radius:2mm;padding:1.5mm 4mm;display:inline-block;background:#fff}
+.tb{position:fixed;top:10px;left:10px;z-index:60;display:flex;flex-direction:column;gap:6px;direction:rtl;width:200px}
+.tb .g{display:flex;gap:4px;flex-wrap:wrap}
+.tb button,.tb a{flex:1;font:800 12.5px Cairo,sans-serif;padding:7px 6px;border-radius:9px;border:2px solid #0C2840;background:#fff;color:#0C2840;cursor:pointer;text-decoration:none;text-align:center}
+.tb button.on{background:#0C2840;color:#fff}.tb button.p{background:#BF8C4E;border-color:#BF8C4E;color:#fff}
+.tb .bx{background:#fff;border:2px solid #0C2840;border-radius:12px;padding:8px;font:700 12px Cairo,sans-serif;color:#0C2840}
+.tb .bx small{display:block;color:#64748b;font-weight:600;margin:2px 0 6px;min-height:15px}
+.tb input[type=color]{width:34px;height:28px;border:1.5px solid #0C2840;border-radius:8px;padding:0}
+@media screen{body{padding-left:225px}}
+@page{size:A4;margin:0}
+@media print{html,body{background:#fff;height:296mm;overflow:hidden}.page{margin:0;box-shadow:none;height:296.5mm}.noprint,.x,.add{display:none!important}[contenteditable]{outline:none!important}[data-ph]:empty:before{content:""}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="tb noprint" id="tb">
+<div class="g"><button data-lang="ar" class="on">عربي</button><button data-lang="en">English</button><button data-lang="both">الاتنين</button></div>
+<div class="g"><button data-th="gen" class="on">عام</button><button data-th="dahab">دهب</button><button data-th="sokhna">السخنة</button><button data-th="bw">أبيض وأسود</button></div>
+<div class="g"><button class="p" onclick="print()">اطبع</button><button id="pdfBtn" onclick="dlPdf()">PDF</button></div>
+<div class="g"><a href="confirmation.html">تأكيد الحجز</a></div>
+<div class="bx" id="tp"><b>تحكم في النص</b><small id="tpn">اضغط على أي نص الأول</small>
+<div class="g"><button data-a="s+">A+</button><button data-a="s-">A-</button><button data-a="b">تقيل</button></div>
+<div class="g" style="margin-top:4px"><button data-a="al">يمين</button><button data-a="ac">وسط</button><button data-a="ar2">شمال</button></div>
+<div class="g" style="margin-top:4px;align-items:center"><input type="color" id="tpc" value="#0C2840"><button data-a="hide">إخفاء</button><button data-a="reset">رجّعه</button></div>
+<button data-a="showall" style="width:100%;margin-top:4px">إظهار كل المخفي</button></div>
+</div>
+<section class="page" data-th="gen">
+<div class="hd">
+  <div class="brand"><div class="wm">NOOK TOURS EGYPT<small>DISCOVER MORE, CREATE MEMORIES</small></div><div class="dtitle" data-k="title"></div></div>
+  <div class="meta"><div class="mf"><div class="lb" data-k="inv_no"></div><div class="vl" contenteditable data-ph="INV-0000"></div></div><div class="mf"><div class="lb" data-k="inv_date"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div></div><div class="mf"><div class="lb" data-k="due"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000"></div></div></div>
+  <svg class="wave" viewBox="0 0 800 40" preserveAspectRatio="none"><path d="M0 22 C100 4 200 40 300 22 S500 4 600 22 S760 36 800 18 L800 40 L0 40Z" fill="#fff"/><path d="M0 22 C100 4 200 40 300 22 S500 4 600 22 S760 36 800 18" fill="none" stroke="#BF8C4E" stroke-width="2.5"/></svg>
+</div>
+<div class="body" style="padding-top:5mm">
+  <div class="grid2" style="grid-template-columns:1fr 1fr;gap:6mm">
+    <div class="guest" style="display:block"><div class="lb" data-k="billto"></div><div class="vl" contenteditable data-ph="اسم العميل · Client name" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="phone"></div><div class="vl" contenteditable data-ph="01XXXXXXXXX"></div></div>
+    <div class="guest" style="display:block"><div class="lb" data-k="trip"></div><div class="vl" contenteditable data-ph="الوجهة · Destination" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="dest"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000 → 00 / 00 / 0000"></div></div>
+  </div>
+  <div class="sec" data-k="items"></div>
+  <table id="tbl"><thead><tr><th style="width:8mm">#</th><th data-k="desc"></th><th class="num" style="width:20mm" data-k="qty"></th><th class="num" style="width:30mm" data-k="price"></th><th class="num" style="width:32mm" data-k="amt"></th></tr></thead>
+  <tbody id="rows"><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr><tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr></tbody></table>
+  <span class="add noprint" onclick="addRow()">+ بند جديد</span>
+  <div class="tot">
+    <div class="tr"><span data-k="sub"></span><span class="v" id="vSub">0</span></div>
+    <div class="tr"><span data-k="disc"></span><span class="v" contenteditable id="vDisc" data-ph="0"></span></div>
+    <div class="tr g"><span data-k="total"></span><span class="v"><span id="vTot">0</span> <span contenteditable id="cur" style="font-size:.7em">EGP</span></span></div>
+    <div class="tr"><span data-k="paid"></span><span class="v" contenteditable id="vPaid" data-ph="0"></span></div>
+    <div class="tr bal"><span data-k="bal"></span><span class="v" id="vBal">0</span></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:8mm;margin-top:6mm">
+    <div style="flex:1"><div class="lb" data-k="pay"></div><div class="vl" contenteditable data-ph="كاش / تحويل / فودافون كاش · Cash / Transfer"></div><div class="lb" style="margin-top:3mm" data-k="notes"></div><div class="vl" contenteditable data-ph="..." style="min-height:14mm"></div></div>
+    <div><span class="stamp" id="stamp" data-s="1" onclick="cycleStamp()">PAID</span></div>
+  </div>
+</div>
+<div class="ft"><div class="thx" data-k="thx"></div><div class="ct">01005377933<br>www.nooktoursegypt.com</div></div>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+const DOC='invoice';
+const D={
+ title:['فاتورة','Invoice'],inv_no:['رقم الفاتورة','Invoice No.'],inv_date:['التاريخ','Date'],due:['تاريخ الاستحقاق','Due date'],
+ billto:['العميل','Billed to'],trip:['الرحلة','Trip'],name:['الاسم','Name'],phone:['التليفون','Phone'],dest:['الوجهة والتواريخ','Destination & dates'],
+ items:['البنود','Items'],desc:['البيان','Description'],qty:['العدد','Qty'],price:['سعر الوحدة','Unit price'],amt:['الإجمالي','Amount'],
+ sub:['المجموع','Subtotal'],disc:['الخصم','Discount'],total:['الإجمالي الكلي','Total'],paid:['المدفوع','Paid'],bal:['المتبقي','Balance due'],
+ pay:['طريقة الدفع','Payment method'],notes:['ملاحظات','Notes'],thx:['شكراً لاختيارك نوك تورز','Thank you for choosing Nook Tours'],
+};
+function afterLang(){}
+
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const page=$('.page');let LANG='ar';
+function applyLang(){$$('[data-k]').forEach(el=>{if(el.dataset.ed)return;const d=D[el.dataset.k];if(!d)return;
+  el.innerHTML=LANG==='ar'?d[0]:LANG==='en'?d[1]:`<span class="la">${d[0]}</span><span class="le">${d[1]}</span>`});
+  page.dir=LANG==='en'?'ltr':'rtl';$$('[data-th]').forEach(x=>{if(x.tagName==='BUTTON')x.classList.toggle('on',x.dataset.th===page.dataset.th)});renderChecks&&renderChecks();$$('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===LANG));afterLang&&afterLang()}
+$$('[data-lang]').forEach(b=>b.onclick=()=>{LANG=b.dataset.lang;applyLang()});
+$$('[data-th]').forEach(b=>b.onclick=()=>{page.dataset.th=b.dataset.th;$$('[data-th]').forEach(x=>{if(x.tagName==='BUTTON')x.classList.toggle('on',x===b)})});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.k)t.dataset.ed=1});
+/* إخفاء صف بزرار × */
+document.addEventListener('click',e=>{const x=e.target.closest('.x');if(x&&!x.closest('tr')){const c=x.parentElement;c.style.display='none';c.dataset.hid=1}});
+/* نقط الصح/الغلط */
+const WORDS={ok:['شامل','Included'],no:['غير شامل','Not included']};
+function renderChecks(){$$('.ck').forEach(c=>{const s=c.dataset.s,i=c.querySelector('i'),w=c.querySelector('b');i.textContent=s==='1'?'✓':s==='0'?'✕':'';
+  if(w){const x=s==='1'?WORDS.ok:WORDS.no;w.textContent=LANG==='ar'?x[0]:LANG==='en'?x[1]:x[0]+' / '+x[1]}})}
+document.addEventListener('click',e=>{const c=e.target.closest('.ck');if(!c||e.target.closest('[contenteditable]'))return;const o={'1':'0','0':'','':'1'};c.dataset.s=o[c.dataset.s]??'1';renderChecks()});
+/* لوحة التحكم في النص */
+(function(){let cur=null;const nm=$('#tpn');
+document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.closest('[contenteditable]');if(!t)return;cur=t;if(t.dataset.o===undefined)t.dataset.o=t.getAttribute('style')||'';nm.textContent=(t.textContent||'').trim().slice(0,20)});
+$('#tp').addEventListener('mousedown',e=>{if(e.target.tagName!=='INPUT')e.preventDefault()});
+const blk=el=>{let x=el;while(x&&getComputedStyle(x).display==='inline')x=x.parentElement;return x||el};
+$('#tp').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;
+ if(a==='showall'){$$('[data-hid]').forEach(x=>{x.style.display='';delete x.dataset.hid});$$('[data-vh]').forEach(x=>{x.style.visibility='';delete x.dataset.vh});return}
+ if(!cur)return nm.textContent='اضغط على نص الأول';const cs=getComputedStyle(cur);
+ if(a==='s+'||a==='s-')cur.style.fontSize=(parseFloat(cs.fontSize)+(a==='s+'?1:-1))+'px';
+ else if(a==='b')cur.style.fontWeight=(+cs.fontWeight>=700?'500':'900');
+ else if(a==='al'||a==='ac'||a==='ar2')blk(cur).style.textAlign=a==='al'?'left':a==='ac'?'center':'right';
+ else if(a==='hide'){cur.style.visibility='hidden';cur.dataset.vh=1}
+ else if(a==='reset'){cur.setAttribute('style',cur.dataset.o||'');delete cur.dataset.vh}});
+$('#tpc').addEventListener('input',e=>{if(cur)cur.style.color=e.target.value})})();
+async function dlPdf(){const b=$('#pdfBtn'),old=b.textContent;b.textContent='...';b.disabled=true;const keep=page.getAttribute('style')||'';page.style.margin='0';page.style.boxShadow='none';page.style.height='296.5mm';
+ try{await document.fonts.ready;await html2pdf().set({margin:0,filename:'nook-tours-'+DOC+'.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:3,useCORS:true,scrollX:0,scrollY:0,windowWidth:page.offsetWidth},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:[]}}).from(page).save()}
+ catch(e){alert('تعذّر إنشاء الـ PDF: '+e.message+'\nاستخدم اطبع واختار Save as PDF.')}
+ finally{page.setAttribute('style',keep);b.textContent=old;b.disabled=false}}
+
+
+const ROW=`<tr><td class="n"></td><td contenteditable data-ph="اكتب البند · Item"></td><td class="num" contenteditable data-ph="1"></td><td class="num" contenteditable data-ph="0"></td><td class="num t">0</td><td class="rx noprint" style="width:0;padding:0;position:static"><b class="x noprint" style="inset-inline-end:-6mm;top:2mm">×</b></td></tr>`;
+function num(s){return parseFloat(String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,\s٫]/g,''))||0}
+const fmt=n=>n.toLocaleString('en-US',{maximumFractionDigits:2});
+function calc(){let sub=0;$$('#rows tr').forEach((tr,i)=>{tr.querySelector('.n').textContent=i+1;const c=tr.children,t=num(c[2].textContent||1)*num(c[3].textContent);const q=c[2].textContent.trim();
+  const tt=(q===''?1:num(q))*num(c[3].textContent);tr.querySelector('.t').textContent=fmt(tt);sub+=tt});
+ const disc=num($('#vDisc').textContent),tot=sub-disc,paid=num($('#vPaid').textContent);$('#vSub').textContent=fmt(sub);$('#vTot').textContent=fmt(tot);$('#vBal').textContent=fmt(tot-paid)}
+function addRow(){const tb=$('#rows');tb.insertAdjacentHTML('beforeend',ROW);calc();if(page.scrollHeight>page.clientHeight+2||$('.ft').getBoundingClientRect().top<$('.add').getBoundingClientRect().bottom+160){tb.lastElementChild.remove();calc();alert('الصفحة اتملت: مفيش مكان لبند زيادة في الصفحة دي')}}
+document.addEventListener('input',e=>{if(e.target.closest('#tbl')||e.target.closest('.tot'))calc()});
+document.addEventListener('click',e=>{const x=e.target.closest('.x');if(x&&x.closest('tr')){x.closest('tr').remove();calc()}});
+const ST=[['PAID','1'],['PARTIAL',''],['UNPAID',''],['','']];let si=0;
+function cycleStamp(){const L=['PAID','PARTIAL','UNPAID',''];si=(si+1)%4;const s=$('#stamp');s.textContent=L[si]||'PAID';s.dataset.s=L[si]?'1':''}
+calc();
+
+(location.hash||'').slice(1).split(',').forEach(x=>{if(['ar','en','both'].includes(x))LANG=x;if(['gen','dahab','sokhna','bw'].includes(x))page.dataset.th=x});
+applyLang();
+</script>
+</body>
+</html>

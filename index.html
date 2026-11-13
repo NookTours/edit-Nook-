@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Studio v20</title>
+<title>Nook Tours Studio v21</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -92,12 +92,14 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v20</span></h1>
+    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v21</span></h1>
 
     <div class="sec">🖨️ مطبوعات الرحلة</div>
     <div class="grid">
       <a class="tb" href="print/welcome-aboard.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">🚌 Welcome Aboard</a>
       <a class="tb" href="print/guest-review.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">📝 Guest Review</a>
+      <a class="tb" href="print/confirmation.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">✅ تأكيد حجز</a>
+      <a class="tb" href="print/invoice.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">🧾 فاتورة</a>
     </div>
 
     <div class="sec">1 · القالب</div>
@@ -587,45 +589,6 @@ offer:{n:'كارت عرض',i:'🎫',f:['badge','title','sub','pfrom','price','cu
         ${d.price?`<div style="border:2px solid rgba(191,140,78,.55);background:rgba(255,255,255,.06);border-radius:${22*k}px;padding:${12*k}px ${26*k}px;text-align:center">${d.pfrom?`<div style="color:${G2};font:700 ${SZ(24*k,'badge')}px ${AR}">${esc(d.pfrom)}</div>`:''}<div style="color:#fff;font:900 ${SZ(76*k,'title')}px/1.05 ${EN};direction:ltr">${esc(d.price)}</div>${d.cur?`<div style="color:${G2};font:700 ${SZ(22*k,'badge')}px ${EN};direction:ltr">${esc(d.cur)}</div>`:''}</div>`:''}
         <div style="text-align:center;flex:1;min-width:${P.land?200:300}px">${d.cta?cta(d.cta,`font-size:${SZ(36*k,'cta')}px;padding:${16*k}px ${40*k}px`):''}<div style="margin-top:${12*k}px">${contact(d,'center')}</div></div>
       </div></div>`}}},
-
-/* ===== خطاب تأكيد حجز: عربي / English / الاتنين، 3 تصميمات، خانات اختيارية، وعلامة ✓/✗ للشامل ===== */
-confirm:{n:'تأكيد حجز (Confirmation)',i:'✅',f:['gn','dst','hotel','cin','cout','ad','rm','rt','tm1','tm2','rf','nt'],
-  modes:[
-    {key:'lang',label:'🌐 لغة الخطاب (حسب الضيف)',opts:[['ar','عربي'],['en','English'],['both','الاتنين']]},
-    {key:'design',label:'🎨 التصميم (بيحط اسم الوجهة تلقائي)',opts:[['classic','كلاسيك'],['dahab','دهب'],['sokhna','السخنة']],presets:{classic:{dst:''},dahab:{dst:'دهب'},sokhna:{dst:'السخنة'}}},
-    {key:'i1',label:'🚐 الانتقالات',opts:[['1','✓ شامل'],['0','✗ غير شامل'],['-','إخفاء']]},
-    {key:'i2',label:'🍳 الفطار',opts:[['1','✓ شامل'],['0','✗ غير شامل'],['-','إخفاء']]},
-    {key:'i3',label:'🍽️ العشاء',opts:[['1','✓ شامل'],['0','✗ غير شامل'],['-','إخفاء']]}],
-  d:{lang:'ar',design:'classic',i1:'1',i2:'1',i3:'-',gn:'اسم الضيف',dst:'',hotel:'اسم الفندق',cin:'00 / 00 / 0000',cout:'00 / 00 / 0000',ad:'2',rm:'1',rt:'',tm1:'',tm2:'',rf:'',nt:''},
-  r:(d,P)=>{const k=P.land?.8:P.tall?1.1:P.sq?.82:1,lang=d.lang||'ar',both=lang==='both',isAr=lang!=='en',col=C();
-    const TH={classic:{bg:'rgba(8,20,36,.9)',tx:'#fff',lb:G2,bd:'rgba(191,140,78,.6)',hd:'transparent',hdt:'#fff',big:col.title,sub:'rgba(255,255,255,.82)',ln:'rgba(255,255,255,.16)'},
-      dahab:{bg:'#F2F2F2',tx:NV,lb:'#8A5A1F',bd:G,hd:NV,hdt:'#fff',big:G2,sub:'#475569',ln:'rgba(12,40,64,.16)'},
-      sokhna:{bg:NV,tx:'#fff',lb:G2,bd:G,hd:G,hdt:NV,big:NV,sub:'rgba(255,255,255,.82)',ln:'rgba(191,140,78,.4)'}},T=TH[d.design]||TH.classic;
-    const L={thanks:['شكراً لاختيارك نوك تورز','Thanks for choosing Nook Tours'],glad:['يسعدنا تأكيد حجزك','Glad to confirm your reservation'],conf:['تم تأكيد حجزك','Booking Confirmed'],
-      gn:['اسم الضيف','Guest Name'],dst:['الوجهة','Destination'],hotel:['الفندق','Hotel'],cin:['تسجيل الدخول','Check-in'],cout:['تسجيل الخروج','Check-out'],ad:['عدد البالغين','Adults'],rm:['عدد الغرف','Rooms'],rt:['نوع الغرفة','Room Type'],tm1:['موعد الانتقالات','Transfer Time'],tm2:['موعد التحرك','Departure Time'],rf:['رقم الحجز','Booking No.']},
-      INC={i1:['الانتقالات','Transfers'],i2:['الفطار','Breakfast'],i3:['العشاء','Dinner']};
-    const lab=key=>both?`${L[key][0]} / ${L[key][1]}`:isAr?L[key][0]:L[key][1];
-    const fnt=v=>/[؀-ۿ]/.test(v)?AR:EN,dr=v=>/[؀-ۿ]/.test(v)?'rtl':'ltr';
-    const cell=(key,v,wide)=>v&&String(v).trim()?`<div style="min-width:0;${wide?'grid-column:1/-1;':''}"><div style="color:${T.lb};font:700 ${21*k}px ${AR}">${esc(lab(key))}</div><div style="color:${T.tx};font:800 ${(wide?40:34)*k}px/1.25 ${fnt(v)};direction:${dr(v)};text-align:${isAr&&dr(v)==='rtl'?'right':'left'}">${esc(v)}</div></div>`:'';
-    const inc=['i1','i2','i3'].filter(x=>d[x]==='1'||d[x]==='0').map(x=>{const y=d[x]==='1',n=INC[x],txt=both?`${n[0]} ${y?'شامل':'غير شامل'} / ${n[1]} ${y?'included':'not included'}`:isAr?`${n[0]} ${y?'شامل':'غير شامل'}`:`${n[1]} ${y?'included':'not included'}`;
-      return `<div style="display:flex;align-items:center;gap:${14*k}px"><span style="flex:none;width:${42*k}px;height:${42*k}px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:900 ${26*k}px ${EN};background:${y?G:'transparent'};color:${y?NV:T.sub};border:2px solid ${y?G:T.sub}">${y?'✓':'✗'}</span><span style="color:${y?T.tx:T.sub};font:700 ${28*k}px ${AR};${y?'':'text-decoration:line-through;text-decoration-thickness:1px'}">${esc(txt)}</span></div>`}).join('');
-    const grid=['cin','cout','ad','rm','rt','tm1','tm2','rf'].map(x=>cell(x,d[x])).join('');
-    const bigsz=Math.round(ts(P)*.74);
-    const head=`<div style="background:${T.hd};padding:${34*k}px ${40*k}px ${30*k}px;text-align:center">
-      <div style="color:${T.hdt};opacity:.92;font:700 ${26*k}px ${AR};letter-spacing:${isAr&&!both?0:1}px">${both?`${L.thanks[0]}<br><span style="font-family:${EN};direction:ltr;unicode-bidi:isolate;font-size:.92em">${L.thanks[1]}</span>`:esc(isAr?L.thanks[0]:L.thanks[1])}</div>
-      <div style="display:flex;align-items:baseline;justify-content:center;gap:${22*k}px;flex-wrap:wrap;margin-top:${14*k}px;color:${T.big}">${both?`<span style="font:900 ${bigsz}px/1.15 ${AR}">${L.conf[0]}</span><span style="font:700 ${Math.round(bigsz*.5)}px/1.2 ${EN};direction:ltr">${L.conf[1]}</span>`:`<span style="font:900 ${bigsz}px/1.15 ${isAr?AR:EN}">${isAr?L.conf[0]:L.conf[1]}</span>`}</div>
-      <div style="color:${T.hdt};opacity:.88;font:600 ${25*k}px ${AR};margin-top:${10*k}px">${both?`${L.glad[0]}<br><span style="font-family:${EN};direction:ltr;unicode-bidi:isolate;font-size:.92em">${L.glad[1]}</span>`:esc(isAr?L.glad[0]:L.glad[1])}</div></div>`;
-    const sep=`border-top:1.5px solid ${T.ln}`;
-    return{ov:d.design==='dahab'?'linear-gradient(rgba(12,40,64,.45),rgba(12,40,64,.6))':'linear-gradient(rgba(6,12,22,.55),rgba(6,12,22,.8))',
-    body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;max-width:${P.land?1200:940}px;background:${T.bg};border:${3}px solid ${T.bd};border-radius:${34*k}px;overflow:hidden;direction:${isAr?'rtl':'ltr'}">
-      ${head}
-      <div style="padding:${28*k}px ${40*k}px ${26*k}px;display:grid;grid-template-columns:1fr 1fr;gap:${18*k}px ${28*k}px">
-        ${cell('gn',d.gn,1)}${cell('dst',d.dst)}${cell('hotel',d.hotel)}${grid}
-      </div>
-      ${inc?`<div style="${sep};padding:${22*k}px ${40*k}px;display:flex;flex-wrap:wrap;gap:${16*k}px ${40*k}px">${inc}</div>`:''}
-      ${d.nt&&d.nt.trim()?`<div style="${sep};padding:${20*k}px ${40*k}px;color:${T.sub};font:600 ${25*k}px/1.55 ${AR}">${ml(d.nt)}</div>`:''}
-      <div style="${sep};padding:${18*k}px ${40*k}px;display:flex;justify-content:space-between;gap:${20*k}px;color:${T.sub};font:700 ${23*k}px ${EN};direction:ltr"><span>${esc(d.phone||'')}</span><span>${esc(d.web||'')}</span></div>
-    </div></div>`}}},
 
 review:{n:'رأي عميل',i:'⭐',f:['badge','stars','sub','who','c1','cta'],
   L:{sub:'💬 نص الرأي',c1:'✈️ الرحلة اللي سافرها'},
