@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Studio v23</title>
+<title>Nook Tours Studio v24</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -79,13 +79,14 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 </style>
 </head>
 <body>
-<div id="gate" style="position:fixed;inset:0;z-index:99999;background:#0C2840;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;direction:rtl">
- <form id="gateF" style="background:#123859;border:2px solid #BF8C4E;border-radius:16px;padding:28px 26px;width:min(340px,90vw);text-align:center;color:#fff;box-sizing:border-box">
-  <div style="font-weight:800;font-size:20px">Nook Tours Studio</div>
-  <div style="font-weight:600;font-size:13px;opacity:.8;margin:6px 0 16px">ادخل الباسورد</div>
-  <input id="gatePw" type="password" autocomplete="current-password" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #BF8C4E;background:#0C2840;color:#fff;font:700 16px Calibri,sans-serif;direction:ltr;text-align:center;box-sizing:border-box">
-  <button type="submit" style="margin-top:14px;width:100%;padding:10px;border:0;border-radius:10px;background:#BF8C4E;color:#0C2840;font:800 15px Cairo,sans-serif;cursor:pointer">دخول</button>
-  <div id="gateErr" style="min-height:20px;margin-top:10px;font-weight:700;font-size:13px;color:#F2C4A0"></div>
+<div id="gate" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px 20px;background:radial-gradient(120% 80% at 50% 0%,#12365a 0%,#0a2540 45%,#050d17 100%);font-family:'Cairo',system-ui,sans-serif;color:#fff;direction:rtl;box-sizing:border-box">
+ <div style="width:96px;height:96px;display:grid;place-items:center;padding:12px;box-sizing:border-box;background:#fff;border-radius:24px;box-shadow:0 24px 60px -16px rgba(0,0,0,.7)"><img id="gateLogo" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>
+ <form id="gateF" style="width:min(380px,100%);box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(217,184,156,.22);border-radius:20px;padding:26px;backdrop-filter:blur(6px);text-align:center">
+  <h1 style="margin:0 0 4px;font-size:1.4rem;font-weight:800">Nook Tours <span style="color:#d9b89c">Studio</span></h1>
+  <p style="margin:0 0 20px;font-size:.92rem;color:rgba(255,255,255,.6)">الاستوديو للإدارة فقط</p>
+  <input id="gatePw" type="password" autocomplete="current-password" placeholder="كلمة السر" aria-label="كلمة السر" style="width:100%;min-height:48px;padding:10px 14px;border-radius:12px;border:1px solid rgba(217,184,156,.3);background:rgba(255,255,255,.06);color:#fff;font:600 16px 'Cairo',sans-serif;text-align:center;box-sizing:border-box">
+  <button type="submit" style="margin-top:14px;width:100%;min-height:48px;border:0;border-radius:12px;background:linear-gradient(180deg,#d9b89c,#bf8450);color:#0C2840;font:800 16px 'Cairo',sans-serif;cursor:pointer">دخول</button>
+  <div id="gateErr" aria-live="polite" style="min-height:22px;margin-top:12px;font-weight:700;font-size:14px;color:#f2c4a0"></div>
  </form>
 </div>
 <div id="app">
@@ -101,7 +102,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v23</span></h1>
+    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v24</span></h1>
 
     <div class="sec">🖨️ مطبوعات الرحلة</div>
     <div class="grid">
@@ -1265,6 +1266,7 @@ function bind(){
  if(app)app.inert=true;
  async function hex(s){var d=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.prototype.map.call(new Uint8Array(d),function(x){return x.toString(16).padStart(2,'0')}).join('')}
  var f=document.getElementById('gateF'),inp=document.getElementById('gatePw'),err=document.getElementById('gateErr');
+ try{var gl=document.getElementById('gateLogo');if(gl&&typeof LOGO_SRC!=='undefined')gl.src=LOGO_SRC}catch(e){}
  inp.focus();
  f.addEventListener('submit',async function(e){
    e.preventDefault();
