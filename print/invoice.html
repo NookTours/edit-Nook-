@@ -252,12 +252,9 @@ function copyWA(){const t=$('#wa');if(!t.value)genWA();t.select();try{navigator.
 const API_URL='https://script.google.com/macros/s/AKfycbyCQpWtkJw3ta3mo9ii9SmB7xlcPoNu_eDUrYGoapvcOxKwMc2_cMQ1vPb6Urb9Ixqc/exec';
 function toast(m){const t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0C2840;color:#fff;padding:10px 18px;border-radius:10px;font:700 14px Cairo,sans-serif;z-index:90';document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
 async function api(action,payload){
- let user=sessionStorage.getItem('inv_user'),pw=sessionStorage.getItem('inv_pw');
- if(!user||!pw){user=prompt('اسم المستخدم');if(!user)return null;pw=prompt('الباسورد');if(!pw)return null;sessionStorage.setItem('inv_user',user);sessionStorage.setItem('inv_pw',pw)}
  let j;
- try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({user:user,pw:pw,action:action},payload))});j=await r.json()}
+ try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({action:action},payload))});j=await r.json()}
  catch(e){toast('مفيش اتصال بالشيت');return null}
- if(!j.ok&&j.error==='bad password'){sessionStorage.removeItem('inv_user');sessionStorage.removeItem('inv_pw');toast('اسم المستخدم أو الباسورد غلط');return null}
  if(!j.ok){toast('حصلت مشكلة: '+j.error);return null}
  return j;
 }
