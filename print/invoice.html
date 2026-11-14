@@ -92,6 +92,8 @@ td[contenteditable]{min-height:8mm}
 @media print{tr.empty{display:none!important}}
 .pdfing tr.empty{display:none!important}
 .pdfing{padding:0!important;direction:ltr!important}.pdfing .page{margin:0!important;box-shadow:none!important}
+@media screen and (max-width:820px){body{padding-left:0!important}.tb{position:relative!important;top:auto!important;left:auto!important;width:auto!important;max-height:none!important;overflow:visible!important;margin:8px}.page{zoom:.4;margin:6px auto!important}}
+.pdfing .page{zoom:1!important}
 @media screen{body{padding-left:225px}}
 @page{size:A4;margin:0}
 @media print{html,body{background:#fff;height:296mm;overflow:hidden}.page{margin:0;box-shadow:none;height:296.5mm}.noprint,.x,.add{display:none!important}[contenteditable]{outline:none!important}[data-ph]:empty:before{content:""}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
@@ -120,7 +122,7 @@ td[contenteditable]{min-height:8mm}
 </div>
 <div class="body" style="padding-top:4mm">
   <div class="grid2" style="grid-template-columns:1fr 1fr;gap:6mm">
-    <div class="guest" style="display:block"><div class="lb" data-k="billto"></div><div class="vl" id="fName" contenteditable data-ph="اسم العميل · Client name" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="phone"></div><div class="vl" contenteditable data-ph="01XXXXXXXXX"></div></div>
+    <div class="guest" style="display:block"><div class="lb" data-k="billto"></div><div class="vl" id="fName" contenteditable data-ph="اسم العميل · Client name" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="phone"></div><div class="vl" id="fPhone" contenteditable data-ph="01XXXXXXXXX"></div></div>
     <div class="guest" style="display:block"><div class="lb" data-k="trip"></div><div class="vl" id="fTrip" contenteditable data-ph="الوجهة · Destination" style="font-size:19px"></div><div class="lb" style="margin-top:2mm" data-k="dest"></div><div class="vl" contenteditable data-ph="00 / 00 / 0000 → 00 / 00 / 0000"></div></div>
   </div>
   <div class="msg" id="msg" contenteditable data-ph="..."></div>
@@ -245,6 +247,51 @@ function genWA(){const l=LANG==='en'?'en':'ar',nm=txt('#fName'),no=txt('#fNo');
  $('#wa').value=LANG==='both'?ar+'\n\n'+en:l==='en'?en:ar}
 function copyWA(){const t=$('#wa');if(!t.value)genWA();t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}const b=$('#cpb');b.textContent='اتنسخت';setTimeout(()=>b.textContent='انسخ',1500)}
 (location.hash||'').slice(1).split(',').forEach(x=>{if(DT[x])setType(x,true)});
+
+/* ===== حفظ واسترجاع الفواتير (Apps Script) ===== */
+const API_URL='https://script.google.com/macros/s/AKfycbyCQpWtkJw3ta3mo9ii9SmB7xlcPoNu_eDUrYGoapvcOxKwMc2_cMQ1vPb6Urb9Ixqc/exec';
+function toast(m){const t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0C2840;color:#fff;padding:10px 18px;border-radius:10px;font:700 14px Cairo,sans-serif;z-index:90';document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+async function api(action,payload){
+ let pw=sessionStorage.getItem('inv_pw');
+ if(!pw){pw=prompt('الباسورد');if(!pw)return null;sessionStorage.setItem('inv_pw',pw)}
+ let j;
+ try{const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(Object.assign({pw:pw,action:action},payload))});j=await r.json()}
+ catch(e){toast('مفيش اتصال بالشيت');return null}
+ if(!j.ok&&j.error==='bad password'){sessionStorage.removeItem('inv_pw');toast('الباسورد غلط');return null}
+ if(!j.ok){toast('حصلت مشكلة: '+j.error);return null}
+ return j;
+}
+async function saveInv(){
+ if(!txt('#fNo'))$('#fNo').textContent='INV-'+Date.now().toString(36).toUpperCase();
+ const data={id:txt('#fNo'),customer:txt('#fName'),phone:txt('#fPhone'),total:txt('#vTot'),status:txt('#stamp'),type:TYPE,st:stMode,html:page.innerHTML};
+ const j=await api('save',{data:data});if(j)toast('اتحفظت الفاتورة '+j.id);
+}
+async function openInv(id){
+ const j=await api('get',{id:id});if(!j)return;const d=j.data;
+ setType(d.type||'inv',true);
+ page.innerHTML=d.html;stMode=(d.st===undefined?-1:d.st);
+ $$('[data-dt]').forEach(b=>b.classList.toggle('on',b.dataset.dt===TYPE));
+ applyLang();closeList();toast('اتفتحت الفاتورة '+id);
+}
+function ensureBox(){if(document.getElementById('invBox'))return;const b=document.createElement('div');b.id='invBox';b.className='noprint';
+ b.style.cssText='position:fixed;inset:0;background:rgba(12,40,64,.55);display:none;align-items:center;justify-content:center;z-index:85;padding:16px';
+ b.innerHTML='<div style="background:#fff;border-radius:14px;width:min(460px,100%);max-height:86vh;overflow:auto;padding:16px;direction:rtl;font:700 14px Cairo,sans-serif;color:#0C2840"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="font-size:16px">الفواتير المحفوظة</b><button id="invClose" style="border:0;background:none;font:800 22px Cairo,sans-serif;cursor:pointer;color:#0C2840">×</button></div><div id="invList"></div></div>';
+ document.body.appendChild(b);
+ b.addEventListener('click',e=>{if(e.target===b||e.target.id==='invClose')closeList()});
+}
+function closeList(){const b=document.getElementById('invBox');if(b)b.style.display='none'}
+async function listInv(){
+ ensureBox();const j=await api('list',{});if(!j)return;
+ const L=document.getElementById('invList');L.textContent='';
+ if(!j.items.length)L.textContent='مفيش فواتير محفوظة لسه';
+ j.items.forEach(it=>{const row=document.createElement('button');
+  row.style.cssText='display:block;width:100%;text-align:right;padding:10px;margin-bottom:8px;border:1.5px solid #0C2840;border-radius:10px;background:#fff;cursor:pointer;font:700 14px Cairo,sans-serif;color:#0C2840';
+  row.textContent=String(it.id)+'  ·  '+String(it.customer||'—')+'  ·  '+String(it.total||'')+' EGP  ·  '+String(it.status||'');
+  row.onclick=()=>openInv(String(it.id));L.appendChild(row)});
+ document.getElementById('invBox').style.display='flex';
+}
+(function(){const tb=document.getElementById('tb');if(!tb)return;const g=document.createElement('div');g.className='g';
+ g.innerHTML='<button class="p" onclick="saveInv()">حفظ الفاتورة</button><button onclick="listInv()">الفواتير المحفوظة</button>';tb.insertBefore(g,tb.firstChild)})();
 calc();
 
 (location.hash||'').slice(1).split(',').forEach(x=>{if(['ar','en','both'].includes(x))LANG=x;if(['gen','dahab','sokhna','bw'].includes(x))page.dataset.th=x});
