@@ -56,6 +56,8 @@ function doPost(e) {
   if (!authed_(body.pw)) return out_({ ok: false, error: 'bad password' });
 
   var sh = sheet_();
+  // keep the phone column as text so numbers like 01005377933 keep their leading zero
+  sh.getRange(1, 4, sh.getMaxRows(), 1).setNumberFormat('@');
   var values = sh.getDataRange().getValues();
 
   if (body.action === 'list') {
