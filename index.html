@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Studio v24</title>
+<title>Nook Tours Studio v25</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -89,6 +89,40 @@ input[type=range]{width:100%;accent-color:var(--gold)}
   <div id="gateErr" aria-live="polite" style="min-height:22px;margin-top:12px;font-weight:700;font-size:14px;color:#f2c4a0"></div>
  </form>
 </div>
+<style>
+.hcard{display:flex;flex-direction:column;gap:12px;padding:22px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(217,184,156,.22);color:#fff;text-decoration:none;cursor:pointer;min-height:170px;transition:transform .15s,background .2s;text-align:start;font:inherit;width:100%}
+.hcard:hover,.hcard:focus-visible{background:rgba(255,255,255,.09);transform:translateY(-2px);outline:none;border-color:#d9b89c}
+.hcard .ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:26px;background:rgba(217,184,156,.14);border:1px solid rgba(217,184,156,.25)}
+.hcard b{font-size:1.15rem;font-weight:800}
+.hcard small{color:rgba(255,255,255,.62);font-size:.9rem;line-height:1.6}
+.hgrid{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:720px){.hgrid{grid-template-columns:repeat(3,1fr)}}
+.hback{background:none;border:0;color:rgba(255,255,255,.7);font:600 15px 'Cairo',sans-serif;cursor:pointer;padding:8px 4px;margin-bottom:14px}
+</style>
+<div id="hub" style="display:none;position:fixed;inset:0;z-index:99998;overflow:auto;padding:28px 20px 40px;box-sizing:border-box;background:radial-gradient(120% 80% at 50% 0%,#12365a 0%,#0a2540 45%,#050d17 100%);font-family:'Cairo',system-ui,sans-serif;color:#fff;direction:rtl">
+ <div style="max-width:920px;margin:0 auto">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px">
+   <div style="width:56px;height:56px;flex:none;display:grid;place-items:center;padding:8px;box-sizing:border-box;background:#fff;border-radius:16px"><img id="hubLogo" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>
+   <div><div style="font-weight:800;font-size:1.2rem">Nook Tours <span style="color:#d9b89c">Studio</span></div><div style="opacity:.6;font-size:.9rem">اختار اللي عايزه</div></div>
+  </div>
+  <div id="hubMain" class="hgrid">
+   <a class="hcard" href="print/invoice.html"><span class="ic">🧾</span><b>الفواتير</b><small>احفظ الفواتير وافتحها تاني من الموبايل أو الكمبيوتر</small></a>
+   <button class="hcard" type="button" onclick="showHubPrint()"><span class="ic">🖨️</span><b>المطبوعات</b><small>تأكيد الحجز، عرض السعر، حجز الباص، ترحيب، تقييم العميل</small></button>
+   <button class="hcard" type="button" onclick="hideHub()"><span class="ic">🎬</span><b>الاستوديو</b><small>تصميم الإعلانات والبوستات والريلز بالقوالب</small></button>
+  </div>
+  <div id="hubPrint" style="display:none">
+   <button class="hback" type="button" onclick="showHubMain()">← رجوع</button>
+   <div class="hgrid">
+    <a class="hcard" href="print/confirmation.html"><span class="ic">✅</span><b>تأكيد الحجز</b><small>خطاب تأكيد حجز بالعربي والإنجليزي</small></a>
+    <a class="hcard" href="print/offer.html"><span class="ic">💰</span><b>عرض السعر</b><small>عرض لأنواع الرحلات: داي يوز، إقامة، فان داي، عائلي، مدرسة</small></a>
+    <a class="hcard" href="print/bus.html"><span class="ic">🚌</span><b>حجز باص</b><small>حجز باص فقط مع الانطلاق والعودة والسائق</small></a>
+    <a class="hcard" href="print/invoice.html"><span class="ic">🧾</span><b>الفاتورة</b><small>فاتورة وإيصالات عربون ودفعات</small></a>
+    <a class="hcard" href="print/welcome-aboard.html"><span class="ic">🚍</span><b>ترحيب الرحلة</b><small>ورقة ترحيب وجدول الرحلة للعميل</small></a>
+    <a class="hcard" href="print/guest-review.html"><span class="ic">📝</span><b>تقييم العميل</b><small>استمارة تقييم بعد الرحلة</small></a>
+   </div>
+  </div>
+ </div>
+</div>
 <div id="app">
   <div class="mbar">
     <b>✏️ Nook Tours Studio</b>
@@ -102,7 +136,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v24</span></h1>
+    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v25</span> <button type="button" onclick="showHub()" style="float:left;background:none;border:1px solid var(--bd);color:var(--sub);border-radius:8px;padding:4px 10px;font:700 11px var(--ar);cursor:pointer">⌂ القائمة</button></h1>
 
     <div class="sec">🖨️ مطبوعات الرحلة</div>
     <div class="grid">
@@ -1260,7 +1294,14 @@ function bind(){
 (function(){
  var SALT='f93e791b4e301396c32f035371bdef68',HASH='92c880970cafb356f08969e21500bb4bcab21fc28ca8a3dc06a0ac2d8f58f7f3';
  var gate=document.getElementById('gate'),app=document.getElementById('app');
- function open(){if(app)app.inert=false;if(gate)gate.remove()}
+ var hub=document.getElementById('hub');
+ try{var hl=document.getElementById('hubLogo');if(hl&&typeof LOGO_SRC!=='undefined')hl.src=LOGO_SRC}catch(e){}
+ function showHub(){if(hub){hub.style.display='block';showHubMain()}}
+ function showHubMain(){document.getElementById('hubMain').style.display='';document.getElementById('hubPrint').style.display='none';hub.scrollTop=0}
+ function showHubPrint(){document.getElementById('hubMain').style.display='none';document.getElementById('hubPrint').style.display='';hub.scrollTop=0}
+ function hideHub(){if(hub)hub.style.display='none'}
+ window.showHub=showHub;window.hideHub=hideHub;window.showHubMain=showHubMain;window.showHubPrint=showHubPrint;window.hideHub=hideHub;
+ function open(){if(app)app.inert=false;if(gate)gate.remove();showHub()}
  var saved=null;try{saved=sessionStorage.getItem('nt_gate')}catch(e){}
  if(saved===HASH){open();return}
  if(app)app.inert=true;
