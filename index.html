@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Studio v25</title>
+<title>Nook Tours Templates v26</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -82,8 +82,8 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 <div id="gate" style="position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px 20px;background:radial-gradient(120% 80% at 50% 0%,#12365a 0%,#0a2540 45%,#050d17 100%);font-family:'Cairo',system-ui,sans-serif;color:#fff;direction:rtl;box-sizing:border-box">
  <div style="width:96px;height:96px;display:grid;place-items:center;padding:12px;box-sizing:border-box;background:#fff;border-radius:24px;box-shadow:0 24px 60px -16px rgba(0,0,0,.7)"><img id="gateLogo" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>
  <form id="gateF" style="width:min(380px,100%);box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(217,184,156,.22);border-radius:20px;padding:26px;backdrop-filter:blur(6px);text-align:center">
-  <h1 style="margin:0 0 4px;font-size:1.4rem;font-weight:800">Nook Tours <span style="color:#d9b89c">Studio</span></h1>
-  <p style="margin:0 0 20px;font-size:.92rem;color:rgba(255,255,255,.6)">الاستوديو للإدارة فقط</p>
+  <h1 style="margin:0 0 4px;font-size:1.4rem;font-weight:800">Nook Tours <span style="color:#d9b89c">Templates</span></h1>
+  <p style="margin:0 0 20px;font-size:.92rem;color:rgba(255,255,255,.6)">Templates · للإدارة فقط</p>
   <input id="gatePw" type="password" autocomplete="current-password" placeholder="كلمة السر" aria-label="كلمة السر" style="width:100%;min-height:48px;padding:10px 14px;border-radius:12px;border:1px solid rgba(217,184,156,.3);background:rgba(255,255,255,.06);color:#fff;font:600 16px 'Cairo',sans-serif;text-align:center;box-sizing:border-box">
   <button type="submit" style="margin-top:14px;width:100%;min-height:48px;border:0;border-radius:12px;background:linear-gradient(180deg,#d9b89c,#bf8450);color:#0C2840;font:800 16px 'Cairo',sans-serif;cursor:pointer">دخول</button>
   <div id="gateErr" aria-live="polite" style="min-height:22px;margin-top:12px;font-weight:700;font-size:14px;color:#f2c4a0"></div>
@@ -103,14 +103,21 @@ input[type=range]{width:100%;accent-color:var(--gold)}
  <div style="max-width:920px;margin:0 auto">
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px">
    <div style="width:56px;height:56px;flex:none;display:grid;place-items:center;padding:8px;box-sizing:border-box;background:#fff;border-radius:16px"><img id="hubLogo" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>
-   <div><div style="font-weight:800;font-size:1.2rem">Nook Tours <span style="color:#d9b89c">Studio</span></div><div style="opacity:.6;font-size:.9rem">اختار اللي عايزه</div></div>
+   <div><div style="font-weight:800;font-size:1.2rem">Nook Tours <span style="color:#d9b89c">Templates</span></div><div style="opacity:.6;font-size:.9rem">اختار اللي عايزه</div></div>
   </div>
   <div id="hubMain" class="hgrid">
-      <button class="hcard" type="button" onclick="showHubPrint()"><span class="ic">🖨️</span><b>المطبوعات</b><small>تأكيد الحجز، عرض السعر، حجز الباص، ترحيب، تقييم العميل</small></button>
-   <button class="hcard" type="button" onclick="hideHub()"><span class="ic">🎬</span><b>الاستوديو</b><small>تصميم الإعلانات والبوستات والريلز بالقوالب</small></button>
+      <button class="hcard" type="button" onclick="showHubPrint()"><span class="ic">🖨️</span><b>المطبوعات</b><small>عرض سعر، تأكيد حجز بعربون، تأكيد حجز مدفوع بالكامل، ومستندات تانية</small></button>
+   <button class="hcard" type="button" onclick="hideHub()"><span class="ic">🎬</span><b>Templates</b><small>تصميم الإعلانات والبوستات والريلز بالقوالب</small></button>
   </div>
   <div id="hubPrint" style="display:none">
    <button class="hback" type="button" onclick="showHubMain()">← رجوع</button>
+   <div style="font-weight:800;color:#d9b89c;margin:0 0 10px">Main documents</div>
+   <div class="hgrid">
+    <a class="hcard" href="print/quotation.html"><span class="ic">📄</span><b>Quotation</b><small>عرض سعر احترافي للعميل بالأسعار والعربون المطلوب</small></a>
+    <a class="hcard" href="print/confirmation-deposit.html"><span class="ic">✅</span><b>Booking Confirmation · Deposit</b><small>تأكيد حجز باستلام عربون، مع المتبقي وميعاد السداد</small></a>
+    <a class="hcard" href="print/confirmation-paid.html"><span class="ic">💳</span><b>Booking Confirmation · Fully Paid</b><small>تأكيد حجز مدفوع بالكامل، بدون أي متبقي</small></a>
+   </div>
+   <div style="font-weight:800;color:#d9b89c;margin:26px 0 10px">Other documents</div>
    <div class="hgrid">
     <a class="hcard" href="print/confirmation.html"><span class="ic">✅</span><b>تأكيد الحجز</b><small>خطاب تأكيد حجز بالعربي والإنجليزي</small></a>
     <a class="hcard" href="print/offer.html"><span class="ic">💰</span><b>عرض السعر</b><small>عرض لأنواع الرحلات: داي يوز، إقامة، فان داي، عائلي، مدرسة</small></a>
@@ -123,7 +130,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 </div>
 <div id="app">
   <div class="mbar">
-    <b>✏️ Nook Tours Studio</b>
+    <b>✏️ Nook Tours Templates</b>
     <div>
       <button type="button" onclick="exportPNG()">PNG</button>
       <button type="button" id="mbVid" style="display:none" onclick="exportVideo()">🎬</button>
@@ -134,10 +141,13 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
   <aside class="sb" id="sb">
     <button class="x" type="button" onclick="side(0)">✕</button>
-    <h1>✏️ Nook Tours Studio <span style="font:700 10px var(--en);opacity:.7">v25</span> <button type="button" onclick="showHub()" style="float:left;background:none;border:1px solid var(--bd);color:var(--sub);border-radius:8px;padding:4px 10px;font:700 11px var(--ar);cursor:pointer">⌂ القائمة</button></h1>
+    <h1>✏️ Nook Tours Templates <span style="font:700 10px var(--en);opacity:.7">v26</span> <button type="button" onclick="showHub()" style="float:left;background:none;border:1px solid var(--bd);color:var(--sub);border-radius:8px;padding:4px 10px;font:700 11px var(--ar);cursor:pointer">⌂ القائمة</button></h1>
 
     <div class="sec">🖨️ مطبوعات الرحلة</div>
     <div class="grid">
+      <a class="tb" href="print/quotation.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">📄 Quotation</a>
+      <a class="tb" href="print/confirmation-deposit.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">✅ Confirmation · Deposit</a>
+      <a class="tb" href="print/confirmation-paid.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">💳 Confirmation · Paid</a>
       <a class="tb" href="print/welcome-aboard.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">🚌 Welcome Aboard</a>
       <a class="tb" href="print/guest-review.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">📝 Guest Review</a>
       <a class="tb" href="print/confirmation.html" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;display:block">✅ تأكيد حجز</a>
@@ -633,6 +643,68 @@ offer:{n:'كارت عرض',i:'🎫',f:['badge','title','sub','pfrom','price','cu
         <div style="text-align:center;flex:1;min-width:${P.land?200:300}px">${d.cta?cta(d.cta,`font-size:${SZ(36*k,'cta')}px;padding:${16*k}px ${40*k}px`):''}<div style="margin-top:${12*k}px">${contact(d,'center')}</div></div>
       </div></div>`}}},
 
+/* ===== 4 قوالب جديدة: كارت فندق، مواعيد الرحلات، مقارنة وجهتين، خطوات الحجز (نفس الهوية: كحلي وذهبي وCairo/Montserrat) ===== */
+spot:{n:'كارت فندق',i:'🏨',f:['badge','title','c1','c2','c3','inc','pfrom','price','cur','cta'],
+  L:{title:'🏨 اسم الفندق',c1:'📍 الموقع',c2:'🍽 الإقامة (الوجبات)',c3:'🗓 المدة',inc:'✅ المميزات (سطر لكل ميزة)',pfrom:'نص قبل السعر',cur:'العملة / الوحدة'},
+  d:{badge:'عرض فندق',title:'عايدة شرم أكوا بارك',c1:'الهضبة، شرم الشيخ',c2:'فطار + عشاء',c3:'4 أيام / 3 ليالي',inc:'الإقامة 4 أيام 3 ليالي\nالانتقالات\nفطار + عشاء',pfrom:'للفرد',price:'3,950',cur:'ج.م',cta:'احجز الآن'},
+  r:(d,P)=>{const col=C(),k=P.land?.82:P.tall?1.1:P.sq?.84:1;
+    const chips=[d.c1,d.c2,d.c3].filter(Boolean).map(x=>`<span style="display:inline-block;padding:${8*k}px ${20*k}px;border-radius:40px;background:#fff;border:2px solid ${G};color:${NV};font:700 ${SZ(23*k,'sub')}px ${AR};white-space:nowrap">${esc(x)}</span>`).join('');
+    const feats=lines(d.inc).slice(0,4).map(x=>`<div style="display:flex;align-items:center;gap:${14*k}px;color:${NV};font:700 ${SZ(26*k,'sub')}px ${AR}"><span style="flex:none;width:${34*k}px;height:${34*k}px;border-radius:50%;background:${NV};color:${G2};display:grid;place-items:center;font:900 ${19*k}px ${EN}">✓</span><span>${esc(x)}</span></div>`).join('');
+    const pr=d.price?`<div style="flex:none;text-align:center;background:${NV};border-radius:${26*k}px;padding:${14*k}px ${30*k}px"><div style="color:${G2};font:700 ${22*k}px ${AR}">${esc(d.pfrom)}</div><div style="color:${G2};font:900 ${SZ(72*k,'title')}px/1.05 ${AR}">${esc(d.price)}</div><div style="color:#fff;font:700 ${22*k}px ${AR}">${esc(d.cur)}</div></div>`:'';
+    return{ov:'linear-gradient(rgba(6,12,22,.05) 45%,rgba(6,12,22,.5))',body:`<div style="${dock(P,P.land?940:null)}"><div style="background:#F2F2F2;border-radius:${40*k}px;padding:${34*k}px ${42*k}px ${38*k}px;box-shadow:0 24px 60px rgba(0,0,0,.45);border-top:${8*k}px solid ${G}">${d.badge?`<div style="display:inline-block;background:${NV};color:${G2};font:800 ${SZ(24*k,'badge')}px ${AR};padding:${8*k}px ${26*k}px;border-radius:40px;margin-bottom:${14*k}px">${esc(d.badge)}</div>`:''}
+      <div style="color:${NV};font:900 ${SZ(ts(P)*.86,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:${10*k}px;margin:${16*k}px 0 ${18*k}px">${chips}</div>
+      <div style="display:grid;grid-template-columns:${P.land||P.sq?'1fr 1fr':'1fr'};gap:${10*k}px ${24*k}px;margin-bottom:${22*k}px">${feats}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:${20*k}px">${pr}<div style="text-align:center">${cta(d.cta,`font-size:${SZ(32*k,'cta')}px;padding:${16*k}px ${38*k}px`)}<div style="margin-top:${10*k}px">${contact(d,'center',NV,'#475569')}</div></div></div></div></div>`}}},
+
+calendar:{n:'مواعيد الرحلات',i:'📅',f:['badge','title','sub','c1','c2','pfrom','price','cur','cta'],
+  L:{c1:'📅 الشهر والسنة (مثال: ديسمبر 2026)',c2:'🗓 أيام الرحلات (مثال: 4, 11, 18, 25)',sub:'💬 ملاحظة تحت التقويم',pfrom:'نص قبل السعر',cur:'العملة / الوحدة'},
+  d:{badge:'مواعيد الرحلات',title:'مواعيد الرحلات القادمة',sub:'اكتب هنا وجهة الرحلة وشامل إيه',c1:'ديسمبر 2026',c2:'4, 11, 18, 25',pfrom:'يبدأ من',price:'0,000',cur:'ج.م / للفرد',cta:'احجز مكانك'},
+  r:(d,P)=>{const col=C(),k=P.land?.74:P.tall?1.08:P.sq?.74:.9;
+    const nz=s=>String(s||'').replace(/[أإآ]/g,'ا').replace(/[٠-٩]/g,x=>'٠١٢٣٤٥٦٧٨٩'.indexOf(x)),MN=['يناير','فبراير','مارس','ابريل','مايو','يونيو','يوليو','اغسطس','سبتمبر','اكتوبر','نوفمبر','ديسمبر'];
+    const t=nz(d.c1),now=new Date(),y=+((t.match(/\d{4}/)||[now.getFullYear()])[0]);let m=MN.findIndex(n=>t.includes(n));
+    if(m<0){const q=t.match(/(\d{1,2})\s*[\/\-]/);m=q?Math.min(11,Math.max(0,+q[1]-1)):now.getMonth()}
+    const sel=new Set((nz(d.c2).match(/\d{1,2}/g)||[]).map(Number)),nd=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+1)%7;
+    const WD=['سبت','أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة'];
+    let cells='';for(let i=0;i<off;i++)cells+='<div></div>';
+    for(let n=1;n<=nd;n++){const on=sel.has(n);cells+=`<div style="display:grid;place-items:center;height:${66*k}px"><span style="display:grid;place-items:center;width:${58*k}px;height:${58*k}px;border-radius:50%;${on?`background:linear-gradient(135deg,${G2},${G});color:${NV};box-shadow:0 6px 18px rgba(191,140,78,.45)`:'color:rgba(255,255,255,.78)'};font:${on?900:600} ${30*k}px ${EN}">${n}</span></div>`}
+    const head=WD.map(w=>`<div style="text-align:center;color:${G2};font:700 ${22*k}px ${AR};padding-bottom:${8*k}px">${w}</div>`).join('');
+    return{ov:'linear-gradient(rgba(6,12,22,.7),rgba(6,12,22,.84))',body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;max-width:${P.land?1100:960}px;${glass};border-radius:${40*k}px;padding:${34*k}px ${40*k}px;direction:rtl">
+      ${badge(d,`margin-bottom:${14*k}px`)}<div style="color:${col.title};font:900 ${SZ(ts(P)*.82,'title')}px/1.2 ${AR}">${ml(d.title)}</div>
+      <div style="display:flex;align-items:center;gap:${14*k}px;margin:${18*k}px 0 ${12*k}px"><span style="color:#fff;font:800 ${SZ(38*k,'sub')}px ${AR}">${esc(d.c1)}</span><span style="flex:1;height:2px;background:rgba(191,140,78,.5)"></span></div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr)">${head}${cells}</div>
+      <div style="display:flex;align-items:center;gap:${10*k}px;margin-top:${8*k}px;color:rgba(255,255,255,.75);font:600 ${22*k}px ${AR}"><span style="width:${18*k}px;height:${18*k}px;border-radius:50%;background:${G}"></span>ميعاد الرحلة</div>
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(26*k,'sub')}px/1.6 ${AR};margin-top:${14*k}px">${ml(d.sub)}</div>`:''}
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:${20*k}px;margin-top:${20*k}px">${priceBox(d,Math.round(64*k))}<div style="text-align:center">${cta(d.cta,`font-size:${SZ(30*k,'cta')}px;padding:${15*k}px ${34*k}px`)}<div style="margin-top:${10*k}px">${contact(d,'center')}</div></div></div></div></div>`}}},
+
+split:{n:'مقارنة وجهتين',i:'🆚',f:['badge','title','sub','rows','cur','cta'],
+  L:{rows:'📋 سطرين: الوجهة | التفاصيل | السعر',sub:'💬 ملاحظة تحت',cur:'العملة / الوحدة'},
+  d:{badge:'اختار وجهتك',title:'مين اختيارك؟',sub:'',rows:'الوجهة الأولى | عدد الأيام | 0,000\nالوجهة التانية | عدد الأيام | 0,000',cur:'ج.م / للفرد',cta:'احجز الآن'},
+  r:(d,P)=>{const col=C(),k=P.land?.8:P.tall?1.04:P.sq?.82:1;
+    const rs=lines(d.rows).slice(0,2).map(x=>{const p=x.split('|').map(s=>s.trim());return{n:p[0]||'',t:p[1]||'',p:p[2]||''}});
+    const pane=(r,i)=>{const gd=i===1,bg=gd?`linear-gradient(150deg,${G2},${G})`:'linear-gradient(160deg,rgba(8,14,24,.93),rgba(12,22,38,.9))',tc=gd?NV:'#fff',pc=gd?NV:G2;
+      return `<div style="flex:1;min-width:0;background:${bg};border:2px solid rgba(191,140,78,.55);border-radius:${36*k}px;padding:${34*k}px ${30*k}px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:${8*k}px"><div style="color:${tc};font:900 ${SZ(50*k,'title')}px/1.2 ${AR}">${esc(r.n)}</div><div style="color:${gd?'#1b3a55':'#c8e6f5'};font:600 ${SZ(28*k,'sub')}px ${AR}">${esc(r.t)}</div>${r.p?`<div style="color:${pc};font:900 ${SZ(76*k,'title')}px/1.1 ${AR};margin-top:${6*k}px">${esc(r.p)}</div><div style="color:${tc};font:700 ${22*k}px ${AR}">${esc(d.cur)}</div>`:''}</div>`};
+    return{ov:'linear-gradient(rgba(6,12,22,.68),rgba(6,12,22,.82))',body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;direction:rtl;text-align:center">
+      ${badge(d,`margin-bottom:${14*k}px`)}<div style="color:${col.title};font:900 ${SZ(ts(P),'title')}px/1.2 ${AR};margin-bottom:${24*k}px">${ml(d.title)}</div>
+      <div style="position:relative;display:flex;flex-direction:${P.land?'row':'column'};gap:${P.land?36*k:28*k}px;direction:rtl">${rs.map(pane).join('')}
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:${96*k}px;height:${96*k}px;border-radius:50%;background:#fff;border:${5*k}px solid ${G};display:grid;place-items:center;color:${NV};font:900 ${34*k}px ${EN};box-shadow:0 10px 30px rgba(0,0,0,.4)">VS</div></div>
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(28*k,'sub')}px/1.6 ${AR};margin-top:${20*k}px">${ml(d.sub)}</div>`:''}
+      <div style="margin-top:${26*k}px">${cta(d.cta,`font-size:${SZ(32*k,'cta')}px;padding:${16*k}px ${40*k}px`)}<div style="margin-top:${12*k}px">${contactRow(d)}</div></div></div></div>`}}},
+
+steps:{n:'خطوات الحجز',i:'🧭',f:['badge','title','sub','rows','cta'],
+  L:{rows:'📋 كل سطر خطوة: العنوان | الشرح',sub:'💬 ملاحظة تحت'},
+  d:{badge:'طريقة الحجز',title:'احجز رحلتك في 3 خطوات',sub:'',rows:'اختار الفندق والمواعيد | ابعتلنا الوجهة وعدد الأفراد\nادفع العربون | عشان نثبّت حجزك\nاستلم تأكيد الحجز | بكل تفاصيل رحلتك',cta:'ابدأ الحجز'},
+  r:(d,P)=>{const col=C(),k=P.land?.78:P.tall?1.12:P.sq?.82:1,sz=84*k;
+    const st=lines(d.rows).slice(0,4).map(x=>{const p=x.split('|').map(s=>s.trim());return{t:p[0]||'',s:p[1]||''}});
+    const rows=st.map((r,i)=>`<div style="position:relative;display:flex;align-items:flex-start;gap:${28*k}px;padding-bottom:${i<st.length-1?34*k:0}px">${i<st.length-1?`<div style="position:absolute;right:${sz/2-1.5}px;top:${sz}px;bottom:0;width:3px;background:rgba(191,140,78,.5)"></div>`:''}
+      <div style="flex:none;width:${sz}px;height:${sz}px;border-radius:50%;background:linear-gradient(135deg,${G2},${G});color:${NV};display:grid;place-items:center;font:900 ${44*k}px ${EN};box-shadow:0 8px 22px rgba(191,140,78,.4);position:relative">${i+1}</div>
+      <div style="padding-top:${6*k}px"><div style="color:#fff;font:900 ${SZ(40*k,'title')}px/1.25 ${AR}">${esc(r.t)}</div>${r.s?`<div style="color:${col.sub};font:500 ${SZ(28*k,'sub')}px/1.5 ${AR};margin-top:${4*k}px">${esc(r.s)}</div>`:''}</div></div>`).join('');
+    return{ov:'linear-gradient(rgba(6,12,22,.7),rgba(6,12,22,.84))',body:`<div style="position:absolute;left:${P.pad}px;right:${P.pad}px;top:${P.top+logoSpace(20)}px;bottom:${P.bot}px;display:flex;align-items:center;justify-content:center"><div style="width:100%;max-width:${P.land?1200:960}px;direction:rtl">
+      ${badge(d,`margin-bottom:${14*k}px`)}<div style="color:${col.title};font:900 ${SZ(ts(P),'title')}px/1.2 ${AR};margin-bottom:${30*k}px">${ml(d.title)}</div>
+      ${rows}
+      ${d.sub?`<div style="color:${col.sub};font:500 ${SZ(28*k,'sub')}px/1.6 ${AR};margin-top:${22*k}px">${ml(d.sub)}</div>`:''}
+      <div style="margin-top:${32*k}px;display:flex;align-items:center;justify-content:space-between;gap:${20*k}px;flex-wrap:wrap">${cta(d.cta,`font-size:${SZ(32*k,'cta')}px;padding:${16*k}px ${40*k}px`)}<div>${contact(d,'right')}</div></div></div></div>`}}},
+
 review:{n:'رأي عميل',i:'⭐',f:['badge','stars','sub','who','c1','cta'],
   L:{sub:'💬 نص الرأي',c1:'✈️ الرحلة اللي سافرها'},
   d:{badge:'⭐ رأي عميل',stars:'⭐⭐⭐⭐⭐',sub:'"التنظيم كان ممتاز والبرنامج مظبوط — رجعت مبسوط ومش هسافر غير مع Nook Tours 🙏"',who:'أحمد محمد',c1:'رحلة شرم الشيخ',cta:'احجز رحلتك دلوقتي',reviewMode:'text',reviewImage:''},
@@ -662,6 +734,11 @@ after:{n:'صور بعد الرحلة',i:'📸',f:['badge','title','sub','who','c
       <div style="margin-top:16px">${contactRow(d)}</div>
     </div>`}}}
 };
+/* أسعار الغردقة والسخنة كقوالب لوحدها جنب شرم: نفس قالب الفنادق بأسعارها جاهزة، وكل سطر يتعدل من خانة "الأسعار" */
+(()=>{const mk=(n,i,p)=>Object.assign({},TPL.hotels,{n,i,d:Object.assign({},HOTEL_PRESETS[p],{preset:p,cta:'احجز الآن',page:'all',bgMode:'auto'})}),
+ extra=[['hotels_hurghada',mk('أسعار الغردقة','🐠','hurghada')],['hotels_sokhna',mk('أسعار السخنة','🌊','sokhna')]];
+ TPL.hotels.n='أسعار شرم';TPL.hotels.i='🏖';
+ const ent=Object.entries(TPL);ent.forEach(([k])=>delete TPL[k]);ent.forEach(([k,v])=>{TPL[k]=v;if(k==='hotels')extra.forEach(([a,b])=>{TPL[a]=b})})})();
 
 const FL={gn:['👤 اسم الضيف','t'],dst:['📍 الوجهة (اختياري)','t'],hotel:['🏨 الفندق (اختياري)','t'],cin:['📅 تسجيل الدخول (Check-in)','t'],cout:['📅 تسجيل الخروج (Check-out)','t'],ad:['👥 عدد البالغين','t'],rm:['🛏️ عدد الغرف','t'],rt:['🛏️ نوع الغرفة (اختياري)','t'],tm1:['🚐 موعد الانتقالات (اختياري)','t'],tm2:['🕒 موعد التحرك (اختياري)','t'],rf:['🔖 رقم الحجز (اختياري)','t'],nt:['📝 ملاحظة تحت (اختياري)','a'],stats:['📊 الأرقام (افصل بينها بـ ·)','t'],badge:['🏷️ الشارة','t'],title:['📝 العنوان','a'],sub:['💬 التفاصيل','a'],c1:['📌 سطر مميز 1','t'],c2:['📌 سطر مميز 2','t'],c3:['📌 سطر مميز 3','t'],inc:['✅ المميزات (سطر لكل ميزة)','a'],rows:['📋 الأسعار','a'],pfrom:['نص قبل السعر','t'],price:['💰 السعر','t'],cur:['العملة / الوحدة','t'],old:['السعر القديم (اختياري)','t'],disc:['نسبة الخصم (اختياري)','t'],who:['👤 اسم العميل','t'],stars:['⭐ التقييم','s'],cta:['🔵 نص الزر','t'],
  /* تحكم بالسلايدر ('r': الحد الأدنى، الأقصى، الخطوة، الافتراضي) وتحميل لوجو ('g') */
