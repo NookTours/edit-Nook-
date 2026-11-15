@@ -512,10 +512,13 @@ urgency:{n:'عرض عاجل + واتساب',i:'⚡',f:['badge','title','c1','c2'
       <div style="color:${col.title};font:900 ${SZ(ts(P)-6,'title')}px/1.2 ${AR};margin-top:${20*k}px;text-shadow:0 4px 22px rgba(0,0,0,.5)">${ml(d.title)}</div>
       ${chat}${priceBox}<div>${sticker}</div></div></div>`}}},
 
-pricelist:{n:'قائمة أسعار',i:'📋',f:['badge','title','sub','rows','cur','cta'],
-  L:{sub:'💬 ملاحظة أسفل القائمة',rows:'📋 الاسم | السعر (سطر لكل بند)'},
-  d:{badge:'أسعار الرحلات',title:'قائمة أسعار الرحلات',sub:'الأسعار للفرد — اكتب هنا اللي شامله السعر',rows:'الوجهة الأولى — عدد الأيام | 0,000\nالوجهة التانية — عدد الأيام | 0,000\nالوجهة التالتة — عدد الأيام | 0,000\nالوجهة الرابعة — عدد الأيام | 0,000',cur:'ج.م',cta:'احجز مكانك'},
+pricelist:{n:'قائمة أسعار',i:'📋',f:['badge','title','c1','sub','rows','cur','cta'],
+  modes:[{key:'preset',label:'جاهز: اختار الوجهة (بتحمّل فنادقها وتتعدّل)',opts:[['trips','📋 رحلات'],['sharm','🏖 شرم الشيخ'],['hurghada','🐠 الغردقة'],['sokhna','🌊 العين السخنة']],presets:Object.assign({trips:{badge:'أسعار الرحلات',title:'قائمة أسعار الرحلات',c1:'',sub:'الأسعار للفرد — اكتب هنا اللي شامله السعر',cur:'ج.م',rows:'الوجهة الأولى — عدد الأيام | 0,000\nالوجهة التانية — عدد الأيام | 0,000\nالوجهة التالتة — عدد الأيام | 0,000\nالوجهة الرابعة — عدد الأيام | 0,000'}},HOTEL_PRESETS)},{key:'page',label:'الصفحات (لو الفنادق كتير)',opts:[['all','📄 الكل'],['1','① النص الأول'],['2','② النص التاني']]},{key:'bgMode',label:'الخلفية',opts:[['auto','🖼️ الصورة لو فيه'],['solid','⬛ كحلي سادة']]}],
+  L:{sub:'💬 ملاحظة أسفل القائمة',c1:'📅 الفترة (اختياري)',rows:'📋 الرحلات: الاسم | السعر. الفنادق: الفندق | الموقع | الإقامة | السعر (أو الفندق | السعر بس)'},
+  d:{badge:'أسعار الرحلات',title:'قائمة أسعار الرحلات',sub:'الأسعار للفرد — اكتب هنا اللي شامله السعر',rows:'الوجهة الأولى — عدد الأيام | 0,000\nالوجهة التانية — عدد الأيام | 0,000\nالوجهة التالتة — عدد الأيام | 0,000\nالوجهة الرابعة — عدد الأيام | 0,000',c1:'',cur:'ج.م',cta:'احجز مكانك',preset:'trips',page:'all',bgMode:'auto'},
   r:(d,P)=>{const col=C(),max=P.tall?7:(P.sq||P.land)?4:6;
+    /* قوايم الفنادق (شرم/الغردقة/السخنة) أو أي قايمة طويلة: بتتعرض بجدول الفنادق عشان كل الصفوف تبان */
+    const RL=lines(d.rows);if((d.preset&&d.preset!=='trips')||RL.length>max||RL.some(x=>x.split('|').length>2))return TPL.hotels.r(d,P);
     const rows=lines(d.rows).slice(0,max).map(x=>{const i=x.lastIndexOf('|'),a=i<0?x:x.slice(0,i).trim(),b=i<0?'':x.slice(i+1).trim();
       return `<div style="display:flex;align-items:baseline;gap:14px;padding:13px 0;border-bottom:2px dashed rgba(191,140,78,.3)"><span style="color:#fff;font:700 ${SZ(34,'sub')}px ${AR}">${esc(a)}</span><span style="flex:1"></span><span style="color:${col.title};font:900 ${SZ(44,'title')}px ${AR}">${esc(b)}</span><span style="color:${col.badge};font:700 24px ${AR}">${esc(b?d.cur:'')}</span></div>`}).join('');
     return{ov:`linear-gradient(rgba(6,12,22,.6),rgba(6,12,22,.35) 50%,rgba(6,12,22,.7))`,body:`<div style="${dock(P)};${glass};border-radius:44px;padding:${P.sq?30:42}px 48px">${badge(d,'margin-bottom:14px')}<div style="color:${col.title};font:900 ${SZ(ts(P)-14,'title')}px/1.25 ${AR}">${ml(d.title)}</div><div style="margin:10px 0 6px">${rows}</div>${d.sub?`<div style="color:${col.sub};font:500 ${SZ(26,'sub')}px/1.5 ${AR};margin:14px 0 18px">${ml(d.sub)}</div>`:''}
