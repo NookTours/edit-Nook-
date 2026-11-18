@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Templates v33</title>
+<title>Nook Tours Templates v34</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -999,7 +999,7 @@ const SPL={logoIn:1,ring1:.5,ring2:1.7,ringP:2.4,ringGrow:1.3,words1:.9,step1:.1
   logoK:.3,baseLogo:148};
 const SPLASH_FONT='Manrope, "Readex Pro", sans-serif',SPLASH_BG={light:'#f5f5f7',dark:'#0C2840'},RING_C='rgba(191,132,80,.55)',BAR_C='#BF8450';
 const MUXER_URL='https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.min.js';
-const AVC_CODECS=['avc1.640033','avc1.4d0033','avc1.420033'],ENC_BPP=.25,ENC_MAX=50e6,ENC_QUEUE=8,GOP_SEC=2;
+const AVC_CODECS=['avc1.640033','avc1.4d0033','avc1.420033'],ENC_BPP=.13,ENC_MAX=22e6,ENC_QUEUE=8,GOP_SEC=2;
 function bez(x1,y1,x2,y2){const a=(p,q)=>1-3*q+3*p,b=(p,q)=>3*q-6*p,c=p=>3*p,
   f=(t,p,q)=>((a(p,q)*t+b(p,q))*t+c(p))*t,df=(t,p,q)=>3*a(p,q)*t*t+2*b(p,q)*t+c(p);
   return x=>{if(x<=0)return 0;if(x>=1)return 1;let t=x;
@@ -1078,6 +1078,10 @@ async function prepAnim(q){const P=geo(),W=even(P.W*q),H=even(P.H*q);let rect=nu
   const Ls=Math.round(Math.min(W,H)*SPL.logoK);
   return{W,H,ov,rect,sc,Ls,u:Ls/SPL.baseLogo,logo:LOGO_IMG,dur:+$('aDur').value||8,dark:$('aTheme').value==='dark',d:curData()}}
 
+/* رسالة التقدم: النسبة + الوقت الفاضل (الفيديو الطويل بياخد دقايق) */
+function progFn(label){const t0=Date.now();return p=>{
+  const el=(Date.now()-t0)/1000,left=p>4?Math.round(el*(100-p)/p):0;
+  busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`+(left?` · فاضل ${left>90?Math.ceil(left/60)+' دقيقة':left+' ثانية'}`:'')+' — سيب الصفحة مفتوحة',p)}}
 let AP=null;
 function stopAnim(){if(AP){cancelAnimationFrame(AP.raf);AP=null}const c=$('acv');if(c)c.style.display='none'}
 async function playAnim(){stopAnim();if(!TPL[S.tpl].anim)return;const tok={};AP={raf:0,tok};
@@ -1174,7 +1178,7 @@ async function exportAnim(){side(0);stopAnim();const P=geo(),q=+$('vq').value,fp
   busy('جاري تجهيز الأنيميشن…',0);
   try{const A=await prepAnim(q),label=`${Math.min(A.W,A.H)>=1000?'1080p':'720p'} · ${fps}fps`;
     let blob=null;
-    if(window.VideoEncoder&&window.VideoFrame){blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p))}
+    if(window.VideoEncoder&&window.VideoFrame){blob=await encodeVerified(A,fps,progFn(label))}
     if(!blob){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome حديث');
       blob=await recordRealtime(A,fps,p=>busy(`جاري تسجيل الفيديو (${label})… ${Math.round(Math.min(99,p))}% — خليك في الصفحة`,Math.min(99,p)))}
     busy(0);Object.assign(LASTX,{mode:'أنيميشن فريم بفريم',want:+A.dur.toFixed(2),size:blob.size,audio:false,frames:Math.round(A.dur*fps),wh:A.W+'×'+A.H,fps,seekMiss:A.seekMiss||0});
@@ -1366,7 +1370,7 @@ async function playMotion(){stopAnim();if(TPL[S.tpl].anim)return;const tok={};AP
 async function exportMotion(){side(0);stopAnim();const q=+$('vq').value,fps=+$('vfps').value||60,v=$('pVid'),wasLoop=v.loop;
   busy('جاري تجهيز الحركة…',0);
   try{const A=await prepMotion(q),label=`${Math.min(A.W,A.H)>=1000?'1080p':'720p'} · ${fps}fps`;let blob=null;
-    if(window.VideoEncoder&&window.VideoFrame)blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p));
+    if(window.VideoEncoder&&window.VideoFrame)blob=await encodeVerified(A,fps,progFn(label));
     if(!blob){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome حديث');
       blob=await recordRealtime(A,fps,p=>busy(`جاري تسجيل الفيديو (${label})… ${Math.round(Math.min(99,p))}% — خليك في الصفحة`,Math.min(99,p)))}
     busy(0);Object.assign(LASTX,{mode:'حركة فريم بفريم',want:+A.dur.toFixed(2),size:blob.size,audio:false,frames:Math.round(A.dur*fps),wh:A.W+'×'+A.H,fps,seekMiss:A.seekMiss||0});
@@ -1391,9 +1395,11 @@ async function exportVideo(){
     try{
       const ov=await renderOffscreen(false,q),dur=Math.max(.5,v.duration||1),A={kind:'overlay',W,H,ov,dur};
       v.pause();v.loop=false;v.muted=true;
+      const nf=Math.round(dur*fps);
+      if(nf>900)toast(`الفيديو ${Math.round(dur)} ثانية بـ${fps}fps = ${nf} فريم، فهياخد وقت. لو عايزه أسرع اختار 30fps من ⚙️ إعدادات الفيديو.`);
       busy('جاري تجهيز الصوت…',0);
       const audio=await encodeAudio(M.vfile,dur),label=`${Math.min(W,H)>=1000?'1080p':'720p'} · ${fps}fps`;
-      const blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p),audio);
+      const blob=await encodeVerified(A,fps,progFn(label),audio);
       if(blob){busy(0);Object.assign(LASTX,{mode:'فريم بفريم',want:+dur.toFixed(2),size:blob.size,audio:!!audio,seekMiss:A.seekMiss||0,frames:Math.round(dur*fps),wh:W+'×'+H,fps});
         await checkOut(blob,dur);await deliver(blob,`nook-${S.tpl}-${S.fmt}.mp4`);
         if(!audio)toast('اتصدّر من غير صوت — الفيديو الأصلي مافيهوش صوت، أو المتصفح مش بيعرف يرمّزه');
