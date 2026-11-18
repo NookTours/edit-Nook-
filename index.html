@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Templates v30</title>
+<title>Nook Tours Templates v31</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -971,6 +971,8 @@ async function exportPNG(){side(0);busy('جاري تجهيز الصورة…');
   catch(e){console.error(e);toast('فشل التصدير: '+e.message)}finally{busy(0)}}
 
 /* ===== تصدير فيديو بالصوت: نرسم الفيديو + التصميم على كانفاس ونسجّله مع صوت الفيديو ===== */
+/* requestAnimationFrame بيقف لو التبويب في الخلفية — فبنضيف مؤقت احتياطي عشان التسجيل ما يبوظش */
+function nextTick(fn){let c=false;const run=()=>{if(c)return;c=true;fn(performance.now())};requestAnimationFrame(run);setTimeout(run,34)}
 let AC=null,monGain=null,recDest=null;
 function ensureAudio(){if(AC)return true;const A=window.AudioContext||window.webkitAudioContext;if(!A)return false;
   try{AC=new A();const src=AC.createMediaElementSource($('pVid'));monGain=AC.createGain();recDest=AC.createMediaStreamDestination();
@@ -1075,12 +1077,12 @@ function loadScript(src){return new Promise((res,rej)=>{if(window.Mp4Muxer)retur
   s.onload=res;s.onerror=()=>{s.remove();rej(new Error('تعذر تحميل أداة الفيديو — اتأكد من النت'))};document.head.appendChild(s)})}
 function seekTo(v,t){return new Promise(res=>{if(Math.abs(v.currentTime-t)<1e-3&&v.readyState>=2)return res();
   const done=()=>{clearTimeout(g);v.removeEventListener('seeked',done);res()},g=setTimeout(done,2000);v.addEventListener('seeked',done);v.currentTime=t})}
-async function pickAvc(W,H,fps,bitrate){for(const codec of AVC_CODECS){const cfg={codec,width:W,height:H,bitrate,framerate:fps,bitrateMode:'variable',latencyMode:'quality',avc:{format:'avc'}};
+async function pickAvc(W,H,fps,bitrate,safe){for(const codec of AVC_CODECS){const cfg={codec,width:W,height:H,bitrate,framerate:fps,bitrateMode:safe?'constant':'variable',latencyMode:'quality',avc:{format:'avc'}};if(safe)cfg.hardwareAcceleration='prefer-software';
     try{if((await VideoEncoder.isConfigSupported(cfg)).supported)return cfg}catch(e){console.error(codec,e)}}return null}
 
 /* تصدير فريم بفريم بـ WebCodecs → MP4 (H.264) */
-async function encodeOffline(A,fps,prog){await loadScript(MUXER_URL);const {W,H}=A;
-  const cfg=await pickAvc(W,H,fps,Math.round(Math.min(ENC_MAX,W*H*fps*ENC_BPP)));if(!cfg)return null;
+async function encodeOffline(A,fps,prog,safe){await loadScript(MUXER_URL);const {W,H}=A;
+  const cfg=await pickAvc(W,H,fps,Math.round(Math.min(ENC_MAX,W*H*fps*ENC_BPP)),safe);if(!cfg)return null;
   const muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:'avc',width:W,height:H,frameRate:fps},fastStart:'in-memory'});
   let encErr=null;const enc=new VideoEncoder({output:(c,m)=>muxer.addVideoChunk(c,m),error:e=>{encErr=e}});enc.configure(cfg);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d',{alpha:false});x.imageSmoothingQuality='high';
@@ -1088,26 +1090,50 @@ async function encodeOffline(A,fps,prog){await loadScript(MUXER_URL);const {W,H}
   for(let i=0;i<N;i++){if(encErr)throw encErr;const t=i/fps;
     if(useVid)await seekTo(v,t%(v.duration||1));
     drawFrame(x,t,A);
-    const fr=new VideoFrame(cv,{timestamp:Math.round(i*1e6/fps),duration:Math.round(1e6/fps)});enc.encode(fr,{keyFrame:i%(fps*GOP_SEC)===0});fr.close();
+    const fr=new VideoFrame(cv,{timestamp:Math.round(i*1e6/fps),duration:Math.round(1e6/fps)});enc.encode(fr,{keyFrame:i%(safe?fps:fps*GOP_SEC)===0});fr.close();
     while(enc.encodeQueueSize>ENC_QUEUE)await sleep(4);
     if(i%6===0){prog(i/N*100);await sleep(0)}}
   await enc.flush();if(encErr)throw encErr;enc.close();muxer.finalize();
   return new Blob([muxer.target.buffer],{type:'video/mp4'})}
 
+/* بنفتح الفيديو اللي اتعمل ونقارن كام فريم منه بالرسم الأصلي — لو في فريم بايظ (زي اللي بيبوظ بعد ثانيتين) بنعيد بطريقة أأمن */
+async function verifyVideo(blob,A){
+  const v=document.createElement('video');v.muted=true;v.preload='auto';const url=URL.createObjectURL(blob);v.src=url;
+  const seek=t=>new Promise(res=>{let d=false;const f=()=>{if(!d){d=true;v.onseeked=null;res()}};v.onseeked=f;setTimeout(f,4000);v.currentTime=t});
+  try{await new Promise((res,rej)=>{v.onloadedmetadata=res;v.onerror=()=>rej(new Error('bad'));setTimeout(()=>rej(new Error('timeout')),8000)});
+    if(!(v.duration>.5)||Math.abs(v.videoWidth-A.W)>2)return false;
+    const w=48,h=Math.max(8,Math.round(48*A.H/A.W)),a=document.createElement('canvas'),b=document.createElement('canvas'),f=document.createElement('canvas');
+    a.width=b.width=w;a.height=b.height=h;f.width=A.W;f.height=A.H;const ax=a.getContext('2d',{willReadFrequently:true}),bx=b.getContext('2d',{willReadFrequently:true}),fx=f.getContext('2d',{alpha:false});
+    for(const q of [.12,.3,.5,.7,.88,.97]){await seek(Math.max(0,Math.min(v.duration-.05,v.duration*q)));if(v.error)return false;
+      ax.drawImage(v,0,0,w,h);drawFrame(fx,v.currentTime,A);bx.drawImage(f,0,0,w,h);
+      const da=ax.getImageData(0,0,w,h).data,db=bx.getImageData(0,0,w,h).data;let diff=0;for(let i=0;i<da.length;i+=4)diff+=Math.abs(da[i]-db[i])+Math.abs(da[i+1]-db[i+1])+Math.abs(da[i+2]-db[i+2]);
+      if(diff/(w*h*3)>22)return false}
+    return true}
+  catch(e){console.error(e);return false}
+  finally{URL.revokeObjectURL(url)}}
+async function encodeVerified(A,fps,prog){
+  const check=!(S.media==='video'&&M.vurl);
+  for(const safe of [false,true]){
+    const blob=await encodeOffline(A,fps,prog,safe);if(!blob)continue;
+    if(!check)return blob;
+    busy('بتأكد إن الفيديو سليم…',100);
+    if(await verifyVideo(blob,A))return blob;
+    toast(safe?'الطريقة الآمنة طلعت بايظة كمان — بجرّب التسجيل المباشر':'الفيديو طلع بايظ — بجرّب طريقة أأمن')}
+  return null}
 /* بديل للمتصفحات اللي مافيهاش WebCodecs: تسجيل في الوقت الحقيقي */
 async function recordRealtime(A,fps,prog){const {W,H}=A,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d',{alpha:false});
   const mime=REC_MIMES.find(m=>MediaRecorder.isTypeSupported(m)),opts={videoBitsPerSecond:Math.round(Math.min(40e6,W*H*fps*.18))};if(mime)opts.mimeType=mime;
   const rec=new MediaRecorder(cv.captureStream(fps),opts),chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};const stopped=new Promise(r=>rec.onstop=r);
   const v=$('pVid');if(S.media==='video'&&M.vurl){v.currentTime=0;v.loop=true;await v.play().catch(e=>console.error(e))}
   drawFrame(x,0,A);rec.start(250);const t0=performance.now();
-  await new Promise(res=>{const tick=now=>{const t=(now-t0)/1000;drawFrame(x,Math.min(t,A.dur),A);prog(t/A.dur*100);if(t>=A.dur)return res();requestAnimationFrame(tick)};requestAnimationFrame(tick)});
+  await new Promise(res=>{const tick=now=>{const t=(now-t0)/1000;drawFrame(x,Math.min(t,A.dur),A);prog(t/A.dur*100);if(t>=A.dur)return res();nextTick(tick)};nextTick(tick)});
   rec.stop();await stopped;return new Blob(chunks,{type:(rec.mimeType||mime||'video/webm').split(';')[0]})}
 
 async function exportAnim(){side(0);stopAnim();const P=geo(),q=+$('vq').value,fps=+$('vfps').value||60,v=$('pVid'),wasLoop=v.loop;
   busy('جاري تجهيز الأنيميشن…',0);
   try{const A=await prepAnim(q),label=`${Math.min(A.W,A.H)>=1000?'1080p':'720p'} · ${fps}fps`;
     let blob=null;
-    if(window.VideoEncoder&&window.VideoFrame){blob=await encodeOffline(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p))}
+    if(window.VideoEncoder&&window.VideoFrame){blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p))}
     if(!blob){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome حديث');
       blob=await recordRealtime(A,fps,p=>busy(`جاري تسجيل الفيديو (${label})… ${Math.round(Math.min(99,p))}% — خليك في الصفحة`,Math.min(99,p)))}
     busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}.${blob.type.indexOf('mp4')>=0?'mp4':'webm'}`)}
@@ -1298,7 +1324,7 @@ async function playMotion(){stopAnim();if(TPL[S.tpl].anim)return;const tok={};AP
 async function exportMotion(){side(0);stopAnim();const q=+$('vq').value,fps=+$('vfps').value||60,v=$('pVid'),wasLoop=v.loop;
   busy('جاري تجهيز الحركة…',0);
   try{const A=await prepMotion(q),label=`${Math.min(A.W,A.H)>=1000?'1080p':'720p'} · ${fps}fps`;let blob=null;
-    if(window.VideoEncoder&&window.VideoFrame)blob=await encodeOffline(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p));
+    if(window.VideoEncoder&&window.VideoFrame)blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p));
     if(!blob){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome حديث');
       blob=await recordRealtime(A,fps,p=>busy(`جاري تسجيل الفيديو (${label})… ${Math.round(Math.min(99,p))}% — خليك في الصفحة`,Math.min(99,p)))}
     busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}-motion.${blob.type.indexOf('mp4')>=0?'mp4':'webm'}`)}
@@ -1338,11 +1364,11 @@ async function exportVideo(){
     rec.start(250);
     try{await v.play()}catch(_){v.muted=true;noAudio=true;await v.play()}
     await new Promise(res=>{
-      const guard=setTimeout(res,(dur+6)*1000);
+      const guard=setTimeout(res,(dur+6)*1000);v.addEventListener('ended',()=>{clearTimeout(guard);res()},{once:true});
       const UI_EVERY=250;let lastUI=0;
       const tick=now=>{x.fillStyle='#000';x.fillRect(0,0,W,H);coverDraw(x,v,v.videoWidth,v.videoHeight,W,H);x.drawImage(ov,0,0,W,H);
         if(!now||now-lastUI>UI_EVERY){lastUI=now||0;const pc=Math.min(99,v.currentTime/dur*100);busy(`جاري تسجيل الفيديو (${H>=1000?'1080p':'720p'} · ${fps}fps)… ${Math.round(pc)}% — خليك في الصفحة`,pc)}
-        if(v.ended||v.currentTime>=dur-.05){clearTimeout(guard);res();return}requestAnimationFrame(tick)};
+        if(v.ended||v.currentTime>=dur-.05){clearTimeout(guard);res();return}nextTick(tick)};
       tick()});
     await sleep(300);rec.stop();await stopped;
     const type=(rec.mimeType||mime||'video/webm').split(';')[0],blob=new Blob(chunks,{type});
