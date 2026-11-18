@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Templates v29</title>
+<title>Nook Tours Templates v30</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -239,7 +239,6 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
     <button class="btn" type="button" onclick="exportPNG()">🖼️ تحميل PNG</button>
     <button class="btn" type="button" id="bVid" style="display:none" onclick="exportVideo()">🎬 تصدير فيديو (بالصوت)</button>
-    <button class="btn o" type="button" onclick="exportHTML()">⬇️ HTML للـ Canva</button>
   </aside>
 
   <main id="pv">
@@ -970,10 +969,6 @@ async function exportPNG(){side(0);busy('جاري تجهيز الصورة…');
   try{const cv=await renderOffscreen(true,1),blob=await new Promise(r=>cv.toBlob(r,'image/png'));
     if(!blob)throw new Error('الصورة كبيرة على الجهاز');busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}.png`)}
   catch(e){console.error(e);toast('فشل التصدير: '+e.message)}finally{busy(0)}}
-
-function exportHTML(){const P=geo(),still=mediaCanvas(P.W,P.H).toDataURL('image/jpeg',.9),ui=buildUI(curData(),P).split(LOGO_URL).join(LOGO_DATA);
-  const html=`<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>Nook Tours Ad</title><link href="${fontsURL([FONT_DEF.ar,FONT_DEF.en,S.fAr,S.fEn])}" rel="stylesheet"><style>body{margin:0;background:#0C2840;display:flex;justify-content:center;align-items:center;min-height:100vh}</style></head><body><div data-document-role="page" style="width:${P.W}px;height:${P.H}px;position:relative;overflow:hidden;font-family:'Cairo',sans-serif;direction:rtl;background:#000"><img src="${still}" style="position:absolute;left:0;top:0;width:100%;height:100%" alt="">${ui}</div></body></html>`;
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));a.download=`nook-${S.tpl}.html`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
 
 /* ===== تصدير فيديو بالصوت: نرسم الفيديو + التصميم على كانفاس ونسجّله مع صوت الفيديو ===== */
 let AC=null,monGain=null,recDest=null;
