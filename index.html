@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0C2840">
-<title>Nook Tours Templates v32</title>
+<title>Nook Tours Templates v33</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -239,6 +239,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
     <button class="btn" type="button" onclick="exportPNG()">🖼️ تحميل PNG</button>
     <button class="btn" type="button" id="bVid" style="display:none" onclick="exportVideo()">🎬 تصدير فيديو (بالصوت)</button>
+    <button class="btn o" type="button" id="bDiag" style="margin-top:6px">🩺 فحص التصدير</button>
   </aside>
 
   <main id="pv">
@@ -263,6 +264,7 @@ input[type=range]{width:100%;accent-color:var(--gold)}
 
 <div id="busy"><div id="bt"></div><div class="bar"><i id="bp"></i></div></div>
 <div id="toast"></div>
+<div id="diag" style="display:none;position:fixed;inset:0;z-index:60;background:rgba(6,14,26,.92);padding:18px;overflow:auto"><div style="max-width:620px;margin:0 auto"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b style="color:#D9B07A;font:800 16px var(--ar)">🩺 فحص التصدير</b><button class="btn o" type="button" style="width:auto;padding:6px 14px" onclick="$('diag').style.display='none'">إغلاق</button></div><pre id="diagT" style="white-space:pre-wrap;color:#e8eef6;background:#0C2840;border:1px solid rgba(191,140,78,.4);border-radius:10px;padding:12px;font:600 12px/1.8 Montserrat,monospace;direction:ltr;text-align:left"></pre><button class="btn" type="button" id="diagCopy" style="margin-top:8px">📋 انسخ التقرير</button></div></div>
 <div id="save">
   <div class="m">اضغط مطوّلاً على الصورة/الفيديو واختر «حفظ» — أو استخدم الأزرار</div>
   <div id="saveBox"></div>
@@ -950,6 +952,7 @@ async function renderOffscreen(withMedia,scale,prep){
     return await html2canvas(host,{width:W,height:H,windowWidth:W,windowHeight:H,scale:scale||1,useCORS:true,backgroundColor:withMedia?'#000':null,logging:false,imageTimeout:15000,ignoreElements:e=>e.id==='app'})
   }finally{host.remove()}}
 
+const LASTX={};
 let curBlobURL='';
 function closeSave(){$('save').style.display='none';$('saveBox').innerHTML='';if(curBlobURL){URL.revokeObjectURL(curBlobURL);curBlobURL=''}}
 function showSave(blob,name){curBlobURL=URL.createObjectURL(blob);const isV=blob.type.indexOf('video')===0;
@@ -958,6 +961,17 @@ function showSave(blob,name){curBlobURL=URL.createObjectURL(blob);const isV=blob
   const f=new File([blob],name,{type:blob.type}),can=navigator.canShare&&navigator.canShare({files:[f]});
   $('shBtn').style.display=can?'':'none';$('shBtn').onclick=()=>navigator.share({files:[f],title:'Nook Tours'}).catch(()=>{});
   $('save').style.display='flex'}
+/* بنفتح الملف اللي اتعمل ونشوف مدته الحقيقية قبل ما ننزله، ونقول للمستخدم طلع إيه */
+function probe(blob){return new Promise(res=>{const v=document.createElement('video');v.muted=true;v.preload='metadata';
+  const url=URL.createObjectURL(blob),done=r=>{URL.revokeObjectURL(url);res(r)};
+  v.onloadedmetadata=()=>done({dur:v.duration,w:v.videoWidth,h:v.videoHeight});
+  v.onerror=()=>done(null);setTimeout(()=>done(null),9000);v.src=url})}
+async function checkOut(blob,want){const m=await probe(blob);
+  LASTX.got=m?+m.dur.toFixed(2):'مش راضي يفتح';LASTX.gotWH=m?m.w+'×'+m.h:'—';
+  if(!m){toast('⚠️ الملف طلع مش راضي يفتح — دوس «فحص التصدير» وابعتلي الصورة');return}
+  if(!isFinite(m.dur)||m.dur>want*1.4+1.5||m.dur<want*.6)toast(`⚠️ المدة طلعت ${m.dur.toFixed(1)} ثانية بدل ${want.toFixed(1)} — دوس «فحص التصدير» وابعتلي الصورة`);
+  else toast(`✅ تمام: ${m.dur.toFixed(1)} ثانية · ${m.w}×${m.h}${LASTX.audio?' · بصوت':''}`)}
+
 async function deliver(blob,name){
   if(isMobile()){const f=new File([blob],name,{type:blob.type});
     if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'Nook Tours'});return}catch(e){if(e.name==='AbortError')return}}
@@ -1112,7 +1126,7 @@ async function encodeOffline(A,fps,prog,safe,audio){await loadScript(MUXER_URL);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d',{alpha:false});x.imageSmoothingQuality='high';
   const N=Math.round(A.dur*fps),v=$('pVid'),useVid=S.media==='video'&&M.vurl;if(useVid)v.pause();
   for(let i=0;i<N;i++){if(encErr)throw encErr;const t=i/fps;
-    if(useVid)await seekTo(v,t%(v.duration||1));
+    if(useVid){const want=t%(v.duration||1);await seekTo(v,want);if(Math.abs(v.currentTime-want)>1.6/fps)A.seekMiss=(A.seekMiss||0)+1}
     drawFrame(x,t,A);
     const fr=new VideoFrame(cv,{timestamp:Math.round(i*1e6/fps),duration:Math.round(1e6/fps)});enc.encode(fr,{keyFrame:i%(safe?fps:fps*GOP_SEC)===0});fr.close();
     while(enc.encodeQueueSize>ENC_QUEUE)await sleep(4);
@@ -1163,7 +1177,8 @@ async function exportAnim(){side(0);stopAnim();const P=geo(),q=+$('vq').value,fp
     if(window.VideoEncoder&&window.VideoFrame){blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p))}
     if(!blob){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome حديث');
       blob=await recordRealtime(A,fps,p=>busy(`جاري تسجيل الفيديو (${label})… ${Math.round(Math.min(99,p))}% — خليك في الصفحة`,Math.min(99,p)))}
-    busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}.${blob.type.indexOf('mp4')>=0?'mp4':'webm'}`)}
+    busy(0);Object.assign(LASTX,{mode:'أنيميشن فريم بفريم',want:+A.dur.toFixed(2),size:blob.size,audio:false,frames:Math.round(A.dur*fps),wh:A.W+'×'+A.H,fps,seekMiss:A.seekMiss||0});
+    await checkOut(blob,A.dur);await deliver(blob,`nook-${S.tpl}-${S.fmt}.${blob.type.indexOf('mp4')>=0?'mp4':'webm'}`)}
   catch(e){console.error(e);toast('فشل تصدير الأنيميشن: '+e.message)}
   finally{busy(0);v.loop=wasLoop;if(S.media==='video'&&M.vurl){v.muted=!S.sound;v.play().catch(e=>console.error(e))}}}
 
@@ -1354,7 +1369,8 @@ async function exportMotion(){side(0);stopAnim();const q=+$('vq').value,fps=+$('
     if(window.VideoEncoder&&window.VideoFrame)blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p));
     if(!blob){if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream)throw new Error('المتصفح ده مش بيدعم تصدير الفيديو — استخدم Chrome حديث');
       blob=await recordRealtime(A,fps,p=>busy(`جاري تسجيل الفيديو (${label})… ${Math.round(Math.min(99,p))}% — خليك في الصفحة`,Math.min(99,p)))}
-    busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}-motion.${blob.type.indexOf('mp4')>=0?'mp4':'webm'}`)}
+    busy(0);Object.assign(LASTX,{mode:'حركة فريم بفريم',want:+A.dur.toFixed(2),size:blob.size,audio:false,frames:Math.round(A.dur*fps),wh:A.W+'×'+A.H,fps,seekMiss:A.seekMiss||0});
+    await checkOut(blob,A.dur);await deliver(blob,`nook-${S.tpl}-${S.fmt}-motion.${blob.type.indexOf('mp4')>=0?'mp4':'webm'}`)}
   catch(e){console.error(e);toast('فشل تصدير الحركة: '+e.message)}
   finally{busy(0);v.loop=wasLoop;if(S.media==='video'&&M.vurl){v.muted=!S.sound;v.play().catch(()=>{})}}}
 
@@ -1364,6 +1380,9 @@ async function exportVideo(){
   if(TPL[S.tpl].anim)return exportAnim();
   const v=$('pVid');
   if(!M.vurl||S.media!=='video')return toast('ارفع فيديو الأول من تبويب 🎥 فيديو');
+  if(!v.videoWidth)return toast('المتصفح مش قادر يقرا الفيديو ده (غالباً HEVC من الأيفون) — حوّله MP4 H.264 الأول');
+  if(!isFinite(v.duration)||v.duration<=0)return toast('مش عارف طول الفيديو ده — افتحه مرة في المعاينة لحد ما يخلص وجرّب تاني');
+  if(v.duration>90&&!confirm('الفيديو '+Math.round(v.duration)+' ثانية. التصدير هياخد وقت طويل. أكمّل؟'))return;
   /* الطريقة الأساسية: فريم بفريم (مفيش فريمات بتضيع ولا مدة غلط) + صوت الفيديو الأصلي */
   if(window.VideoEncoder&&window.VideoFrame){
     side(0);stopAnim();
@@ -1375,7 +1394,8 @@ async function exportVideo(){
       busy('جاري تجهيز الصوت…',0);
       const audio=await encodeAudio(M.vfile,dur),label=`${Math.min(W,H)>=1000?'1080p':'720p'} · ${fps}fps`;
       const blob=await encodeVerified(A,fps,p=>busy(`جاري عمل الفيديو (${label})… ${Math.round(p)}%`,p),audio);
-      if(blob){busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}.mp4`);
+      if(blob){busy(0);Object.assign(LASTX,{mode:'فريم بفريم',want:+dur.toFixed(2),size:blob.size,audio:!!audio,seekMiss:A.seekMiss||0,frames:Math.round(dur*fps),wh:W+'×'+H,fps});
+        await checkOut(blob,dur);await deliver(blob,`nook-${S.tpl}-${S.fmt}.mp4`);
         if(!audio)toast('اتصدّر من غير صوت — الفيديو الأصلي مافيهوش صوت، أو المتصفح مش بيعرف يرمّزه');
         return}
       toast('بجرّب طريقة التسجيل المباشر…')}
@@ -1416,10 +1436,34 @@ async function exportVideo(){
       tick()});
     await sleep(300);rec.stop();await stopped;
     const type=(rec.mimeType||mime||'video/webm').split(';')[0],blob=new Blob(chunks,{type});
-    busy(0);await deliver(blob,`nook-${S.tpl}-${S.fmt}.${type.indexOf('mp4')>=0?'mp4':'webm'}`);
+    busy(0);Object.assign(LASTX,{mode:'تسجيل مباشر (احتياطي)',want:+dur.toFixed(2),size:blob.size,audio:!noAudio,wh:W+'×'+H,fps});
+    await checkOut(blob,dur);await deliver(blob,`nook-${S.tpl}-${S.fmt}.${type.indexOf('mp4')>=0?'mp4':'webm'}`);
     if(noAudio)toast('اتسجل من غير صوت — المتصفح منع التقاط الصوت');
   }catch(e){console.error(e);toast('فشل تصدير الفيديو: '+e.message)}
   finally{v.pause();v.loop=wasLoop;v.muted=!S.sound;if(monGain)monGain.gain.value=1;v.currentTime=0;v.play().catch(()=>{});busy(0)}}
+
+/* ================= فحص التصدير: بيقول إيه المدعوم على الجهاز ده وإيه اللي حصل في آخر تصدير ================= */
+async function diagnose(){
+  const L=[],v=$('pVid'),yn=b=>b?'YES':'NO';
+  L.push('Nook Tours '+(document.title.match(/v\d+/)||['?'])[0]);
+  L.push('UA: '+navigator.userAgent.replace(/^Mozilla\/5\.0 /,''));
+  L.push('VideoEncoder: '+yn(!!window.VideoEncoder)+'  AudioEncoder: '+yn(!!window.AudioEncoder));
+  L.push('MediaRecorder: '+yn(!!window.MediaRecorder));
+  try{const P=geo(),q=+$('vq').value,c=await pickAvc(even(P.W*q),even(P.H*q),+$('vfps').value||60,8e6,false);
+    L.push('H.264 '+even(P.W*q)+'x'+even(P.H*q)+'@'+($('vfps').value)+': '+(c?c.codec:'NOT SUPPORTED'))}catch(e){L.push('H.264 check failed: '+e.message)}
+  try{L.push('AAC: '+yn((await AudioEncoder.isConfigSupported({codec:'mp4a.40.2',sampleRate:48000,numberOfChannels:2,bitrate:192000})).supported))}catch(e){L.push('AAC: NO')}
+  L.push('--- source ---');
+  if(S.media==='video'&&M.vurl){L.push('file: '+(M.vfile?M.vfile.name+' · '+(M.vfile.type||'?')+' · '+(M.vfile.size/1048576).toFixed(1)+'MB':'?'));
+    L.push('readable: '+v.videoWidth+'x'+v.videoHeight+' · '+(isFinite(v.duration)?v.duration.toFixed(2)+'s':'UNKNOWN LENGTH')+' · readyState '+v.readyState)}
+  else L.push('no background video (photo mode)');
+  L.push('template: '+S.tpl+' · size: '+S.fmt+' · quality: '+$('vq').value+' · fps: '+$('vfps').value);
+  L.push('--- last export ---');
+  if(!LASTX.mode)L.push('(مفيش تصدير لسه — صدّر مرة وافتح الفحص تاني)');
+  else{L.push('path: '+LASTX.mode);L.push('expected: '+LASTX.want+'s · got: '+LASTX.got+'s');
+    L.push('out: '+(LASTX.gotWH||'?')+' · '+((LASTX.size||0)/1048576).toFixed(2)+'MB · audio: '+yn(LASTX.audio));
+    if(LASTX.frames!==undefined)L.push('frames: '+LASTX.frames+' · bad seeks: '+(LASTX.seekMiss||0))}
+  const t=L.join('\n');$('diagT').textContent=t;$('diag').style.display='block';
+  $('diagCopy').onclick=()=>{navigator.clipboard.writeText(t).then(()=>toast('اتنسخ ✓'),()=>toast('انسخه بإيدك'))}}
 
 /* ================= تهيئة ================= */
 async function prepLogo(){const im=new Image();await new Promise(r=>{im.onload=im.onerror=r;im.src=LOGO_SRC});
@@ -1450,6 +1494,7 @@ function bind(){
   $('fEn').onchange=e=>setFont('en',e.target.value);
   $('aPlay').onclick=()=>{side(0);playAnim()};
   $('mPlay').onclick=()=>{side(0);playMotion()};$('mExport').onclick=exportMotion;
+  $('bDiag').onclick=()=>{side(0);diagnose()};
   $('aDur').onchange=()=>playAnim();
   $('aTheme').onchange=()=>{render();playAnim()};
   $('fields').addEventListener('input',e=>{const k=e.target.dataset.k;if(k){S.store[S.tpl][k]=e.target.value;render()}});
